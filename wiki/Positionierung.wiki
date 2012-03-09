@@ -1,0 +1,8 @@
+X Koordinate 
+  rechts von Person bis +1
+  links von Person bis -1
+Y Koordinate
+  oben von Person bis +1
+  unten von Person bis -1
+Z Koordinate
+  scheint der Abstand zu Kinect in Metern zu sein
