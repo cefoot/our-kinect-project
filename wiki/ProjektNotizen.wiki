@@ -1,7 +1,7 @@
-*Gestenerkennung 2D
-*Gestenerkennung 3D
-*Facetracking/Eyetracking
-*Menübedienung/Userinterface
-*Augmented Reality (3D Rendering)
-*Object-Tracking
-*Finger-Tracking
+ * Gestenerkennung 2D
+ * Gestenerkennung 3D
+ * Facetracking/Eyetracking
+ * Menübedienung/Userinterface
+ * Augmented Reality (3D Rendering)
+ * Object-Tracking
+ * Finger-Tracking
