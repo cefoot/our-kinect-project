@@ -1,7 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kinect", "Kinect\Kinect.csproj", "{35330457-005F-43C6-BF88-2CFAC73B79F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectStart", "Kinect\KinectStart.csproj", "{35330457-005F-43C6-BF88-2CFAC73B79F2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{019C0B21-1EE2-4A95-A296-4C5CE823F740}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectPong", "KinectPong\KinectPong\KinectPong.csproj", "{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "KinectPongContent", "KinectPong\KinectPongContent\KinectPongContent.contentproj", "{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +23,12 @@ Global
 		{35330457-005F-43C6-BF88-2CFAC73B79F2}.Debug|x86.Build.0 = Debug|x86
 		{35330457-005F-43C6-BF88-2CFAC73B79F2}.Release|x86.ActiveCfg = Release|x86
 		{35330457-005F-43C6-BF88-2CFAC73B79F2}.Release|x86.Build.0 = Release|x86
+		{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}.Debug|x86.ActiveCfg = Debug|x86
+		{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}.Debug|x86.Build.0 = Debug|x86
+		{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}.Release|x86.ActiveCfg = Release|x86
+		{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}.Release|x86.Build.0 = Release|x86
+		{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}.Debug|x86.ActiveCfg = Debug|x86
+		{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

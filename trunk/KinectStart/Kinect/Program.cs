@@ -5,7 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Coding4Fun.Kinect.WinForm;
 using Microsoft.Kinect;
+using Coding4Fun.Kinect.Common;
 
 namespace Kinect
 {
@@ -60,6 +62,17 @@ namespace Kinect
                                                             }));
                 //Cursor.Position = new Point(head.Position.X, head.Position.Y);
             }
+        }
+
+        private static Point CalculatePoint(Joint handRight)
+        {
+            var screen = Screen.PrimaryScreen;
+            _mainForm.Invoke(new MethodInvoker(() => screen = Screen.FromPoint(_mainForm.Location)));
+
+            var scaleTo = handRight.ScaleTo(screen.Bounds.Width, screen.Bounds.Height);
+
+            return new Point((int)scaleTo.Position.X + screen.Bounds.Left, (int)scaleTo.Position.Y);
+
         }
 
         private static Point CalculatePoint(SkeletonPoint position)
