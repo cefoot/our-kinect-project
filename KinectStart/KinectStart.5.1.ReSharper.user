@@ -1,0 +1,181 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="2174" fromTop="24" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="1883" fromTop="16" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="264" fromTop="7" />
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="3037" fromTop="27" />
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="3140" fromTop="16" />
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="2613" fromTop="29" />
+      <File id="35330457-005F-43C6-BF88-2CFAC73B79F2/f:Program.cs" caret="2174" fromTop="24" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6469" fromTop="14" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6469" fromTop="13" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6469" fromTop="102" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6469" fromTop="107" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="2401" fromTop="33" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="429" fromTop="2" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="2774" fromTop="19" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="781" fromTop="24" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6364" fromTop="25" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4416" fromTop="4" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4416" fromTop="3" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4416" fromTop="12" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4416" fromTop="14" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4416" fromTop="9" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6158" fromTop="21" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="948" fromTop="13" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="6426" fromTop="30" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="2876" fromTop="24" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="4670" fromTop="6" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="1617" fromTop="9" />
+      <File id="391FF3F9-48E5-45A2-9A8E-EE69B0A328DA/f:Game1.cs" caret="1883" fromTop="16" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir>C:\Program Files (x86)\NUnit 2.5.4\bin\net-2.0\</NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="Coding4Fun" priority="0" />
+      <Item value="Kinect" priority="1" />
+      <Item value="Common" priority="1" />
+      <Item value="using" priority="1" />
+      <Item value="handRight" priority="0" />
+      <Item value="Point`0" priority="0" />
+      <Item value="screen" priority="1" />
+      <Item value="prop" priority="0" />
+      <Item value="String`0" priority="0" />
+      <Item value="psvm" priority="0" />
+      <Item value="Microsoft" priority="0" />
+      <Item value="KinectSensor`0" priority="0" />
+      <Item value="kinectSensor" priority="3" />
+      <Item value="e" priority="0" />
+      <Item value="openSkeletonFrame" priority="5" />
+      <Item value="new" priority="2" />
+      <Item value="Skeleton" priority="0" />
+      <Item value="skelet" priority="0" />
+      <Item value="Tracked" priority="0" />
+      <Item value="List" priority="0" />
+      <Item value="Array`0" priority="0" />
+      <Item value="skeletsData" priority="0" />
+      <Item value="ToList`1" priority="0" />
+      <Item value="trackedSkelets" priority="4" />
+      <Item value="for" priority="0" />
+      <Item value="i" priority="0" />
+      <Item value="if" priority="1" />
+      <Item value="enumerator" priority="1" />
+      <Item value="return" priority="1" />
+      <Item value="var" priority="0" />
+      <Item value="player1" priority="2" />
+      <Item value="player2" priority="0" />
+      <Item value="Coding4Fun.Kinect" priority="0" />
+      <Item value="JointType`0" priority="1" />
+      <Item value="plyr1Hnd" priority="1" />
+      <Item value="plyr1Head" priority="0" />
+      <Item value="plyr2Head" priority="1" />
+      <Item value="graphics" priority="3" />
+      <Item value="else" priority="0" />
+      <Item value="GraphicsDevice" priority="1" />
+      <Item value="Rectangle" priority="0" />
+      <Item value="rectangleRight" priority="2" />
+      <Item value="dummyTexture" priority="1" />
+      <Item value="Texture2D" priority="0" />
+      <Item value="rectangleLeft" priority="1" />
+      <Item value="Color`0" priority="0" />
+      <Item value="null" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.Joint">
+      <Item value="ScaleTo`0" priority="3" />
+      <Item value="Position" priority="4" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Screen">
+      <Item value="Bounds" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Drawing.Rectangle">
+      <Item value="Width" priority="0" />
+      <Item value="Height" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.SkeletonPoint">
+      <Item value="X" priority="2" />
+      <Item value="Y" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Kinect.KinectSensor">
+      <Item value="KinectSensors" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.KinectSensor">
+      <Item value="SkeletonStream" priority="1" />
+      <Item value="SkeletonFrameReady" priority="0" />
+      <Item value="Start`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.SkeletonStream">
+      <Item value="Enable`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.SkeletonFrameReadyEventArgs">
+      <Item value="OpenSkeletonFrame`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.SkeletonFrame">
+      <Item value="CopySkeletonDataTo`0" priority="0" />
+      <Item value="SkeletonArrayLength" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.List`1">
+      <Item value="Where`1" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.Skeleton">
+      <Item value="TrackingState" priority="0" />
+      <Item value="Joints" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IEnumerable`1">
+      <Item value="Count`1" priority="0" />
+      <Item value="ElementAt`1" priority="0" />
+      <Item value="GetEnumerator`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IEnumerator`1">
+      <Item value="MoveNext`0" priority="0" />
+      <Item value="Current" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Kinect.JointType">
+      <Item value="Head" priority="0" />
+      <Item value="HandRight" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Xna.Framework.GraphicsDeviceManager">
+      <Item value="GraphicsDevice" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Xna.Framework.Graphics.GraphicsDevice">
+      <Item value="PresentationParameters" priority="1" />
+      <Item value="Viewport" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Xna.Framework.Graphics.PresentationParameters">
+      <Item value="BackBufferWidth" priority="1" />
+      <Item value="BackBufferHeight" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Xna.Framework.Rectangle">
+      <Item value="Width" priority="1" />
+      <Item value="Left" priority="0" />
+      <Item value="Height" priority="0" />
+      <Item value="Y" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Xna.Framework.Color">
+      <Item value="Chocolate" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Xna.Framework.Graphics.Viewport">
+      <Item value="ToString`0" priority="0" />
+      <Item value="TitleSafeArea" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+</Configuration>
