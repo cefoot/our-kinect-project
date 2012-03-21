@@ -23,9 +23,15 @@ namespace KinectPong
         SpriteBatch spriteBatch;
 
         Texture2D dummyTexture;
-        Rectangle rectangleLeft;
-        Rectangle rectangleRight;
+        Rectangle paddleLeft;
+        Rectangle paddleRight;
         Color Colori;
+        private Texture2D _ballTexture;
+        private Ball _ball;
+        private SoundEffect _boomSound;
+        private SpriteFont _spriteFont;
+
+        protected Vector2 BallStartPosition { get; set; }
 
 
         public Game1()
@@ -97,17 +103,9 @@ namespace KinectPong
             
         }
 
-        protected int RightPlayerY
-        {
-            get { return rectangleRight.Y; }
-            set { rectangleRight.Y = value; }
-        }
+        protected int RightPlayerY { get; set; }
 
-        protected int LeftPlayerY
-        {
-            get { return rectangleLeft.Y; }
-            set { rectangleLeft.Y = value; }
-        }
+        protected int LeftPlayerY { get; set; }
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -117,12 +115,12 @@ namespace KinectPong
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            rectangleLeft = new Rectangle(5, 10, 50, 100);
-            rectangleRight = new Rectangle(
-                GraphicsDevice.Viewport.TitleSafeArea.Width - rectangleLeft.Width - rectangleLeft.Left, 
+            paddleLeft = new Rectangle(5, 10, 10, 100);
+            paddleRight = new Rectangle(
+                GraphicsDevice.Viewport.TitleSafeArea.Width - paddleLeft.Width - paddleLeft.Left, 
                 10,
-                rectangleLeft.Width,
-                rectangleLeft.Height);
+                paddleLeft.Width,
+                paddleLeft.Height);
             dummyTexture = new Texture2D(GraphicsDevice, 50, 100);
             var data = new Color[50 * 100];
             for (int i = 0; i < data.Length; ++i) data[i] = Color.Chocolate;
@@ -130,7 +128,15 @@ namespace KinectPong
 
             Colori = Color.Chocolate;
             //dummyTexture.SetData(new Color[] { Color.Red });
+            _ballTexture = Content.Load<Texture2D>("ball");
+            
 
+            BallStartPosition = new Vector2(
+                GraphicsDevice.Viewport.TitleSafeArea.Width/2f, GraphicsDevice.Viewport.TitleSafeArea.Height/2f);
+            _ball = new Ball(BallStartPosition, CreateNewSpeed());
+
+            _boomSound = Content.Load<SoundEffect>("boom");
+            _spriteFont = Content.Load<SpriteFont>("Arial");
 
 
             // TODO: use this.Content to load your game content here
@@ -145,6 +151,9 @@ namespace KinectPong
             // TODO: Unload any non ContentManager content here
         }
 
+        private Vector2 LeftPaddleSpeed { get; set; }
+        private Vector2 RightPaddleSpeed { get; set; }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -156,9 +165,65 @@ namespace KinectPong
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
+            LeftPaddleSpeed = new Vector2
+                                  {
+                                      X = 0,
+                                      Y = (float) ((LeftPlayerY - paddleLeft.Y)/gameTime.ElapsedGameTime.TotalSeconds)
+                                  };
+            RightPaddleSpeed = new Vector2
+            {
+                X = 0,
+                Y = (float)((RightPlayerY - paddleRight.Y) / gameTime.ElapsedGameTime.TotalSeconds)
+            };
+            paddleLeft.Y = LeftPlayerY;
+            paddleRight.Y = RightPlayerY;
+
+
+            var nextStep = _ball.GetNextStep(gameTime);
+            var rectangle = _ball.CreateFrame(nextStep);
+            if (rectangle.Top < 0 || rectangle.Bottom > GraphicsDevice.Viewport.TitleSafeArea.Height)
+            {
+                _ball.Speed.Y *= -1;
+            }
+            if (rectangle.Intersects(paddleRight))
+            {
+                _ball.Speed.X *= -1.1F;
+                _ball.Speed += RightPaddleSpeed;
+            }
+            else if (rectangle.Intersects(paddleLeft))
+            {
+                _ball.Speed.X *= -1.1F;
+                _ball.Speed += LeftPaddleSpeed;
+            }
+            else if (rectangle.Left < paddleLeft.Right)
+            {
+                GameOver();
+                RightScore++;
+            }
+            else if(rectangle.Right > paddleRight.Left)
+            {
+                GameOver();
+                LeftScore++;
+            }
+            _ball.Step(gameTime);
 
             base.Update(gameTime);
+        }
+
+        protected int LeftScore { get; set; }
+
+        protected int RightScore { get; set; }
+
+        private void GameOver()
+        {
+            _boomSound.Play();
+            _ball.Speed = CreateNewSpeed();
+            _ball.Location = BallStartPosition;
+        }
+
+        private Vector2 CreateNewSpeed()
+        {
+            return new Vector2(200f, 200f);
         }
 
         /// <summary>
@@ -170,12 +235,82 @@ namespace KinectPong
             //GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(dummyTexture, rectangleLeft, Colori);
-            spriteBatch.Draw(dummyTexture, rectangleRight, Colori);
+            spriteBatch.Draw(dummyTexture, paddleLeft, Colori);
+            spriteBatch.Draw(dummyTexture, paddleRight, Colori);
+            spriteBatch.Draw(_ballTexture, _ball.Location, null, Color.White, 0f, new Vector2(108f, 108f), 0.5f, SpriteEffects.None, 0);
+            var scoreString = String.Format("{0}:{1}",LeftScore,RightScore);
+            var measureString = _spriteFont.MeasureString(scoreString);
+            measureString.Y = 10;
+            measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
+
+            spriteBatch.DrawString(_spriteFont, scoreString, measureString, Color.White);
+            DrawDebugStuff(spriteBatch);
             spriteBatch.End();
 
 
             //base.Draw(gameTime);
+        }
+
+        private void DrawDebugStuff(SpriteBatch spriteBatch)
+        {
+            int i = 1;
+            var msg = String.Format("Ball Position:{0}", _ball.Location);
+            var measureString = _spriteFont.MeasureString(msg);
+            measureString.Y = GraphicsDevice.Viewport.TitleSafeArea.Height - measureString.Y * i++;
+            measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
+            spriteBatch.DrawString(_spriteFont, msg, measureString, Color.White);
+
+            msg = String.Format("Ball Speed:{0}", _ball.Speed);
+            measureString = _spriteFont.MeasureString(msg);
+            measureString.Y = GraphicsDevice.Viewport.TitleSafeArea.Height - measureString.Y * i++;
+            measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
+            spriteBatch.DrawString(_spriteFont, msg, measureString, Color.White);
+
+            msg = String.Format("PaddleSpeed:Left{0} Right{1}", LeftPaddleSpeed, RightPaddleSpeed);
+            measureString = _spriteFont.MeasureString(msg);
+            measureString.Y = GraphicsDevice.Viewport.TitleSafeArea.Height - measureString.Y * i++;
+            measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
+            spriteBatch.DrawString(_spriteFont, msg, measureString, Color.White);
+        }
+
+        public class Ball
+        {
+            public Ball(Vector2 startPosition, Vector2 startSpeed)
+            {
+                Location = startPosition;
+                Speed = startSpeed;
+            }
+
+            public Rectangle Frame
+            {
+                get {
+                    return CreateFrame(Location);
+                }
+            }
+
+            public Rectangle CreateFrame(Vector2 location)
+            {
+                var frame = new Rectangle(
+                    x:(int)location.X - 54,
+                    y:(int)location.Y -54,
+                    width:108,
+                    height:108
+                    );
+                return frame;
+            }
+
+            public Vector2 Location { get; set; }
+            public Vector2 Speed;
+
+            public Vector2 GetNextStep(GameTime gameTime)
+            {
+                return Location + Speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            }
+
+            public void Step(GameTime gameTime)
+            {
+                Location = GetNextStep(gameTime);
+            }
         }
     }
 }
