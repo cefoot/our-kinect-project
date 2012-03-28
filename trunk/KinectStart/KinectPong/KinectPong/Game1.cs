@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Coding4Fun.Kinect.Wpf;
+using Kinect;
 using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -30,6 +31,7 @@ namespace KinectPong
         private Ball _ball;
         private SoundEffect _boomSound;
         private SpriteFont _spriteFont;
+        private float TmpPos;
 
         protected Vector2 BallStartPosition { get; set; }
 
@@ -82,25 +84,52 @@ namespace KinectPong
         private void UpdateCoords(Skeleton player1, Skeleton player2)
         {
             var plyr1Head = player1.Joints[JointType.Head];
-            var plyr1Hnd = player1.Joints[JointType.HandRight].ScaleTo(
-            GraphicsDevice.Viewport.TitleSafeArea.Width ,
-            GraphicsDevice.Viewport.TitleSafeArea.Height);
+            var plyr1Hnd = Optimize(player1.Joints[JointType.HandRight]).ScaleOwn(
+                GraphicsDevice.Viewport.TitleSafeArea.Width,
+                GraphicsDevice.Viewport.TitleSafeArea.Height);
             var plyr2Head = player2.Joints[JointType.Head];
-            var plyr2Hnd = player2.Joints[JointType.HandRight].ScaleTo(
-            GraphicsDevice.Viewport.TitleSafeArea.Width,
-            GraphicsDevice.Viewport.TitleSafeArea.Height);
+            var plyr2Hnd = Optimize(player2.Joints[JointType.HandRight]).ScaleOwn(
+                GraphicsDevice.Viewport.TitleSafeArea.Width,
+                GraphicsDevice.Viewport.TitleSafeArea.Height);
+
 
             if(plyr1Head.Position.X < plyr2Head.Position.X)
             {
-                LeftPlayerY = (int) plyr1Hnd.Position.Y;
-                RightPlayerY = (int) plyr2Hnd.Position.Y;
+                TmpPos = plyr1Hnd.Position.Y;
+                LeftPlayerY = (int) plyr1Hnd.Position.Y - GetMiddleDeltaFromPlayer(player1);
+                RightPlayerY = (int)plyr2Hnd.Position.Y - GetMiddleDeltaFromPlayer(player2);
             }
             else
             {
-                RightPlayerY = (int) plyr1Hnd.Position.Y;
-                LeftPlayerY = (int) plyr2Hnd.Position.Y;
+
+                TmpPos = plyr2Hnd.Position.Y;
+                RightPlayerY = (int)plyr1Hnd.Position.Y - GetMiddleDeltaFromPlayer(player1);
+                LeftPlayerY = (int)plyr2Hnd.Position.Y - GetMiddleDeltaFromPlayer(player2);
             }
             
+        }
+
+        private int GetMiddleDeltaFromPlayer(Skeleton plyr)
+        {
+            var scaledHipCenter = plyr.Joints[JointType.HipCenter].ScaleTo(
+                GraphicsDevice.Viewport.TitleSafeArea.Width,
+                GraphicsDevice.Viewport.TitleSafeArea.Height);
+
+            var scaledShoulderCenter = plyr.Joints[JointType.ShoulderCenter].ScaleTo(
+                GraphicsDevice.Viewport.TitleSafeArea.Width,
+                GraphicsDevice.Viewport.TitleSafeArea.Height);
+
+
+            var middlePosition = (scaledShoulderCenter.Position.Y+scaledHipCenter.Position.Y)/2f;
+            return (int)middlePosition - GraphicsDevice.Viewport.TitleSafeArea.Height/2;
+        }
+
+        private static Joint Optimize(Joint jnt)
+        {
+            jnt.Position = new SkeletonPoint { X = 0f,
+            Y = jnt.Position.Y * 2f,
+            Z = 0f};
+            return jnt;
         }
 
         protected int RightPlayerY { get; set; }
@@ -149,6 +178,7 @@ namespace KinectPong
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            KinectSensor.KinectSensors[0].Stop();
         }
 
         private Vector2 LeftPaddleSpeed { get; set; }
@@ -188,12 +218,12 @@ namespace KinectPong
             if (rectangle.Intersects(paddleRight))
             {
                 _ball.Speed.X *= -1.1F;
-                _ball.Speed += RightPaddleSpeed;
+                _ball.Speed += 0.5f*RightPaddleSpeed;
             }
             else if (rectangle.Intersects(paddleLeft))
             {
                 _ball.Speed.X *= -1.1F;
-                _ball.Speed += LeftPaddleSpeed;
+                _ball.Speed += 0.5f*LeftPaddleSpeed;
             }
             else if (rectangle.Left < paddleLeft.Right)
             {
@@ -221,9 +251,20 @@ namespace KinectPong
             _ball.Location = BallStartPosition;
         }
 
+        Random rand = new Random();
         private Vector2 CreateNewSpeed()
         {
-            return new Vector2(200f, 200f);
+            return new Vector2(GetRandVal(), GetRandVal());
+        }
+
+        private float GetRandVal()
+        {
+            var d = (float) ((rand.NextDouble() - .5)*200f);
+            if(d<0)
+            {
+                return d - 200f;
+            }
+            return d + 200f;
         }
 
         /// <summary>
@@ -237,7 +278,7 @@ namespace KinectPong
             spriteBatch.Begin();
             spriteBatch.Draw(dummyTexture, paddleLeft, Colori);
             spriteBatch.Draw(dummyTexture, paddleRight, Colori);
-            spriteBatch.Draw(_ballTexture, _ball.Location, null, Color.White, 0f, new Vector2(108f, 108f), 0.5f, SpriteEffects.None, 0);
+            spriteBatch.Draw(_ballTexture, _ball.Location, null, Color.White, 0f, new Vector2(_ball.Frame.Width/2, _ball.Frame.Height/2), 0.2f, SpriteEffects.None, 0);
             var scoreString = String.Format("{0}:{1}",LeftScore,RightScore);
             var measureString = _spriteFont.MeasureString(scoreString);
             measureString.Y = 10;
@@ -271,6 +312,12 @@ namespace KinectPong
             measureString.Y = GraphicsDevice.Viewport.TitleSafeArea.Height - measureString.Y * i++;
             measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
             spriteBatch.DrawString(_spriteFont, msg, measureString, Color.White);
+
+            msg = String.Format("LeftHandPosition:Pos{0}", TmpPos);
+            measureString = _spriteFont.MeasureString(msg);
+            measureString.Y = GraphicsDevice.Viewport.TitleSafeArea.Height - measureString.Y * i++;
+            measureString.X = GraphicsDevice.Viewport.TitleSafeArea.Width / 2 - measureString.X / 2;
+            spriteBatch.DrawString(_spriteFont, msg, measureString, Color.White);
         }
 
         public class Ball
@@ -290,11 +337,13 @@ namespace KinectPong
 
             public Rectangle CreateFrame(Vector2 location)
             {
+                var size = 43;
                 var frame = new Rectangle(
-                    x:(int)location.X - 54,
-                    y:(int)location.Y -54,
-                    width:108,
-                    height:108
+                    x:(int)location.X,// - size/2,
+                    y:(int)location.Y,// - size/2,
+                    width:size,
+                    height:size
+                    
                     );
                 return frame;
             }
