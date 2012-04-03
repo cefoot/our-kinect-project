@@ -1,4 +1,4 @@
   * Pong
-  * XKCD-Immage (Strichmännchen+Sprechblasen)
+  * XKCD-AR (Strichmännchen+Sprechblasen)
   * Fallspiel
   * Kinect-Mock-Objekt
