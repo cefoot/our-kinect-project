@@ -1,4 +1,4 @@
   * Pong
-  * Sprechblasen
+  * XKCD-Immage (Strichmännchen+Sprechblasen)
   * Fallspiel
   * Kinect-Mock-Objekt
