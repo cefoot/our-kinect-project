@@ -11,7 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{019C0B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectPong", "KinectPong\KinectPong\KinectPong.csproj", "{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "KinectPongContent", "KinectPong\KinectPongContent\KinectPongContent.contentproj", "{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectPongContent", "KinectPong\KinectPongContent\KinectPongContent.contentproj", "{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StickmansSpeech", "StickmansSpeech\StickmansSpeech\StickmansSpeech.csproj", "{8D94859F-E8B3-4FBA-A4B6-76D056802533}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "StickmansSpeechContent", "StickmansSpeech\StickmansSpeechContent\StickmansSpeechContent.contentproj", "{D0D707B7-7F63-44A7-9A89-0D74EFBD9506}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectAddons", "KinectAddons\KinectAddons.csproj", "{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +35,16 @@ Global
 		{391FF3F9-48E5-45A2-9A8E-EE69B0A328DA}.Release|x86.Build.0 = Release|x86
 		{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}.Debug|x86.ActiveCfg = Debug|x86
 		{3006C4F6-EF16-4D1C-B39D-DDA1BB058949}.Release|x86.ActiveCfg = Release|x86
+		{8D94859F-E8B3-4FBA-A4B6-76D056802533}.Debug|x86.ActiveCfg = Debug|x86
+		{8D94859F-E8B3-4FBA-A4B6-76D056802533}.Debug|x86.Build.0 = Debug|x86
+		{8D94859F-E8B3-4FBA-A4B6-76D056802533}.Release|x86.ActiveCfg = Release|x86
+		{8D94859F-E8B3-4FBA-A4B6-76D056802533}.Release|x86.Build.0 = Release|x86
+		{D0D707B7-7F63-44A7-9A89-0D74EFBD9506}.Debug|x86.ActiveCfg = Debug|x86
+		{D0D707B7-7F63-44A7-9A89-0D74EFBD9506}.Release|x86.ActiveCfg = Release|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Debug|x86.ActiveCfg = Debug|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Debug|x86.Build.0 = Debug|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.ActiveCfg = Release|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

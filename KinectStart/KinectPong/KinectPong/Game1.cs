@@ -294,6 +294,8 @@ namespace KinectPong
 
         private void DrawDebugStuff(SpriteBatch spriteBatch)
         {
+            //its clean code :-)
+            return;
             int i = 1;
             var msg = String.Format("Ball Position:{0}", _ball.Location);
             var measureString = _spriteFont.MeasureString(msg);
