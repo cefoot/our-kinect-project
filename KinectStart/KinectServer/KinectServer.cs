@@ -16,11 +16,11 @@ namespace KinectServer
         static void Main(string[] args)
         {
             PrintInfo();
-            //var kinect = KinectSensor.KinectSensors[0];
-            //kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
-            //kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
-            //kinect.SkeletonStream.Enable();
-            var cmds = new Commands();//kinect);
+            var kinect = KinectSensor.KinectSensors[0];
+            kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
+            kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
+            kinect.SkeletonStream.Enable();
+            var cmds = new Commands(kinect);
             while (ReactOnCommand(cmds))
             {}
 

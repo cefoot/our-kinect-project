@@ -97,8 +97,8 @@ namespace KinectServer
         [Description("Startet den Server")]
         public bool Start()
         {
-            //Kinect.SkeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
-            //Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
+            Kinect.SkeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
+            Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
             Console.WriteLine("Kinect gestartet");
             foreach (var tcpListener in ServerListener)
             {
@@ -137,13 +137,13 @@ namespace KinectServer
             }
         }
 
-        private static void SendToSocket(TcpClient socket, List<TransferableJoint> transferableJoints)
+        private static void SendToSocket(TcpClient tcpClient, List<TransferableJoint> transferableJoints)
         {
             try
             {
-                //if (!socket.Connected) return;
+                if (!tcpClient.Connected) return;
 
-                transferableJoints.SerializeJointData(socket.GetStream());
+                transferableJoints.SerializeJointData(tcpClient.GetStream());
             }
             catch (Exception e)
             {
