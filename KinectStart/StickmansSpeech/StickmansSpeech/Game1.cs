@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Speech.Recognition;
+using Microsoft.Speech.AudioFormat;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -14,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Kinect;
+
 using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 using MessageBoxIcon = System.Windows.Forms.MessageBoxIcon;
 
@@ -28,9 +30,15 @@ namespace StickmansSpeech
         SpriteBatch _spriteBatch;
         private IList<Stickman> _trackedStickmans;
         private KinectSensor _kinectSensor;
+        
         private double _anglesource;
         private SpriteFont _spriteFont;
         private int ScreenWidth { get; set; }
+        private Choices choices;
+        private SpeechRecognitionEngine speechEngine;
+        private String currentText = "";
+        private IList<String> allText;
+
 
         private int ScreenHeight { get; set; }
 
@@ -52,28 +60,34 @@ namespace StickmansSpeech
             _kinectSensor.SkeletonStream.Enable();
             _kinectSensor.SkeletonFrameReady += KinectSensorSkeletonFrameReady;
             _kinectSensor.Start();
+
+            allText = new List<String>();
             base.Initialize();
         }
 
         private void KinectSensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+            _trackedStickmans.Clear();
             var openSkeletonFrame = e.OpenSkeletonFrame();
-            if (openSkeletonFrame == null) return;
+
+            if (openSkeletonFrame == null)
+            {
+                return;
+            }
+
             var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
             openSkeletonFrame.CopySkeletonDataTo(skeletsData);
-            foreach (var stickman in skeletsData.Select(skeleton => new Stickman
+
+            foreach (var selectedStickman in skeletsData.Where(Skeleton => Skeleton.TrackingState == SkeletonTrackingState.Tracked).Select(skeleton => new Stickman
             {
                 Skeleton = skeleton
-            }))
+
+            })) 
             {
-                if(stickman.Skeleton.TrackingState != SkeletonTrackingState.Tracked)
-                {
-                    _trackedStickmans.Remove(stickman);
-                }else if(!_trackedStickmans.Contains(stickman))
-                {
-                    _trackedStickmans.Add(stickman);
-                }
-            }
+                _trackedStickmans.Add(selectedStickman); 
+            };
+            openSkeletonFrame.Dispose();
+
         }
 
         /// <summary>
@@ -86,15 +100,109 @@ namespace StickmansSpeech
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _spriteFont = Content.Load<SpriteFont>("Arial");
 
-            _kinectSensor.AudioSource.Start();
+            this.initKinectAudio();          
 
-            _kinectSensor.AudioSource.SoundSourceAngleChanged += AudioSourceSoundSourceAngleChanged;
+
             ScreenWidth = GraphicsDevice.Viewport.TitleSafeArea.Width;
             ScreenHeight = GraphicsDevice.Viewport.TitleSafeArea.Height;
             _trackedStickmans = new List<Stickman>();
 
             // TODO: use this.Content to load your game content here
         }
+
+        private void initKinectAudio()
+        {
+            _kinectSensor.AudioSource.AutomaticGainControlEnabled = false;
+            _kinectSensor.AudioSource.EchoCancellationMode = EchoCancellationMode.None;
+            _kinectSensor.AudioSource.NoiseSuppression = false;
+
+            RecognizerInfo ri = GetKinectRecognizer();
+
+            speechEngine = new SpeechRecognitionEngine(ri.Id);
+
+            this.initChoices();
+
+            GrammarBuilder gb = new GrammarBuilder();
+            gb.Culture = ri.Culture;
+            gb.Append(choices);
+
+            var g = new Grammar(gb);
+
+            speechEngine.LoadGrammar(g);
+            speechEngine.SpeechHypothesized += new EventHandler<SpeechHypothesizedEventArgs>(sre_SpeechHypothesized);
+            speechEngine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(sre_SpeechRecognized);
+            speechEngine.SpeechRecognitionRejected += new EventHandler<SpeechRecognitionRejectedEventArgs>(sre_SpeechRecognitionRejected);
+
+            var stream = _kinectSensor.AudioSource.Start();
+
+            speechEngine.SetInputToAudioStream(stream,
+                  new SpeechAudioFormatInfo(
+                      EncodingFormat.Pcm, 16000, 16, 1,
+                      32000, 2, null));
+
+            speechEngine.RecognizeAsync(RecognizeMode.Multiple);
+
+
+            _kinectSensor.AudioSource.SoundSourceAngleChanged += AudioSourceSoundSourceAngleChanged;
+        }
+
+        private void initChoices()
+        {
+
+            choices = new Choices();
+            choices.Add("hello");
+            choices.Add("world");
+            choices.Add("goodbye");
+            choices.Add("my");
+            choices.Add("test");
+            choices.Add("sentence");
+            choices.Add("first");
+            choices.Add("exit");
+            choices.Add("empty");
+        }
+
+        private static RecognizerInfo GetKinectRecognizer()
+        {
+            Func<RecognizerInfo, bool> matchingFunc = r =>
+            {
+                string value;
+                r.AdditionalInfo.TryGetValue("Kinect", out value);
+                return "True".Equals(value, StringComparison.InvariantCultureIgnoreCase) && "en-US".Equals(r.Culture.Name, StringComparison.InvariantCultureIgnoreCase);
+            };
+            return SpeechRecognitionEngine.InstalledRecognizers().Where(matchingFunc).FirstOrDefault();
+        }
+
+        void sre_SpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
+        {
+            //System.Diagnostics.Debug.Print("Hypothesized: " + e.Result.Text + " " + e.Result.Confidence);
+        }
+
+        void sre_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+        {
+            //System.Diagnostics.Debug.Print("speech rejected:"+e.Result.Text);
+        }
+
+        void sre_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence < 0.7)
+            {
+                
+                System.Diagnostics.Debug.Print(e.Result.Text+" rejected with confidence:"+e.Result.Confidence.ToString());
+                return;
+            }
+            //currentText = e.Result.Text;
+            if (e.Result.Text == "empty")
+            {
+                allText.Clear();
+            }
+            else
+            {
+                allText.Add(e.Result.Text);
+            }
+            string currentSentence = String.Join(" ", allText.ToArray());
+            System.Diagnostics.Debug.Print(currentSentence);
+            
+    }
 
         void AudioSourceSoundSourceAngleChanged(object sender, SoundSourceAngleChangedEventArgs e)
         {
@@ -125,7 +233,7 @@ namespace StickmansSpeech
                 _trackedStickmans.AsParallel().ForAll(man => man.IsSpeaker = false);
                 var t = (from stickman in _trackedStickmans
                          let joint = stickman.Skeleton.Joints[JointType.Head]
-                         let d = Math.Asin(joint.Position.X/joint.Position.Z) * (180.0 / Math.PI)
+                         let d = Math.Asin(joint.Position.X / joint.Position.Z) * (180.0 / Math.PI)
                          select new Tuple<Stickman, double>(stickman, Math.Abs(d - _anglesource)));
                 if (t.Count() > 0)
                 {
@@ -146,16 +254,15 @@ namespace StickmansSpeech
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            
+
             GraphicsDevice.Clear(Color.White);
             _spriteBatch.Begin();
             //_trackedStickmans.AsParallel().ForAll(skelet => Drawstickman(skelet, spriteBatch));
             foreach (var trackedSkeleton in _trackedStickmans)
             {
-
                 Drawstickman(trackedSkeleton, _spriteBatch);
             }
-            DrawSpeech(_spriteBatch,_trackedStickmans);
+            DrawSpeech(_spriteBatch, _trackedStickmans);
             DrawDebugStuff(_spriteBatch);
             // TODO: Add your drawing code here
             _spriteBatch.End();
@@ -164,22 +271,26 @@ namespace StickmansSpeech
 
         private void DrawSpeech(SpriteBatch spriteBatch, IEnumerable<Stickman> trackedSkeletons)
         {
+            
+            
+            
             var speaker = trackedSkeletons.FirstOrDefault(skel => skel.IsSpeaker);
             if (speaker == null)
             {
                 return;
             }
-            const string msg = "Bla..";
-            var measureString = _spriteFont.MeasureString(msg);
+            string currentSentence = String.Join(" ", allText.ToArray());
+            System.Diagnostics.Debug.Print(currentSentence);
+            var measureString = _spriteFont.MeasureString(currentSentence);
             var textWith = measureString.X;
             var textHeight = measureString.Y;
             measureString.Y = 0;
             measureString.X = ScreenWidth / 2f - measureString.X / 2f;
-            spriteBatch.DrawString(_spriteFont, msg, measureString, Color.Black);
+            spriteBatch.DrawString(_spriteFont, currentSentence, measureString, Color.Black);
             var primitiveLine = new PrimitiveLine(GraphicsDevice)
                                     {
                                         Colour = Color.Black,
-                                        TransformVector = new Vector2(ScreenWidth/4, ScreenHeight/2)
+                                        TransformVector = new Vector2(ScreenWidth / 4, ScreenHeight / 2)
                                     };
             primitiveLine.AddVector(new Vector2(measureString.X + textWith, textHeight + 1) - primitiveLine.TransformVector);
             primitiveLine.AddVector(new Vector2(measureString.X, textHeight + 1) - primitiveLine.TransformVector);
@@ -193,75 +304,13 @@ namespace StickmansSpeech
             int i = 1;
             var msg = String.Format("DiffminAngle:{0}", 0);
             var measureString = _spriteFont.MeasureString(msg);
-            measureString.Y = ScreenHeight - measureString.Y*i++;
-            measureString.X = ScreenWidth/2 - measureString.X/2;
+            measureString.Y = ScreenHeight - measureString.Y * i++;
+            measureString.X = ScreenWidth / 2 - measureString.X / 2;
             spriteBatch.DrawString(_spriteFont, msg, measureString, Color.Black);
         }
 
 
-        private SpeechRecognitionEngine CreateSpeechRecognizer()
-        {
-            RecognizerInfo ri = SpeechUtils.GetKinectRecognizer();
-            if (ri == null)
-            {
-                MessageBox.Show(
-                    @"There was a problem initializing Speech Recognition.
-Ensure you have the Microsoft Speech SDK installed.",
-                    "Failed to load Speech SDK",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return null;
-            }
-
-            SpeechRecognitionEngine sre;
-            try
-            {
-                sre = new SpeechRecognitionEngine(ri.Id);
-            }
-            catch
-            {
-                MessageBox.Show(
-                    @"There was a problem initializing Speech Recognition.
-Ensure you have the Microsoft Speech SDK installed and configured.",
-                    "Failed to load Speech SDK",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return null;
-            }
-
-            var colors = new Choices();
-            colors.Add("red");
-            colors.Add("green");
-            colors.Add("blue");
-
-            var gb = new GrammarBuilder { Culture = ri.Culture };
-            gb.Append(colors);
-
-            // Create the actual Grammar instance, and then load it into the speech recognizer.
-            var g = new Grammar(gb);
-
-            sre.LoadGrammar(g);
-            sre.SpeechRecognized += this.SreSpeechRecognized;
-            sre.SpeechHypothesized += this.SreSpeechHypothesized;
-            sre.SpeechRecognitionRejected += this.SreSpeechRecognitionRejected;
-
-            return sre;
-        }
-
-        private void SreSpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SreSpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SreSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         private void Drawstickman(Stickman trackedSkeleton, SpriteBatch spriteBatch)
         {
@@ -278,7 +327,7 @@ Ensure you have the Microsoft Speech SDK installed and configured.",
             var head = trackedSkeleton.Skeleton.Joints[JointType.Head].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
             var primitiveLine = new PrimitiveLine(GraphicsDevice)
                                     {
-                                        TransformVector = new Vector2(ScreenWidth/4, ScreenHeight/2),
+                                        TransformVector = new Vector2(ScreenWidth / 4, ScreenHeight / 2),
                                         Depth = 0
                                     };
             primitiveLine.AddVector(shoulderCenter.Position.Convert());
@@ -310,7 +359,7 @@ Ensure you have the Microsoft Speech SDK installed and configured.",
             primitiveLine.ClearVectors();
             primitiveLine.Position = head.Position.Convert();
             //primitiveLine.CreateCircle((head.Position.Convert() - shoulderCenter.Position.Convert()).Length(), 20);
-            primitiveLine.CreateCircle(12,20);
+            primitiveLine.CreateCircle(12, 20);
             primitiveLine.Render(spriteBatch);
         }
     }
