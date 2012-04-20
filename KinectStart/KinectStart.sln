@@ -19,15 +19,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StickmansSpeechContent", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectAddons", "KinectAddons\KinectAddons.csproj", "{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}"
 EndProject
-<<<<<<< .mine
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallingMan", "FallingMan\FallingMan\FallingMan.csproj", "{B628F0B6-6935-4C16-A741-5DF5A831DD32}"
 EndProject
 Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "FallingManContent", "FallingMan\FallingManContent\FallingManContent.contentproj", "{0A522258-FFC0-43C5-98CF-DCC181DF5204}"
 EndProject
-=======
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectServer", "KinectServer\KinectServer.csproj", "{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}"
 EndProject
->>>>>>> .r24
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,14 +87,20 @@ Global
 		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|Mixed Platforms.Build.0 = Release|x86
 		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.ActiveCfg = Release|x86
 		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.Build.0 = Release|x86
-<<<<<<< .mine
+		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Debug|x86.ActiveCfg = Debug|x86
 		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Debug|x86.Build.0 = Debug|x86
+		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Release|Any CPU.ActiveCfg = Debug|x86
+		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Release|Mixed Platforms.ActiveCfg = Debug|x86
 		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Release|x86.ActiveCfg = Release|x86
 		{B628F0B6-6935-4C16-A741-5DF5A831DD32}.Release|x86.Build.0 = Release|x86
+		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Debug|x86.ActiveCfg = Debug|x86
+		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Release|Any CPU.ActiveCfg = Debug|x86
+		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Release|Mixed Platforms.ActiveCfg = Debug|x86
 		{0A522258-FFC0-43C5-98CF-DCC181DF5204}.Release|x86.ActiveCfg = Release|x86
-=======
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Debug|Mixed Platforms.Build.0 = Debug|x86
@@ -108,7 +111,6 @@ Global
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Release|Mixed Platforms.Build.0 = Release|x86
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Release|x86.ActiveCfg = Release|x86
 		{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}.Release|x86.Build.0 = Release|x86
->>>>>>> .r24
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
