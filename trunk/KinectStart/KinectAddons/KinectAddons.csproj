@@ -100,6 +100,7 @@
     <Compile Include="JointExtensions.cs" />
     <Compile Include="PrimitiveLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkeletonExtensions.cs" />
     <Compile Include="SpeechUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
