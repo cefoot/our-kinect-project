@@ -51,6 +51,8 @@ namespace KinectAddons
             }
         }
 
+        public Vector2 TransformVector { get; set; }
+
         /// <summary>
         /// Creates a new primitive line object.
         /// </summary>
@@ -67,6 +69,7 @@ namespace KinectAddons
             Position = new Vector2(0, 0);
             Depth = 0;
 
+            TransformVector = new Vector2(0, 0);
             vectors = new ArrayList();
         }
 
@@ -126,8 +129,8 @@ namespace KinectAddons
 
             for (int i = 1; i < vectors.Count; i++)
             {
-                Vector2 vector1 = (Vector2)vectors[i - 1];
-                Vector2 vector2 = (Vector2)vectors[i];
+                Vector2 vector1 = (Vector2) vectors[i - 1] + TransformVector;
+                Vector2 vector2 = (Vector2) vectors[i] + TransformVector;
 
                 // calculate the distance between the two vectors
                 float distance = Vector2.Distance(vector1, vector2);
