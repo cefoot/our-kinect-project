@@ -15,13 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml.Serialization;
 using Microsoft.Kinect;
 
 namespace KinectAddons
 {
-
+    [Serializable]
     public class TransferableJoint
     {
         public JointType JointType { get; set; }
@@ -30,33 +31,27 @@ namespace KinectAddons
 
     public static class SkeletonExtensions
     {
-        public static Byte[] SerializeJointData(this IList<TransferableJoint> transferableJoints)
+
+        public static void SerializeJointData(this List<TransferableJoint> transferableJoints, Stream stream)
         {
-            var serializer = new XmlSerializer(transferableJoints.GetType());
-            byte[] data;
-            using (var stream = new MemoryStream())
-            {
-                serializer.Serialize(stream, transferableJoints);
-                stream.Flush();
-                data = stream.GetBuffer();
-                stream.Close();
-            }
-            return data;
+            var binaryFormatter = new BinaryFormatter();
+            binaryFormatter.Serialize(stream, transferableJoints);
+            stream.Flush();
         }
 
-        public static IList<TransferableJoint> DeserializeJointData(this Byte[] sendedData)
+        public static List<TransferableJoint> DeserializeJointData(this Byte[] sendedData)
         {
-            var serializer = new XmlSerializer(typeof(IList<TransferableJoint>));
-            IList<TransferableJoint> transferableJoint;
+            var serializer = new XmlSerializer(typeof(List<TransferableJoint>));
+            List<TransferableJoint> transferableJoint;
             using(var stream = new MemoryStream(sendedData))
             {
-                transferableJoint = serializer.Deserialize(stream) as IList<TransferableJoint>;
+                transferableJoint = serializer.Deserialize(stream) as List<TransferableJoint>;
                 stream.Close();
             }
             return transferableJoint;
         }
 
-        public static IList<TransferableJoint> CreateTransferable(this Skeleton skelet)
+        public static List<TransferableJoint> CreateTransferable(this Skeleton skelet)
         {
             var joints = new List<TransferableJoint>();
             foreach (Joint joint in skelet.Joints)
