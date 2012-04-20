@@ -120,7 +120,7 @@ namespace KinectServer
         {
             if (!socket.Connected) return;
 
-            socket.Send(transferableJoints.CreateSendableData());
+            socket.Send(transferableJoints.SerializeJointData());
         }
     }
 }
