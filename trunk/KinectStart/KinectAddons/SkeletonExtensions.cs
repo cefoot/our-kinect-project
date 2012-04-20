@@ -64,5 +64,12 @@ namespace KinectAddons
             }
             return joints;
         }
+
+        public static List<TransferableJoint> DeserializeJointData(this Stream stream)
+        {
+            var formatter = new BinaryFormatter();
+            return formatter.Deserialize(stream) as List<TransferableJoint>;
+
+        }
     }
 }
