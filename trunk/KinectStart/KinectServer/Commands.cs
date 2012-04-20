@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using KinectAddons;
 using KinectServer.Properties;
@@ -32,29 +33,29 @@ namespace KinectServer
 
         public IList<TcpListener> ServerListener { get; set; }
 
-        public IList<Socket> ConnectedClients { get; set; }
+        public IList<TcpClient> ConnectedClients { get; set; }
 
-        public Commands(KinectSensor kinect)
+        public Commands(KinectSensor kinect):this()
         {
             Kinect = kinect;
-            var hostAddress = Dns.GetHostEntry(Dns.GetHostName());
+        }
+
+        public Commands()
+        {
             ServerListener = new List<TcpListener>();
-            ConnectedClients = new List<Socket>();
+            ConnectedClients = new List<TcpClient>();
+            var hostAddress = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ipAddress in hostAddress.AddressList)
             {
                 ServerListener.Add(new TcpListener(ipAddress, Settings.Default.ServerPort));
             }
         }
 
-        public Commands()
-        {
-        }
-
         [Description("Zeigt die Hilfe an")]
         public bool Help()
         {
             Console.Clear();
-            foreach (var methodInfo in GetType().GetMethods())
+            foreach (var methodInfo in GetType().GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly))
             {
                 if (methodInfo.GetParameters().Length > 0 || methodInfo.Name.Contains("_"))
                 {
@@ -67,6 +68,13 @@ namespace KinectServer
             return true;
         }
 
+        [Description("Sendet eine Leere Nachricht an Alle Clients")]
+        public bool Dummy()
+        {
+            ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, new Skeleton().CreateTransferable()));
+            return true;
+        }
+
         [Description("Beendet den Server")]
         public bool Stop()
         {
@@ -75,16 +83,27 @@ namespace KinectServer
             return false;
         }
 
+        [Description("Zeigt den Status an")]
+        public bool Status()
+        {
+            Console.Clear();
+            foreach (var connectedClient in ConnectedClients)
+            {
+                Console.WriteLine(connectedClient.Client.RemoteEndPoint.AddressFamily);
+            }
+            return true;
+        }
+
         [Description("Startet den Server")]
         public bool Start()
         {
-            Kinect.SkeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
-            Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
+            //Kinect.SkeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
+            //Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
             Console.WriteLine("Kinect gestartet");
             foreach (var tcpListener in ServerListener)
             {
                 tcpListener.Start();
-                tcpListener.BeginAcceptSocket(ClientConnected, tcpListener);
+                tcpListener.BeginAcceptTcpClient(ClientConnected, tcpListener);
             }
             Console.WriteLine(String.Concat("Server läuft auf Port:", Settings.Default.ServerPort));
             return true;
@@ -93,7 +112,9 @@ namespace KinectServer
         private void ClientConnected(IAsyncResult ar)
         {
             var tcpListener = ar.AsyncState as TcpListener;
-            ConnectedClients.Add(tcpListener.EndAcceptSocket(ar));
+            var tcpClient = tcpListener.EndAcceptTcpClient(ar);
+            Console.WriteLine("Client Connected : '{0}'", tcpClient);
+            ConnectedClients.Add(tcpClient);
             tcpListener.BeginAcceptSocket(ClientConnected, tcpListener);
 
         }
@@ -109,18 +130,25 @@ namespace KinectServer
 
             var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
             openSkeletonFrame.CopySkeletonDataTo(skeletsData);
-
+            
             foreach (var selectedStickman in skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).AsParallel())
             {
                 ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, selectedStickman.CreateTransferable()));
             }
         }
 
-        private static void SendToSocket(Socket socket, IList<TransferableJoint> transferableJoints)
+        private static void SendToSocket(TcpClient socket, List<TransferableJoint> transferableJoints)
         {
-            if (!socket.Connected) return;
+            try
+            {
+                //if (!socket.Connected) return;
 
-            socket.Send(transferableJoints.SerializeJointData());
+                transferableJoints.SerializeJointData(socket.GetStream());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
     }
 }
