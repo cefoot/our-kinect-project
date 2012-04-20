@@ -89,7 +89,7 @@ namespace KinectServer
             Console.Clear();
             foreach (var connectedClient in ConnectedClients)
             {
-                Console.WriteLine(connectedClient.Client.RemoteEndPoint.AddressFamily);
+                Console.WriteLine(connectedClient.Client.RemoteEndPoint.ToString());
             }
             return true;
         }
@@ -113,7 +113,7 @@ namespace KinectServer
         {
             var tcpListener = ar.AsyncState as TcpListener;
             var tcpClient = tcpListener.EndAcceptTcpClient(ar);
-            Console.WriteLine("Client Connected : '{0}'", tcpClient);
+            Console.WriteLine("Client Connected : '{0}'", tcpClient.Client.LocalEndPoint.ToString());
             ConnectedClients.Add(tcpClient);
             tcpListener.BeginAcceptSocket(ClientConnected, tcpListener);
 
