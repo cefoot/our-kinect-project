@@ -37,10 +37,10 @@ namespace KinectAddons
 
     public static class SkeletonExtensions
     {
-
+        private static BinaryFormatter binaryFormatter = new BinaryFormatter();
         public static void SerializeJointData(this TrackedSkelletons transferableJoints, Stream stream)
         {
-            var binaryFormatter = new BinaryFormatter();
+            
             binaryFormatter.Serialize(stream, transferableJoints);
             stream.Flush();
         }

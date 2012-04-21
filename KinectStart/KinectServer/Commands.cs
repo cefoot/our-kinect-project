@@ -218,6 +218,7 @@ namespace KinectServer
                 }
                 if (!found) return;
                 trackedSkelets.SerializeJointData(tcpClient.GetStream());
+                System.Diagnostics.Debug.Print("wrote");
             }
             catch (Exception e)
             {

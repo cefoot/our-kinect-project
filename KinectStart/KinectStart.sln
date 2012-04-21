@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectAddons", "KinectAddon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallingMan", "FallingMan\FallingMan\FallingMan.csproj", "{B628F0B6-6935-4C16-A741-5DF5A831DD32}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "FallingManContent", "FallingMan\FallingManContent\FallingManContent.contentproj", "{0A522258-FFC0-43C5-98CF-DCC181DF5204}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FallingManContent", "FallingMan\FallingManContent\FallingManContent.contentproj", "{0A522258-FFC0-43C5-98CF-DCC181DF5204}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectServer", "KinectServer\KinectServer.csproj", "{DDB31782-0CC3-481D-8F2C-09478CB5FA8B}"
 EndProject
