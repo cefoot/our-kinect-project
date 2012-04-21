@@ -73,9 +73,7 @@ namespace KinectAddons
 
         public static TrackedSkelletons DeserializeJointData(this Stream stream)
         {
-            var formatter = new BinaryFormatter();
-            return formatter.Deserialize(stream) as TrackedSkelletons;
-
+            return binaryFormatter.Deserialize(stream) as TrackedSkelletons;
         }
     }
 }
