@@ -94,11 +94,7 @@ namespace StickmansSpeech
             var networkStream = client.GetStream();
             while (client.Connected)
             {
-                var dateTime = DateTime.Now;
-                Console.WriteLine("start reading:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
                 var _deserializeJointData = networkStream.DeserializeJointData();
-                dateTime = DateTime.Now;
-                Console.WriteLine("ready reading:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
                 ThreadPool.QueueUserWorkItem(SkeletsRecieved, _deserializeJointData);
             }
         }
