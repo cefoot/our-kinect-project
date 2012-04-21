@@ -107,7 +107,6 @@ namespace KinectServer
         [Description("Startet den Server")]
         public bool Start()
         {
-            Kinect.SkeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
             Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
             Console.WriteLine("Kinect gestartet");
             foreach (var tcpListener in ServerListener)
@@ -211,11 +210,13 @@ namespace KinectServer
                 if (!tcpClient.Connected) return;
                 var trackedSkelets = new TrackedSkelletons();
                 trackedSkelets.Skelletons = new List<List<TransferableJoint>>();
-                foreach (var trackedSkelet in trackedSkeletons)
+                bool found = false;
+                foreach (var trackedSkelet in trackedSkeletons.AsParallel())
                 {
                     trackedSkelets.Skelletons.Add(trackedSkelet.CreateTransferable());
-
+                    found = true;
                 }
+                if (!found) return;
                 trackedSkelets.SerializeJointData(tcpClient.GetStream());
             }
             catch (Exception e)
