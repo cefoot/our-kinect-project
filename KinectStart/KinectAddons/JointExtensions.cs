@@ -11,14 +11,10 @@
   noch manipuliert werden.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
 
-namespace Kinect
+namespace KinectAddons
 {
 
     public static class JointExtensions

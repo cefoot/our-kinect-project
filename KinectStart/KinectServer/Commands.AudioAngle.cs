@@ -48,7 +48,7 @@ namespace KinectServer
             var client = state as TcpClient;
             try
             {
-                using (var networkStream = new BufferedStream(client.GetStream()))
+                using (var networkStream = client.GetStream())
                 {
                     while (client.Connected)
                     {
@@ -80,7 +80,7 @@ namespace KinectServer
             foreach (var connectedClient in ConnectedAudioAngleClients)
             {
                 //um 90 grad verschieben das byte erst bei 0 losgeht
-                _clientQueueBuffer[connectedClient].Enqueue(e.ConfidenceLevel > .4 ? (byte) e.Angle + 90 : ToLowConfidenceLevel);
+                _clientQueueBuffer[connectedClient].Enqueue(e.ConfidenceLevel > .4 ? (byte)(e.Angle + 90) : ToLowConfidenceLevel);
             }
         }
     }
