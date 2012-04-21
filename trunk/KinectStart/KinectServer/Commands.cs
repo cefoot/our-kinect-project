@@ -78,6 +78,8 @@ namespace KinectServer
         public bool Stop()
         {
             Kinect.SkeletonFrameReady -= RuntimeSkeletonFrameReady;
+            Kinect.SkeletonStream.Disable();
+            Kinect.AudioSource.Stop();
             Kinect.Stop();
             return false;
         }

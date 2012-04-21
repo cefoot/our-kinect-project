@@ -14,6 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -51,19 +52,22 @@ namespace KinectServer
             var client = state as TcpClient;
             try
             {
-                while (client.Connected)
+                using (var networkStream = new BufferedStream(client.GetStream()))
                 {
-                    if (SendQueue[client].Count == 0) continue;
-                    var skelets = SendQueue[client].Dequeue() as IEnumerable<Skeleton>;
-                    var trackedSkelets = new TrackedSkelletons
+                    while (client.Connected)
                     {
-                        Skelletons = new List<List<TransferableJoint>>()
-                    };
-                    foreach (var trackedSkelet in skelets)
-                    {
-                        trackedSkelets.Skelletons.Add(trackedSkelet.CreateTransferable());
+                        if (SendQueue[client].Count == 0) continue;
+                        var skelets = SendQueue[client].Dequeue() as IEnumerable<Skeleton>;
+                        var trackedSkelets = new TrackedSkelletons
+                        {
+                            Skelletons = new List<List<TransferableJoint>>()
+                        };
+                        foreach (var trackedSkelet in skelets)
+                        {
+                            trackedSkelets.Skelletons.Add(trackedSkelet.CreateTransferable());
+                        }
+                        trackedSkelets.SerializeJointData(networkStream);
                     }
-                    trackedSkelets.SerializeJointData(client.GetStream());
                 }
             }
             catch (Exception e)
@@ -84,7 +88,7 @@ namespace KinectServer
                 var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
                 openSkeletonFrame.CopySkeletonDataTo(skeletsData);
                 var trackedSkeletons = skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).ToList();
-                if(trackedSkeletons.Count == 0) return;
+                if (trackedSkeletons.Count == 0) return;
                 foreach (var connectedClient in ConnectedClients)
                 {
                     SendQueue[connectedClient].Enqueue(trackedSkeletons);
