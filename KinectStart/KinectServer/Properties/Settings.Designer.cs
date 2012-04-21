@@ -70,5 +70,17 @@ namespace KinectServer.Properties {
                 this["AudioServerPort"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("668")]
+        public int AudioAnlgeServerPort {
+            get {
+                return ((int)(this["AudioAnlgeServerPort"]));
+            }
+            set {
+                this["AudioAnlgeServerPort"] = value;
+            }
+        }
     }
 }

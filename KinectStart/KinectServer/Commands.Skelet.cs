@@ -34,21 +34,19 @@ namespace KinectServer
 
         private IList<TcpClient> ConnectedSkeletClients { get; set; }
 
-        private readonly Dictionary<TcpClient, Queue> SendQueue = new Dictionary<TcpClient, Queue>();
-
         private void SkeletClientConnected(IAsyncResult ar)
         {
             var tcpListener = ar.AsyncState as TcpListener;
             var tcpClient = tcpListener.EndAcceptTcpClient(ar);
             tcpListener.BeginAcceptSocket(SkeletClientConnected, tcpListener);
             tcpClient.NoDelay = true;
-            Console.WriteLine("Client Connected : '{0}'", tcpClient.Client.LocalEndPoint);
+            Console.WriteLine("Client Connected : '{0}'", tcpClient.Client.RemoteEndPoint);
             ConnectedSkeletClients.Add(tcpClient);
-            SendQueue[tcpClient] = Queue.Synchronized(new Queue());
-            ThreadPool.QueueUserWorkItem(SendToSocket, tcpClient);
+            _clientQueueBuffer[tcpClient] = Queue.Synchronized(new Queue());
+            ThreadPool.QueueUserWorkItem(SendToSkeletSocket, tcpClient);
         }
 
-        private void SendToSocket(object state)
+        private void SendToSkeletSocket(object state)
         {
             var client = state as TcpClient;
             try
@@ -57,8 +55,8 @@ namespace KinectServer
                 {
                     while (client.Connected)
                     {
-                        if (SendQueue[client].Count == 0) continue;
-                        var skelets = SendQueue[client].Dequeue() as IEnumerable<Skeleton>;
+                        if (_clientQueueBuffer[client].Count == 0) continue;
+                        var skelets = _clientQueueBuffer[client].Dequeue() as IEnumerable<Skeleton>;
                         var trackedSkelets = new TrackedSkelletons
                         {
                             Skelletons = new List<List<TransferableJoint>>()
@@ -100,7 +98,7 @@ namespace KinectServer
                 if (trackedSkeletons.Count == 0) return;
                 foreach (var connectedClient in ConnectedSkeletClients)
                 {
-                    SendQueue[connectedClient].Enqueue(trackedSkeletons);
+                    _clientQueueBuffer[connectedClient].Enqueue(trackedSkeletons);
                 }
             }
         }
@@ -117,6 +115,7 @@ namespace KinectServer
 
         private bool StartSkelet()
         {
+            Console.WriteLine(String.Concat("Skelet Server läuft auf Port:", Settings.Default.ServerPort));
             //Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
             return ThreadPool.QueueUserWorkItem(SkeletonFrameResolving, Kinect.SkeletonStream);
         }
