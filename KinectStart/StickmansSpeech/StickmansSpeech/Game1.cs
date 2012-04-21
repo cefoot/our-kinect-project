@@ -91,11 +91,13 @@ namespace StickmansSpeech
         private void SkeletonsRecieving(object state)
         {
             var client = state as TcpClient;
-            var networkStream = client.GetStream();
-            while (client.Connected)
+            using (var stream = new BufferedStream(client.GetStream()))
             {
-                var _deserializeJointData = networkStream.DeserializeJointData();
-                ThreadPool.QueueUserWorkItem(SkeletsRecieved, _deserializeJointData);
+                while (client.Connected)
+                {
+                    var _deserializeJointData = stream.DeserializeJointData();
+                    ThreadPool.QueueUserWorkItem(SkeletsRecieved, _deserializeJointData);
+                }
             }
         }
 
