@@ -30,7 +30,6 @@ namespace KinectServer
 
             var transferableJoints = new Skeleton().CreateTransferable();
             var serializer = new XmlSerializer(transferableJoints.GetType());
-            var tmp = new JointType();
             var writer = new StringWriter();
             serializer.Serialize(writer, transferableJoints);
             writer.Flush();
@@ -73,11 +72,6 @@ namespace KinectServer
             PrintInfo();
             Console.WriteLine("Command '{0}' not found", command);
             return true;
-        }
-
-        private static void RuntimeSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
-        {
-            throw new NotImplementedException();
         }
     }
 }

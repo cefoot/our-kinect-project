@@ -30,38 +30,21 @@ namespace KinectAddons
     }
 
     [Serializable]
-    public class TrackedSkelletons : IEnumerable<TransferableJoint>
+    public class TrackedSkelletons
     {
         public List<List<TransferableJoint>> Skelletons { get; set; }
-
-        #region IEnumerable<TransferableJoint> Member
-
-        IEnumerator<TransferableJoint> IEnumerable<TransferableJoint>.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region IEnumerable Member
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 
     public static class SkeletonExtensions
     {
-        private static BinaryFormatter binaryFormatter = new BinaryFormatter();
+        private static readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
         public static void SerializeJointData(this TrackedSkelletons transferableJoints, Stream stream)
         {
-            var watch = new Stopwatch();
-            watch.Start();
+            var dateTime = DateTime.Now;
+            Debug.Print("Start Sending:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
             binaryFormatter.Serialize(stream, transferableJoints);
-            Debug.Print("Serialisierung Dauert:"+watch.ElapsedMilliseconds);
+            dateTime = DateTime.Now;
+            Debug.Print("Send:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
         }
 
         public static TrackedSkelletons DeserializeJointData(this Byte[] sendedData)
@@ -92,8 +75,12 @@ namespace KinectAddons
 
         public static TrackedSkelletons DeserializeJointData(this Stream stream)
         {
+            var dateTime = DateTime.Now;
+            Console.WriteLine("Start Recieving:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
             var deserializeJointData = binaryFormatter.Deserialize(stream) as TrackedSkelletons;
             Debug.Print(deserializeJointData.Skelletons != null ? deserializeJointData.Skelletons.Count.ToString() : "LEER");
+            dateTime = DateTime.Now;
+            Console.WriteLine("Recieved:" + dateTime.ToLongTimeString()+"."+dateTime.Millisecond);
             return deserializeJointData;
         }
     }
