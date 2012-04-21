@@ -30,9 +30,27 @@ namespace KinectAddons
     }
 
     [Serializable]
-    public class TrackedSkelletons
+    public class TrackedSkelletons : IEnumerable<TransferableJoint>
     {
         public List<List<TransferableJoint>> Skelletons { get; set; }
+
+        #region IEnumerable<TransferableJoint> Member
+
+        IEnumerator<TransferableJoint> IEnumerable<TransferableJoint>.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IEnumerable Member
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
     }
 
     public static class SkeletonExtensions
