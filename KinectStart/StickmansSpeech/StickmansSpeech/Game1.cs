@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -94,16 +95,12 @@ namespace StickmansSpeech
                 {
                     continue;
                 }
-                _trackedStickmans.Clear();
-                System.Diagnostics.Debug.Print(_deserializeJointData.Skelletons.Count.ToString());
-                foreach (var skelet in _deserializeJointData.Skelletons.Select(skeleton => new Stickman
-                                                                                                {
-                                                                                                    Joints = skeleton
-
-                                                                                                }))
-                {
-                    _trackedStickmans.Add(skelet);
-                }
+                var skellets = _deserializeJointData.Skelletons.Select(skeleton => new Stickman
+                                                                                       {
+                                                                                           Joints = skeleton
+                                                                                       }).ToList();
+                _trackedStickmans = skellets;
+                Debug.Print(_trackedStickmans.Count.ToString());
             }
         }
 
