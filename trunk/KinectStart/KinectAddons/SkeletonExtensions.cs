@@ -40,9 +40,10 @@ namespace KinectAddons
         private static BinaryFormatter binaryFormatter = new BinaryFormatter();
         public static void SerializeJointData(this TrackedSkelletons transferableJoints, Stream stream)
         {
-            
+            var watch = new Stopwatch();
+            watch.Start();
             binaryFormatter.Serialize(stream, transferableJoints);
-            stream.Flush();
+            Debug.Print("Serialisierung Dauert:"+watch.ElapsedMilliseconds);
         }
 
         public static TrackedSkelletons DeserializeJointData(this Byte[] sendedData)
@@ -73,7 +74,9 @@ namespace KinectAddons
 
         public static TrackedSkelletons DeserializeJointData(this Stream stream)
         {
-            return binaryFormatter.Deserialize(stream) as TrackedSkelletons;
+            var deserializeJointData = binaryFormatter.Deserialize(stream) as TrackedSkelletons;
+            Debug.Print(deserializeJointData.Skelletons != null ? deserializeJointData.Skelletons.Count.ToString() : "LEER");
+            return deserializeJointData;
         }
     }
 }
