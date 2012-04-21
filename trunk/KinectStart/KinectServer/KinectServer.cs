@@ -17,10 +17,11 @@ namespace KinectServer
         {
             PrintInfo();
             var kinect = KinectSensor.KinectSensors[0];
+            var kinectAudioSource = kinect.AudioSource;
             kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
             kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
             kinect.SkeletonStream.Enable();
-            var cmds = new Commands(kinect);
+            var cmds = new Commands(kinect,kinectAudioSource);
             while (ReactOnCommand(cmds))
             {}
 
