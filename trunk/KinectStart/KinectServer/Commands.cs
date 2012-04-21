@@ -85,13 +85,6 @@ namespace KinectServer
             return true;
         }
 
-        [Description("Sendet eine Leere Nachricht an Alle Clients")]
-        public bool Dummy()
-        {
-            ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, new Skeleton().CreateTransferable()));
-            return true;
-        }
-
         [Description("Beendet den Server")]
         public bool Stop()
         {
@@ -154,10 +147,11 @@ namespace KinectServer
             var data = asynResult.AsyncState as Tuple<Stream, byte[]>;
             var count = data.Item1.EndRead(asynResult);
             var buffer = new byte[256];
-            var asyncr = data.Item1.BeginRead(buffer, 0, buffer.Length, AudioStreamBufferd, new Tuple<Stream, byte[]>(data.Item1, buffer));
+            data.Item1.BeginRead(buffer, 0, buffer.Length, AudioStreamBufferd, new Tuple<Stream, byte[]>(data.Item1, buffer));
             
             foreach (var item in ConnectedAudioClients.AsParallel())
             {
+                if(!item.Connected) continue;
                 item.GetStream().Write(data.Item2, 0, count);
             }
         }
@@ -205,21 +199,24 @@ namespace KinectServer
 
                 var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
                 openSkeletonFrame.CopySkeletonDataTo(skeletsData);
-
-                foreach (var selectedStickman in skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).AsParallel())
-                {
-                    ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, selectedStickman.CreateTransferable()));
-                }
+                var trackedSkeletons = skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked);
+                ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, trackedSkeletons));
             }
         }
 
-        private static void SendToSocket(TcpClient tcpClient, List<TransferableJoint> transferableJoints)
+        private static void SendToSocket(TcpClient tcpClient, IEnumerable<Skeleton> trackedSkeletons)
         {
             try
             {
                 if (!tcpClient.Connected) return;
+                var trackedSkelets = new TrackedSkelletons();
+                trackedSkelets.Skelletons = new List<List<TransferableJoint>>();
+                foreach (var trackedSkelet in trackedSkeletons)
+                {
+                    trackedSkelets.Skelletons.Add(trackedSkelet.CreateTransferable());
 
-                transferableJoints.SerializeJointData(tcpClient.GetStream());
+                }
+                trackedSkelets.SerializeJointData(tcpClient.GetStream());
             }
             catch (Exception e)
             {

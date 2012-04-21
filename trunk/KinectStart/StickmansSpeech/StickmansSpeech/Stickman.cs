@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
 
@@ -37,7 +38,12 @@ namespace StickmansSpeech
 
         #region Eigenschaften
 
-        public Skeleton Skeleton { get; set; }
+        public TransferableJoint this[JointType val]
+        {
+            get { return Joints.Find(jnt => jnt.JointType == val); }
+        }
+
+        public List<TransferableJoint> Joints { get; set; }
 
         private bool _isSpeaker;
         public bool IsSpeaker
