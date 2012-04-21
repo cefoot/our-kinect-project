@@ -37,14 +37,10 @@ namespace KinectAddons
 
     public static class SkeletonExtensions
     {
-        private static readonly BinaryFormatter binaryFormatter = new BinaryFormatter();
+        private static readonly BinaryFormatter BinaryFormatter = new BinaryFormatter();
         public static void SerializeJointData(this TrackedSkelletons transferableJoints, Stream stream)
         {
-            var dateTime = DateTime.Now;
-            Debug.Print("Start Sending:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
-            binaryFormatter.Serialize(stream, transferableJoints);
-            dateTime = DateTime.Now;
-            Debug.Print("Send:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
+            BinaryFormatter.Serialize(stream, transferableJoints);
         }
 
         public static TrackedSkelletons DeserializeJointData(this Byte[] sendedData)
@@ -75,12 +71,7 @@ namespace KinectAddons
 
         public static TrackedSkelletons DeserializeJointData(this Stream stream)
         {
-            var dateTime = DateTime.Now;
-            Console.WriteLine("Start Recieving:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
-            var deserializeJointData = binaryFormatter.Deserialize(stream) as TrackedSkelletons;
-            Debug.Print(deserializeJointData.Skelletons != null ? deserializeJointData.Skelletons.Count.ToString() : "LEER");
-            dateTime = DateTime.Now;
-            Console.WriteLine("Recieved:" + dateTime.ToLongTimeString()+"."+dateTime.Millisecond);
+            var deserializeJointData = BinaryFormatter.Deserialize(stream) as TrackedSkelletons;
             return deserializeJointData;
         }
     }
