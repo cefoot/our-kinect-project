@@ -14,7 +14,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -49,9 +48,6 @@ namespace KinectServer
 
         private void SendToSocket(object state)
         {
-
-            var dateTime = DateTime.Now;
-            Debug.Print("Start Socket Send:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
             var client = state as TcpClient;
             try
             {
@@ -59,8 +55,6 @@ namespace KinectServer
                 {
                     if (SendQueue[client].Count == 0) continue;
                     var skelets = SendQueue[client].Dequeue() as IEnumerable<Skeleton>;
-                    dateTime = DateTime.Now;
-                    Debug.Print("Dequed:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
                     var trackedSkelets = new TrackedSkelletons
                     {
                         Skelletons = new List<List<TransferableJoint>>()
@@ -68,8 +62,6 @@ namespace KinectServer
                     foreach (var trackedSkelet in skelets)
                     {
                         trackedSkelets.Skelletons.Add(trackedSkelet.CreateTransferable());
-                        dateTime = DateTime.Now;
-                        Debug.Print("Found!:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
                     }
                     trackedSkelets.SerializeJointData(client.GetStream());
                 }
@@ -77,11 +69,6 @@ namespace KinectServer
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-            }
-            finally
-            {
-                dateTime = DateTime.Now;
-                Debug.Print("Ready Socke Send:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
             }
         }
 
@@ -101,8 +88,6 @@ namespace KinectServer
                 foreach (var connectedClient in ConnectedClients)
                 {
                     SendQueue[connectedClient].Enqueue(trackedSkeletons);
-
-                    Debug.Print("Enqueued");
                 }
             }
         }
