@@ -29,23 +29,29 @@ namespace KinectAddons
         public SkeletonPoint SkeletPoint { get; set; }
     }
 
+    [Serializable]
+    public class TrackedSkelletons
+    {
+        public List<List<TransferableJoint>> Skelletons { get; set; }
+    }
+
     public static class SkeletonExtensions
     {
 
-        public static void SerializeJointData(this List<TransferableJoint> transferableJoints, Stream stream)
+        public static void SerializeJointData(this TrackedSkelletons transferableJoints, Stream stream)
         {
             var binaryFormatter = new BinaryFormatter();
             binaryFormatter.Serialize(stream, transferableJoints);
             stream.Flush();
         }
 
-        public static List<TransferableJoint> DeserializeJointData(this Byte[] sendedData)
+        public static TrackedSkelletons DeserializeJointData(this Byte[] sendedData)
         {
-            var serializer = new XmlSerializer(typeof(List<TransferableJoint>));
-            List<TransferableJoint> transferableJoint;
+            var serializer = new XmlSerializer(typeof(TrackedSkelletons));
+            TrackedSkelletons transferableJoint;
             using(var stream = new MemoryStream(sendedData))
             {
-                transferableJoint = serializer.Deserialize(stream) as List<TransferableJoint>;
+                transferableJoint = serializer.Deserialize(stream) as TrackedSkelletons;
                 stream.Close();
             }
             return transferableJoint;
@@ -65,10 +71,10 @@ namespace KinectAddons
             return joints;
         }
 
-        public static List<TransferableJoint> DeserializeJointData(this Stream stream)
+        public static TrackedSkelletons DeserializeJointData(this Stream stream)
         {
             var formatter = new BinaryFormatter();
-            return formatter.Deserialize(stream) as List<TransferableJoint>;
+            return formatter.Deserialize(stream) as TrackedSkelletons;
 
         }
     }

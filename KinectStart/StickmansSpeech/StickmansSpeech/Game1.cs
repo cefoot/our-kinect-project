@@ -1,7 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using KinectAddons;
 using Microsoft.Kinect;
@@ -29,7 +34,6 @@ namespace StickmansSpeech
         GraphicsDeviceManager graphics;
         SpriteBatch _spriteBatch;
         private IList<Stickman> _trackedStickmans;
-        private KinectSensor _kinectSensor;
         
         private double _anglesource;
         private SpriteFont _spriteFont;
@@ -38,6 +42,7 @@ namespace StickmansSpeech
         private SpeechRecognitionEngine speechEngine;
         private String currentText = "";
         private IList<String> allText;
+        private TrackedSkelletons _deserializeJointData;
 
 
         private int ScreenHeight { get; set; }
@@ -56,38 +61,45 @@ namespace StickmansSpeech
         /// </summary>
         protected override void Initialize()
         {
-            _kinectSensor = KinectSensor.KinectSensors[0];
-            _kinectSensor.SkeletonStream.Enable();
-            _kinectSensor.SkeletonFrameReady += KinectSensorSkeletonFrameReady;
-            _kinectSensor.Start();
+            var client = new TcpClient();
+            client.BeginConnect("LAPTOP", 666, ServerSkeletConnected, client);
+            client.BeginConnect("LAPTOP", 667, ServerAudioConnected,client);
 
             allText = new List<String>();
             base.Initialize();
         }
 
-        private void KinectSensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        private void ServerAudioConnected(IAsyncResult ar)
         {
-            _trackedStickmans.Clear();
-            var openSkeletonFrame = e.OpenSkeletonFrame();
+            var tcpClient = ar.AsyncState as TcpClient;
+            tcpClient.EndConnect(ar);
+            initKinectAudio(tcpClient.GetStream());  
+        }
 
-            if (openSkeletonFrame == null)
+        private void ServerSkeletConnected(IAsyncResult ar)
+        {
+            var tcpClient = ar.AsyncState as TcpClient;
+            tcpClient.EndConnect(ar);
+            ThreadPool.QueueUserWorkItem(SkeletonsRecieving, tcpClient);
+        }
+
+        private void SkeletonsRecieving(object state)
+        {
+            var client = state as TcpClient;
+            var networkStream = client.GetStream();
+            while (client.Connected)
             {
-                return;
+                _deserializeJointData = networkStream.DeserializeJointData();
+                _trackedStickmans.Clear();
+                foreach (var skelet in _deserializeJointData.Skelletons.Select(skeleton => new Stickman
+                                                                                                {
+                                                                                                    Joints = skeleton
+
+                                                                                                }))
+                {
+                    _trackedStickmans.Add(skelet);
+                }
             }
-
-            var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
-            openSkeletonFrame.CopySkeletonDataTo(skeletsData);
-
-            foreach (var selectedStickman in skeletsData.Where(Skeleton => Skeleton.TrackingState == SkeletonTrackingState.Tracked).Select(skeleton => new Stickman
-            {
-                Skeleton = skeleton
-
-            })) 
-            {
-                _trackedStickmans.Add(selectedStickman); 
-            };
-            openSkeletonFrame.Dispose();
-
         }
 
         /// <summary>
@@ -98,9 +110,7 @@ namespace StickmansSpeech
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _spriteFont = Content.Load<SpriteFont>("Arial");
-
-            this.initKinectAudio();          
+            _spriteFont = Content.Load<SpriteFont>("Arial");        
 
 
             ScreenWidth = GraphicsDevice.Viewport.TitleSafeArea.Width;
@@ -110,12 +120,8 @@ namespace StickmansSpeech
             // TODO: use this.Content to load your game content here
         }
 
-        private void initKinectAudio()
+        private void initKinectAudio(Stream audioStream)
         {
-            _kinectSensor.AudioSource.AutomaticGainControlEnabled = false;
-            _kinectSensor.AudioSource.EchoCancellationMode = EchoCancellationMode.None;
-            _kinectSensor.AudioSource.NoiseSuppression = false;
-
             RecognizerInfo ri = GetKinectRecognizer();
 
             speechEngine = new SpeechRecognitionEngine(ri.Id);
@@ -133,9 +139,7 @@ namespace StickmansSpeech
             speechEngine.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(sre_SpeechRecognized);
             speechEngine.SpeechRecognitionRejected += new EventHandler<SpeechRecognitionRejectedEventArgs>(sre_SpeechRecognitionRejected);
 
-            var stream = _kinectSensor.AudioSource.Start();
-
-            speechEngine.SetInputToAudioStream(stream,
+            speechEngine.SetInputToAudioStream(audioStream,
                   new SpeechAudioFormatInfo(
                       EncodingFormat.Pcm, 16000, 16, 1,
                       32000, 2, null));
@@ -143,7 +147,7 @@ namespace StickmansSpeech
             speechEngine.RecognizeAsync(RecognizeMode.Multiple);
 
 
-            _kinectSensor.AudioSource.SoundSourceAngleChanged += AudioSourceSoundSourceAngleChanged;
+            //_kinectSensor.AudioSource.SoundSourceAngleChanged += AudioSourceSoundSourceAngleChanged;
         }
 
         private void initChoices()
@@ -232,8 +236,8 @@ namespace StickmansSpeech
             {
                 _trackedStickmans.AsParallel().ForAll(man => man.IsSpeaker = false);
                 var t = (from stickman in _trackedStickmans
-                         let joint = stickman.Skeleton.Joints[JointType.Head]
-                         let d = Math.Asin(joint.Position.X / joint.Position.Z) * (180.0 / Math.PI)
+                         let joint = stickman[JointType.Head]
+                         let d = Math.Asin(joint.SkeletPoint.X / joint.SkeletPoint.Z) * (180.0 / Math.PI)
                          select new Tuple<Stickman, double>(stickman, Math.Abs(d - _anglesource)));
                 if (t.Count() > 0)
                 {
@@ -294,7 +298,7 @@ namespace StickmansSpeech
                                     };
             primitiveLine.AddVector(new Vector2(measureString.X + textWith, textHeight + 1) - primitiveLine.TransformVector);
             primitiveLine.AddVector(new Vector2(measureString.X, textHeight + 1) - primitiveLine.TransformVector);
-            primitiveLine.AddVector(speaker.Skeleton.Joints[JointType.Head].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2).Position.Convert());
+            primitiveLine.AddVector(speaker[JointType.Head].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2).SkeletPoint.Convert());
             primitiveLine.Render(spriteBatch);
         }
 
@@ -314,50 +318,50 @@ namespace StickmansSpeech
 
         private void Drawstickman(Stickman trackedSkeleton, SpriteBatch spriteBatch)
         {
-            var shoulderCenter = trackedSkeleton.Skeleton.Joints[JointType.ShoulderCenter].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var hipCenter = trackedSkeleton.Skeleton.Joints[JointType.HipCenter].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var footLeft = trackedSkeleton.Skeleton.Joints[JointType.FootLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var footRight = trackedSkeleton.Skeleton.Joints[JointType.FootRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var handLeft = trackedSkeleton.Skeleton.Joints[JointType.HandLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var handRight = trackedSkeleton.Skeleton.Joints[JointType.HandRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var elbowLeft = trackedSkeleton.Skeleton.Joints[JointType.ElbowLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var elbowRight = trackedSkeleton.Skeleton.Joints[JointType.ElbowRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var kneeLeft = trackedSkeleton.Skeleton.Joints[JointType.KneeLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var kneeRight = trackedSkeleton.Skeleton.Joints[JointType.KneeRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
-            var head = trackedSkeleton.Skeleton.Joints[JointType.Head].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var shoulderCenter = trackedSkeleton[JointType.ShoulderCenter].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var hipCenter = trackedSkeleton[JointType.HipCenter].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var footLeft = trackedSkeleton[JointType.FootLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var footRight = trackedSkeleton[JointType.FootRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var handLeft = trackedSkeleton[JointType.HandLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var handRight = trackedSkeleton[JointType.HandRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var elbowLeft = trackedSkeleton[JointType.ElbowLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var elbowRight = trackedSkeleton[JointType.ElbowRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var kneeLeft = trackedSkeleton[JointType.KneeLeft].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var kneeRight = trackedSkeleton[JointType.KneeRight].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
+            var head = trackedSkeleton[JointType.Head].ScaleOwn(ScreenWidth / 2, ScreenHeight / 2);
             var primitiveLine = new PrimitiveLine(GraphicsDevice)
                                     {
                                         TransformVector = new Vector2(ScreenWidth / 4, ScreenHeight / 2),
                                         Depth = 0
                                     };
-            primitiveLine.AddVector(shoulderCenter.Position.Convert());
-            primitiveLine.AddVector(hipCenter.Position.Convert());
+            primitiveLine.AddVector(shoulderCenter.SkeletPoint.Convert());
+            primitiveLine.AddVector(hipCenter.SkeletPoint.Convert());
             primitiveLine.Colour = trackedSkeleton.BoneColor;
             primitiveLine.Render(spriteBatch);
 
             primitiveLine.ClearVectors();
-            primitiveLine.AddVector(shoulderCenter.Position.Convert());
-            primitiveLine.AddVector(elbowRight.Position.Convert());
-            primitiveLine.AddVector(handRight.Position.Convert());
+            primitiveLine.AddVector(shoulderCenter.SkeletPoint.Convert());
+            primitiveLine.AddVector(elbowRight.SkeletPoint.Convert());
+            primitiveLine.AddVector(handRight.SkeletPoint.Convert());
             primitiveLine.Render(spriteBatch);
             primitiveLine.ClearVectors();
-            primitiveLine.AddVector(shoulderCenter.Position.Convert());
-            primitiveLine.AddVector(elbowLeft.Position.Convert());
-            primitiveLine.AddVector(handLeft.Position.Convert());
+            primitiveLine.AddVector(shoulderCenter.SkeletPoint.Convert());
+            primitiveLine.AddVector(elbowLeft.SkeletPoint.Convert());
+            primitiveLine.AddVector(handLeft.SkeletPoint.Convert());
             primitiveLine.Render(spriteBatch);
             primitiveLine.ClearVectors();
-            primitiveLine.AddVector(hipCenter.Position.Convert());
-            primitiveLine.AddVector(kneeRight.Position.Convert());
-            primitiveLine.AddVector(footRight.Position.Convert());
+            primitiveLine.AddVector(hipCenter.SkeletPoint.Convert());
+            primitiveLine.AddVector(kneeRight.SkeletPoint.Convert());
+            primitiveLine.AddVector(footRight.SkeletPoint.Convert());
             primitiveLine.Render(spriteBatch);
             primitiveLine.ClearVectors();
-            primitiveLine.AddVector(hipCenter.Position.Convert());
-            primitiveLine.AddVector(kneeLeft.Position.Convert());
-            primitiveLine.AddVector(footLeft.Position.Convert());
+            primitiveLine.AddVector(hipCenter.SkeletPoint.Convert());
+            primitiveLine.AddVector(kneeLeft.SkeletPoint.Convert());
+            primitiveLine.AddVector(footLeft.SkeletPoint.Convert());
             primitiveLine.Render(spriteBatch);
 
             primitiveLine.ClearVectors();
-            primitiveLine.Position = head.Position.Convert();
+            primitiveLine.Position = head.SkeletPoint.Convert();
             //primitiveLine.CreateCircle((head.Position.Convert() - shoulderCenter.Position.Convert()).Length(), 20);
             primitiveLine.CreateCircle(12, 20);
             primitiveLine.Render(spriteBatch);

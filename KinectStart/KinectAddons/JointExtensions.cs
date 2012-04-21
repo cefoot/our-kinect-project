@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
 
@@ -22,6 +23,17 @@ namespace Kinect
 
     public static class JointExtensions
     {
+
+        public static TransferableJoint ScaleOwn(this TransferableJoint jnt, int width, int height)
+        {
+            var position = jnt.SkeletPoint;
+            var xVal = position.X + 1.0f;//damit nichtmehr negativ
+            var yVal = position.Y * -1 + 1.0f;//umdrehen damit 0 oben
+            var posX = ((float)width / 2) * xVal;
+            var posY = ((float)height / 2) * yVal;
+            jnt.SkeletPoint = new SkeletonPoint { X = posX, Y = posY, Z = position.Z };
+            return jnt;
+        }
 
         public static Joint ScaleOwn(this Joint jnt, int width, int height)
         {
