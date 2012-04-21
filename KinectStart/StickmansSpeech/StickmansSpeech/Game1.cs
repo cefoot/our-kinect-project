@@ -95,6 +95,7 @@ namespace StickmansSpeech
                     continue;
                 }
                 _trackedStickmans.Clear();
+                System.Diagnostics.Debug.Print(_deserializeJointData.Skelletons.Count.ToString());
                 foreach (var skelet in _deserializeJointData.Skelletons.Select(skeleton => new Stickman
                                                                                                 {
                                                                                                     Joints = skeleton
@@ -238,8 +239,9 @@ namespace StickmansSpeech
                 this.Exit();
             if (_trackedStickmans != null && _anglesource != 1000)
             {
-                _trackedStickmans.AsParallel().ForAll(man => man.IsSpeaker = false);
-                var t = (from stickman in _trackedStickmans
+                var stickmans = _trackedStickmans.ToArray();
+                stickmans.AsParallel().ForAll(man => man.IsSpeaker = false);
+                var t = (from stickman in stickmans
                          let joint = stickman[JointType.Head]
                          let d = Math.Asin(joint.SkeletPoint.X / joint.SkeletPoint.Z) * (180.0 / Math.PI)
                          select new Tuple<Stickman, double>(stickman, Math.Abs(d - _anglesource)));
@@ -265,12 +267,13 @@ namespace StickmansSpeech
 
             GraphicsDevice.Clear(Color.White);
             _spriteBatch.Begin();
+            var stickmans = _trackedStickmans.ToArray();
             //_trackedStickmans.AsParallel().ForAll(skelet => Drawstickman(skelet, spriteBatch));
-            foreach (var trackedSkeleton in _trackedStickmans)
+            foreach (var trackedSkeleton in stickmans)
             {
                 Drawstickman(trackedSkeleton, _spriteBatch);
             }
-            DrawSpeech(_spriteBatch, _trackedStickmans);
+            DrawSpeech(_spriteBatch, stickmans);
             DrawDebugStuff(_spriteBatch);
             // TODO: Add your drawing code here
             _spriteBatch.End();
