@@ -35,6 +35,8 @@ namespace KinectServer
     {
         public KinectSensor Kinect { get; set; }
 
+        protected bool Stopped { get; set; }
+
         public Commands(KinectSensor kinect,KinectAudioSource kinectAudioSource):this()
         {
             Kinect = kinect;
@@ -43,10 +45,11 @@ namespace KinectServer
 
         public Commands()
         {
+            Stopped = true;
             ServerListener = new List<TcpListener>();
             AudioServerListener = new List<TcpListener>();
 
-            ConnectedClients = new List<TcpClient>();
+            ConnectedSkeletClients = new List<TcpClient>();
             ConnectedAudioClients = new List<TcpClient>();
 
             var hostAddress = Dns.GetHostEntry(Dns.GetHostName());
@@ -77,6 +80,7 @@ namespace KinectServer
         [Description("Beendet den Server")]
         public bool Stop()
         {
+            Stopped = true;
             Kinect.SkeletonFrameReady -= RuntimeSkeletonFrameReady;
             Kinect.SkeletonStream.Disable();
             Kinect.AudioSource.Stop();
@@ -88,7 +92,7 @@ namespace KinectServer
         public bool Status()
         {
             Console.Clear();
-            foreach (var connectedClient in ConnectedClients)
+            foreach (var connectedClient in ConnectedSkeletClients)
             {
                 Console.WriteLine(connectedClient.Client.RemoteEndPoint.ToString());
             }
@@ -98,8 +102,6 @@ namespace KinectServer
         [Description("Startet den Server")]
         public bool Start()
         {
-            Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
-            Console.WriteLine("Kinect gestartet");
             foreach (var tcpListener in ServerListener)
             {
                 tcpListener.Start();
@@ -113,7 +115,10 @@ namespace KinectServer
             }
 
             Console.WriteLine(String.Concat("Server läuft auf Port:", Settings.Default.ServerPort));
-            return StartAudio();
+            Stopped = false;
+            var start = StartAudio() && StartSkelet();
+            Console.WriteLine("Kinect gestartet");
+            return start;
         }
     }
 }
