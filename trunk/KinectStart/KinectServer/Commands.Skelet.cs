@@ -21,6 +21,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using KinectAddons;
+using KinectServer.Properties;
 using Microsoft.Kinect;
 
 namespace KinectServer
@@ -31,9 +32,9 @@ namespace KinectServer
 
         private IList<TcpListener> ServerListener { get; set; }
 
-        private IList<TcpClient> ConnectedClients { get; set; }
+        private IList<TcpClient> ConnectedSkeletClients { get; set; }
 
-        private Dictionary<TcpClient, Queue> SendQueue = new Dictionary<TcpClient, Queue>();
+        private readonly Dictionary<TcpClient, Queue> SendQueue = new Dictionary<TcpClient, Queue>();
 
         private void SkeletClientConnected(IAsyncResult ar)
         {
@@ -42,7 +43,7 @@ namespace KinectServer
             tcpListener.BeginAcceptSocket(SkeletClientConnected, tcpListener);
             tcpClient.NoDelay = true;
             Console.WriteLine("Client Connected : '{0}'", tcpClient.Client.LocalEndPoint);
-            ConnectedClients.Add(tcpClient);
+            ConnectedSkeletClients.Add(tcpClient);
             SendQueue[tcpClient] = Queue.Synchronized(new Queue());
             ThreadPool.QueueUserWorkItem(SendToSocket, tcpClient);
         }
@@ -73,12 +74,20 @@ namespace KinectServer
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
+            }finally
+            {
+                ConnectedSkeletClients.Remove(client);
             }
         }
 
         private void RuntimeSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            using (var openSkeletonFrame = e.OpenSkeletonFrame())
+            WorkOnSkeletonFrame(e.OpenSkeletonFrame());
+        }
+
+        private void WorkOnSkeletonFrame(SkeletonFrame openSkeletonFrame)
+        {
+            using (openSkeletonFrame)
             {
                 if (openSkeletonFrame == null)
                 {
@@ -89,11 +98,27 @@ namespace KinectServer
                 openSkeletonFrame.CopySkeletonDataTo(skeletsData);
                 var trackedSkeletons = skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).ToList();
                 if (trackedSkeletons.Count == 0) return;
-                foreach (var connectedClient in ConnectedClients)
+                foreach (var connectedClient in ConnectedSkeletClients)
                 {
                     SendQueue[connectedClient].Enqueue(trackedSkeletons);
                 }
             }
+        }
+
+        private void SkeletonFrameResolving(object state)
+        {
+            var skeletonStream = state as SkeletonStream;
+            while (!Stopped)
+            {
+                var nextSkeletonFrame = skeletonStream.OpenNextFrame(Settings.Default.RefreshRate);
+                WorkOnSkeletonFrame(nextSkeletonFrame);
+            }
+        }
+
+        private bool StartSkelet()
+        {
+            //Kinect.SkeletonFrameReady += RuntimeSkeletonFrameReady;
+            return ThreadPool.QueueUserWorkItem(SkeletonFrameResolving, Kinect.SkeletonStream);
         }
     }
 }

@@ -54,11 +54,17 @@ namespace KinectServer
             var buffer = new byte[256];
             data.Item1.BeginRead(buffer, 0, buffer.Length, AudioStreamBufferd, new Tuple<Stream, byte[]>(data.Item1, buffer));
 
+            TcpClient toRemove = null;
             foreach (var item in ConnectedAudioClients.AsParallel())
             {
-                if (!item.Connected) continue;
+                if (!item.Connected)
+                {
+                    toRemove = item;
+                    continue;
+                }
                 item.GetStream().Write(data.Item2, 0, count);
             }
+            ConnectedAudioClients.Remove(toRemove);
         }
 
         private void AudioClientConnected(IAsyncResult ar)
