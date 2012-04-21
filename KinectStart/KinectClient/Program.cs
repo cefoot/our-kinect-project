@@ -13,19 +13,13 @@ namespace KinectClient
         static void Main(string[] args)
         {
             var client = new TcpClient();
-            client.Connect("WS201736", 666);
+            client.Connect("LAPTOP", 667);
             var stream = client.GetStream();
             while (client.Connected)
             {
-                //var byt = stream.ReadByte();
-                //if (byt < 0) continue;
-                //Console.Write((char)byt);
-                var jointDatas = stream.DeserializeJointData();
-                foreach (var jointData in jointDatas)
-                {
-                    Console.WriteLine(jointData.SkeletPoint);
-                }
-               
+                var readByte = stream.ReadByte();
+                if(readByte < 0) continue;
+                Console.Write(readByte);
             }
         }
     }
