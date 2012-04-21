@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Speech.Recognition;
@@ -61,10 +62,13 @@ namespace StickmansSpeech
         /// </summary>
         protected override void Initialize()
         {
-            var skeletClient = new TcpClient();
-            skeletClient.BeginConnect("LAPTOP", 666, ServerSkeletConnected, skeletClient);
+            var skeletClient = new TcpClient
+                                   {
+                                       NoDelay = true
+                                   };
+            skeletClient.BeginConnect("WS201736", 666, ServerSkeletConnected, skeletClient);
             var audioClient = new TcpClient();
-            audioClient.BeginConnect("LAPTOP", 667, ServerAudioConnected, audioClient);
+            audioClient.BeginConnect("WS201736", 667, ServerAudioConnected, audioClient);
 
             allText = new List<String>();
             base.Initialize();
@@ -90,18 +94,27 @@ namespace StickmansSpeech
             var networkStream = client.GetStream();
             while (client.Connected)
             {
+                var dateTime = DateTime.Now;
+                Console.WriteLine("start reading:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
                 var _deserializeJointData = networkStream.DeserializeJointData();
-                if (_deserializeJointData == null)
-                {
-                    continue;
-                }
-                var skellets = _deserializeJointData.Skelletons.Select(skeleton => new Stickman
-                                                                                       {
-                                                                                           Joints = skeleton
-                                                                                       }).ToList();
-                _trackedStickmans = skellets;
-                Debug.Print(_trackedStickmans.Count.ToString());
+                dateTime = DateTime.Now;
+                Console.WriteLine("ready reading:" + dateTime.ToLongTimeString() + "." + dateTime.Millisecond);
+                ThreadPool.QueueUserWorkItem(SkeletsRecieved, _deserializeJointData);
             }
+        }
+
+        private void SkeletsRecieved(object state)
+        {
+            var _deserializeJointData = state as TrackedSkelletons;
+            if (_deserializeJointData == null)
+            {
+                return;
+            }
+            var skellets = _deserializeJointData.Skelletons.Select(skeleton => new Stickman
+            {
+                Joints = skeleton
+            }).ToList();
+            _trackedStickmans = skellets;
         }
 
         /// <summary>
