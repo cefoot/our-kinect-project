@@ -71,7 +71,7 @@ namespace KinectServer
         {
             var tcpListener = ar.AsyncState as TcpListener;
             var tcpClient = tcpListener.EndAcceptTcpClient(ar);
-            Console.WriteLine("Audio Client Connected : '{0}'", tcpClient.Client.LocalEndPoint);
+            Console.WriteLine("Audio Client Connected : '{0}'", tcpClient.Client.RemoteEndPoint);
             ConnectedAudioClients.Add(tcpClient);
             tcpListener.BeginAcceptSocket(AudioClientConnected, tcpListener);
 

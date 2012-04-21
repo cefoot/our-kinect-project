@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands.Audio.cs" />
+    <Compile Include="Commands.AudioAngle.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="KinectServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

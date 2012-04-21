@@ -17,24 +17,9 @@ namespace KinectServer
         {
             PrintInfo();
             var kinect = KinectSensor.KinectSensors[0];
-            var kinectAudioSource = kinect.AudioSource;
-            kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
-            kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
-            kinect.SkeletonStream.Enable();
-            var cmds = new Commands(kinect,kinectAudioSource);
+            var cmds = new Commands(kinect);
             while (ReactOnCommand(cmds))
             {}
-
-
-
-
-            var transferableJoints = new Skeleton().CreateTransferable();
-            var serializer = new XmlSerializer(transferableJoints.GetType());
-            var writer = new StringWriter();
-            serializer.Serialize(writer, transferableJoints);
-            writer.Flush();
-            Console.WriteLine(writer.ToString());
-            Console.ReadKey();
         }
 
         private static void PrintInfo()

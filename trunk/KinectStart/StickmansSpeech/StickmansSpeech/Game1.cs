@@ -36,7 +36,7 @@ namespace StickmansSpeech
         GraphicsDeviceManager graphics;
         SpriteBatch _spriteBatch;
         private IList<Stickman> _trackedStickmans;
-        
+
         private double _anglesource = 0;
         private SpriteFont _spriteFont;
         private int ScreenWidth { get; set; }
@@ -62,23 +62,35 @@ namespace StickmansSpeech
         /// </summary>
         protected override void Initialize()
         {
-            var skeletClient = new TcpClient
+            var client = new TcpClient
                                    {
                                        NoDelay = true
                                    };
-            skeletClient.BeginConnect("WS201736", 666, ServerSkeletConnected, skeletClient);
-            var audioClient = new TcpClient();
-            audioClient.BeginConnect("WS201736", 667, ServerAudioConnected, audioClient);
+            client.BeginConnect("WS201736", 666, ServerSkeletConnected, client);
+            client = new TcpClient();
+            client.BeginConnect("WS201736", 667, ServerAudioConnected, client);
+            client = new TcpClient
+            {
+                NoDelay = true
+            };
+            client.BeginConnect("WS201736", 668, ServerAudioAngleConnected, client);
 
             allText = new List<String>();
             base.Initialize();
+        }
+
+        private void ServerAudioAngleConnected(IAsyncResult ar)
+        {
+            var tcpClient = ar.AsyncState as TcpClient;
+            tcpClient.EndConnect(ar);
+            ThreadPool.QueueUserWorkItem(AudiAngleRecieving, tcpClient);
         }
 
         private void ServerAudioConnected(IAsyncResult ar)
         {
             var tcpClient = ar.AsyncState as TcpClient;
             tcpClient.EndConnect(ar);
-            initKinectAudio(tcpClient.GetStream());  
+            initKinectAudio(tcpClient.GetStream());
         }
 
         private void ServerSkeletConnected(IAsyncResult ar)
@@ -86,6 +98,27 @@ namespace StickmansSpeech
             var tcpClient = ar.AsyncState as TcpClient;
             tcpClient.EndConnect(ar);
             ThreadPool.QueueUserWorkItem(SkeletonsRecieving, tcpClient);
+        }
+
+        private void AudiAngleRecieving(object state)
+        {
+            var client = state as TcpClient;
+            using (var stream = new BufferedStream(client.GetStream()))
+            {
+                while (client.Connected)
+                {
+                    var readByte = stream.ReadByte();
+                    if (readByte < 0) continue;
+                    if (readByte == byte.MaxValue)
+                    {
+                        _anglesource = 1000;
+                    }
+                    else
+                    {
+                        _anglesource = readByte - 90;//byte geht bei 0 los daher um 90 grad verschoben
+                    }
+                }
+            }
         }
 
         private void SkeletonsRecieving(object state)
@@ -123,7 +156,7 @@ namespace StickmansSpeech
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _spriteFont = Content.Load<SpriteFont>("Arial");        
+            _spriteFont = Content.Load<SpriteFont>("Arial");
 
 
             ScreenWidth = GraphicsDevice.Viewport.TitleSafeArea.Width;
@@ -203,8 +236,8 @@ namespace StickmansSpeech
         {
             if (e.Result.Confidence < 0.7)
             {
-                
-                System.Diagnostics.Debug.Print(e.Result.Text+" rejected with confidence:"+e.Result.Confidence.ToString());
+
+                System.Diagnostics.Debug.Print(e.Result.Text + " rejected with confidence:" + e.Result.Confidence.ToString());
                 return;
             }
             //currentText = e.Result.Text;
@@ -218,12 +251,7 @@ namespace StickmansSpeech
             }
             string currentSentence = String.Join(" ", allText.ToArray());
             System.Diagnostics.Debug.Print(currentSentence);
-            
-    }
 
-        void AudioSourceSoundSourceAngleChanged(object sender, SoundSourceAngleChangedEventArgs e)
-        {
-            _anglesource = e.ConfidenceLevel > .4 ? e.Angle : 1000;
         }
 
         /// <summary>
@@ -290,9 +318,9 @@ namespace StickmansSpeech
 
         private void DrawSpeech(SpriteBatch spriteBatch, IEnumerable<Stickman> trackedSkeletons)
         {
-            
-            
-            
+
+
+
             var speaker = trackedSkeletons.FirstOrDefault(skel => skel.IsSpeaker);
             if (speaker == null)
             {
@@ -329,7 +357,7 @@ namespace StickmansSpeech
         }
 
 
-       
+
 
         private void Drawstickman(Stickman trackedSkeleton, SpriteBatch spriteBatch)
         {

@@ -37,9 +37,13 @@ namespace KinectServer
 
         protected bool Stopped { get; set; }
 
-        public Commands(KinectSensor kinect,KinectAudioSource kinectAudioSource):this()
+        private readonly Dictionary<TcpClient, Queue> _clientQueueBuffer = new Dictionary<TcpClient, Queue>();
+
+        public Commands(KinectSensor kinect)
+            : this()
         {
             Kinect = kinect;
+            var kinectAudioSource = kinect.AudioSource;
             KinectAudio = kinectAudioSource;
         }
 
@@ -48,15 +52,18 @@ namespace KinectServer
             Stopped = true;
             ServerListener = new List<TcpListener>();
             AudioServerListener = new List<TcpListener>();
+            AudioAngleServerListener = new List<TcpListener>();
 
             ConnectedSkeletClients = new List<TcpClient>();
             ConnectedAudioClients = new List<TcpClient>();
+            ConnectedAudioAngleClients = new List<TcpClient>();
 
             var hostAddress = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ipAddress in hostAddress.AddressList)
             {
                 ServerListener.Add(new TcpListener(ipAddress, Settings.Default.ServerPort));
                 AudioServerListener.Add(new TcpListener(ipAddress, Settings.Default.AudioServerPort));
+                AudioAngleServerListener.Add(new TcpListener(ipAddress, Settings.Default.AudioAnlgeServerPort));
             }
         }
 
@@ -64,7 +71,7 @@ namespace KinectServer
         public bool Help()
         {
             Console.Clear();
-            foreach (var methodInfo in GetType().GetMethods(BindingFlags.Instance|BindingFlags.Public|BindingFlags.DeclaredOnly))
+            foreach (var methodInfo in GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 if (methodInfo.GetParameters().Length > 0 || methodInfo.Name.Contains("_"))
                 {
@@ -77,14 +84,27 @@ namespace KinectServer
             return true;
         }
 
-        [Description("Beendet den Server")]
+        [Description("Stoppt den Server")]
         public bool Stop()
         {
             Stopped = true;
+            AudioServerListener.AsParallel().ForAll(listener => listener.Stop());
+            ServerListener.AsParallel().ForAll(listener => listener.Stop());
+            AudioAngleServerListener.AsParallel().ForAll(listener => listener.Stop());
             Kinect.SkeletonFrameReady -= RuntimeSkeletonFrameReady;
             Kinect.SkeletonStream.Disable();
             Kinect.AudioSource.Stop();
             Kinect.Stop();
+            return true;
+        }
+
+        [Description("Beendet den Server")]
+        public bool Exit()
+        {
+            if (!Stopped)
+            {
+                Stop();
+            }
             return false;
         }
 
@@ -102,6 +122,9 @@ namespace KinectServer
         [Description("Startet den Server")]
         public bool Start()
         {
+            Kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
+            Kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
+            Kinect.SkeletonStream.Enable();
             foreach (var tcpListener in ServerListener)
             {
                 tcpListener.Start();
@@ -114,9 +137,15 @@ namespace KinectServer
                 tcpListener.BeginAcceptTcpClient(AudioClientConnected, tcpListener);
             }
 
-            Console.WriteLine(String.Concat("Server läuft auf Port:", Settings.Default.ServerPort));
+            foreach (var tcpListener in AudioAngleServerListener)
+            {
+                tcpListener.Start();
+                tcpListener.BeginAcceptTcpClient(AudioAngleClientConnected, tcpListener);
+            }
             Stopped = false;
-            var start = StartAudio() && StartSkelet();
+            var start = StartSkelet();
+            start &= StartAudio();
+            start &= StartAudioAngle();
             Console.WriteLine("Kinect gestartet");
             return start;
         }
