@@ -35,14 +35,13 @@ namespace StickmansSpeech
         SpriteBatch _spriteBatch;
         private IList<Stickman> _trackedStickmans;
         
-        private double _anglesource;
+        private double _anglesource = 0;
         private SpriteFont _spriteFont;
         private int ScreenWidth { get; set; }
         private Choices choices;
         private SpeechRecognitionEngine speechEngine;
         private String currentText = "";
         private IList<String> allText;
-        private TrackedSkelletons _deserializeJointData;
 
 
         private int ScreenHeight { get; set; }
@@ -61,9 +60,10 @@ namespace StickmansSpeech
         /// </summary>
         protected override void Initialize()
         {
-            var client = new TcpClient();
-            client.BeginConnect("LAPTOP", 666, ServerSkeletConnected, client);
-            client.BeginConnect("LAPTOP", 667, ServerAudioConnected,client);
+            var skeletClient = new TcpClient();
+            skeletClient.BeginConnect("LAPTOP", 666, ServerSkeletConnected, skeletClient);
+            var audioClient = new TcpClient();
+            audioClient.BeginConnect("LAPTOP", 667, ServerAudioConnected, audioClient);
 
             allText = new List<String>();
             base.Initialize();
@@ -89,7 +89,11 @@ namespace StickmansSpeech
             var networkStream = client.GetStream();
             while (client.Connected)
             {
-                _deserializeJointData = networkStream.DeserializeJointData();
+                var _deserializeJointData = networkStream.DeserializeJointData();
+                if (_deserializeJointData == null)
+                {
+                    continue;
+                }
                 _trackedStickmans.Clear();
                 foreach (var skelet in _deserializeJointData.Skelletons.Select(skeleton => new Stickman
                                                                                                 {

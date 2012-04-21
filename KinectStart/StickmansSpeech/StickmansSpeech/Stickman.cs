@@ -59,26 +59,5 @@ namespace StickmansSpeech
         public Color BoneColor { get; set; }
 
         #endregion
-
-        #region Methoden
-
-        // override object.Equals
-        public override bool Equals(object obj)
-        {
-
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            return ((Stickman) obj).Skeleton.TrackingId.Equals(Skeleton.TrackingId);
-            
-        }
-
-// override object.GetHashCode
-        public override int GetHashCode()
-        {
-            return Skeleton.GetHashCode();
-        }
-        #endregion
     }
 }
