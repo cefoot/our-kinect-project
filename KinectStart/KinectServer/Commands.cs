@@ -23,6 +23,9 @@ using System.Text;
 using KinectAddons;
 using KinectServer.Properties;
 using Microsoft.Kinect;
+using Microsoft.Speech.Recognition;
+using Microsoft.Speech.AudioFormat;
+using System.IO;
 
 namespace KinectServer
 {
@@ -31,23 +34,37 @@ namespace KinectServer
     {
         public KinectSensor Kinect { get; set; }
 
+        public KinectAudioSource KinectAudio { get; set; }
+
         public IList<TcpListener> ServerListener { get; set; }
 
-        public IList<TcpClient> ConnectedClients { get; set; }
+        public IList<TcpListener> AudioServerListener { get; set; }
 
-        public Commands(KinectSensor kinect):this()
+        public IList<TcpClient> ConnectedClients { get; set; }
+        
+        public IList<TcpClient> ConnectedAudioClients { get; set; }
+
+        private SpeechRecognitionEngine speechEngine;
+
+        public Commands(KinectSensor kinect,KinectAudioSource kinectAudioSource):this()
         {
             Kinect = kinect;
+            KinectAudio = kinectAudioSource;
         }
 
         public Commands()
         {
             ServerListener = new List<TcpListener>();
+            AudioServerListener = new List<TcpListener>();
+
             ConnectedClients = new List<TcpClient>();
+            ConnectedAudioClients = new List<TcpClient>();
+
             var hostAddress = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ipAddress in hostAddress.AddressList)
             {
                 ServerListener.Add(new TcpListener(ipAddress, Settings.Default.ServerPort));
+                AudioServerListener.Add(new TcpListener(ipAddress, Settings.Default.AudioServerPort));
             }
         }
 
@@ -105,8 +122,55 @@ namespace KinectServer
                 tcpListener.Start();
                 tcpListener.BeginAcceptTcpClient(ClientConnected, tcpListener);
             }
+
+            foreach (var tcpListener in AudioServerListener)
+            {
+                tcpListener.Start();
+                tcpListener.BeginAcceptTcpClient(AudioClientConnected, tcpListener);
+            }
+
             Console.WriteLine(String.Concat("Server läuft auf Port:", Settings.Default.ServerPort));
+            return StartAudio();
+        }
+
+        private bool StartAudio()
+        {
+            KinectAudio.AutomaticGainControlEnabled = false;
+            KinectAudio.EchoCancellationMode = EchoCancellationMode.None;
+            KinectAudio.NoiseSuppression = false;
+            
+            var stream = KinectAudio.Start();
+            Console.WriteLine("AudioKinect gestartet");
+
+            var buffer = new byte[256];
+            stream.BeginRead(buffer, 0, buffer.Length, AudioStreamBufferd, new Tuple<Stream,byte[]>(stream,buffer));
+
+            Console.WriteLine(String.Concat("Audio Server läuft auf Port:", Settings.Default.AudioServerPort));
             return true;
+        }
+
+        public void AudioStreamBufferd(IAsyncResult asynResult)
+        {
+            var data = asynResult.AsyncState as Tuple<Stream, byte[]>;
+            var count = data.Item1.EndRead(asynResult);
+            var buffer = new byte[256];
+            var asyncr = data.Item1.BeginRead(buffer, 0, buffer.Length, AudioStreamBufferd, new Tuple<Stream, byte[]>(data.Item1, buffer));
+            
+            foreach (var item in ConnectedAudioClients.AsParallel())
+            {
+                item.GetStream().Write(data.Item2, 0, count);
+            }
+        }
+
+        private static RecognizerInfo GetKinectRecognizer()
+        {
+            Func<RecognizerInfo, bool> matchingFunc = r =>
+            {
+                string value;
+                r.AdditionalInfo.TryGetValue("Kinect", out value);
+                return "True".Equals(value, StringComparison.InvariantCultureIgnoreCase) && "en-US".Equals(r.Culture.Name, StringComparison.InvariantCultureIgnoreCase);
+            };
+            return SpeechRecognitionEngine.InstalledRecognizers().Where(matchingFunc).FirstOrDefault();
         }
 
         private void ClientConnected(IAsyncResult ar)
@@ -119,21 +183,33 @@ namespace KinectServer
 
         }
 
+        private void AudioClientConnected(IAsyncResult ar)
+        {
+            var tcpListener = ar.AsyncState as TcpListener;
+            var tcpClient = tcpListener.EndAcceptTcpClient(ar);
+            Console.WriteLine("Audio Client Connected : '{0}'", tcpClient.Client.LocalEndPoint.ToString());
+            ConnectedAudioClients.Add(tcpClient);
+            tcpListener.BeginAcceptSocket(AudioClientConnected, tcpListener);
+
+        }
+
         private void RuntimeSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            var openSkeletonFrame = e.OpenSkeletonFrame();
-
-            if (openSkeletonFrame == null)
+            using (var openSkeletonFrame = e.OpenSkeletonFrame())
             {
-                return;
-            }
 
-            var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
-            openSkeletonFrame.CopySkeletonDataTo(skeletsData);
-            
-            foreach (var selectedStickman in skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).AsParallel())
-            {
-                ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, selectedStickman.CreateTransferable()));
+                if (openSkeletonFrame == null)
+                {
+                    return;
+                }
+
+                var skeletsData = new Skeleton[openSkeletonFrame.SkeletonArrayLength];
+                openSkeletonFrame.CopySkeletonDataTo(skeletsData);
+
+                foreach (var selectedStickman in skeletsData.Where(skeleton => skeleton.TrackingState == SkeletonTrackingState.Tracked).AsParallel())
+                {
+                    ConnectedClients.AsParallel().ForAll(socket => SendToSocket(socket, selectedStickman.CreateTransferable()));
+                }
             }
         }
 

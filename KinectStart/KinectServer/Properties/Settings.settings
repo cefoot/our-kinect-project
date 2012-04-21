@@ -11,5 +11,8 @@
     <Setting Name="ServerPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">666</Value>
     </Setting>
+    <Setting Name="AudioServerPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">667</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
