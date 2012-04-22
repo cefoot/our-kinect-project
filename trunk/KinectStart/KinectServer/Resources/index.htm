@@ -1,0 +1,72 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title>Skelet</title>
+    <script type="text/javascript" src="wz_jsgraphics.js"></script>
+</head>
+<body>
+    <h1>
+        Skelet</h1>
+    <div id="skelet" style="height: 480px; width: 640px; border-style:solid; border-width:medium; border-color: Black;">
+    </div>
+    <script type="text/javascript">
+        var xmlHttp = null;
+        var jg = new jsGraphics("skelet");
+
+        function GetData() {
+            var Url = "skelets/";
+
+            xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = ProcessRequest;
+            xmlHttp.open("GET", Url, true);
+            xmlHttp.send(null);
+        };
+
+        function ProcessRequest() {
+            if (xmlHttp.readyState != 4 || xmlHttp.status != 200) {
+                return;
+            }
+            if (xmlHttp.responseText.indexOf("no skelets tracked") > -1) {
+                jg.clear();
+                jg.drawString("No Skelets Tracked", 302, 240);
+                jg.paint();
+                GetData();
+                return;
+            }
+            //alert(xmlHttp.responseText);
+            var skeletData = xmlHttp.responseText.split(",");
+            jg.setColor("black");
+            var headX = parseInt(skeletData[0]);
+            var headY = parseInt(skeletData[1]);
+
+            var hipX = parseInt(skeletData[2]);
+            var hipY = parseInt(skeletData[3]);
+
+            var handleftX = parseInt(skeletData[4]);
+            var handleftY = parseInt(skeletData[5]);
+
+            var handrightX = parseInt(skeletData[6]);
+            var handrightY = parseInt(skeletData[7]);
+
+            var footleftX = parseInt(skeletData[8]);
+            var footleftY = parseInt(skeletData[9]);
+
+            var footrightX = parseInt(skeletData[10]);
+            var footrightY = parseInt(skeletData[11]);
+
+            var shouldercenterX = parseInt(skeletData[12]);
+            var shouldercenterY = parseInt(skeletData[13]);
+            jg.clear();
+            jg.fillEllipse(headX, headY, 50, 50);
+            jg.drawLine(shouldercenterX, shouldercenterY, hipX, hipY);
+            jg.drawLine(shouldercenterX, shouldercenterY, handrightX, handrightY);
+            jg.drawLine(shouldercenterX, shouldercenterY, handleftX, handrightY);
+            jg.drawLine(footleftX, footleftY, hipX, hipY);
+            jg.drawLine(footrightX, footrightY, hipX, hipY);
+            jg.paint();
+            GetData();
+        };
+        GetData();
+    </script>
+</body>
+</html>

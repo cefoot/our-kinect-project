@@ -35,6 +35,7 @@ namespace KinectServer
         private void AudioAngleClientConnected(IAsyncResult ar)
         {
             var tcpListener = ar.AsyncState as TcpListener;
+            if(Stopped) return;
             var tcpClient = tcpListener.EndAcceptTcpClient(ar);
             tcpListener.BeginAcceptSocket(AudioAngleClientConnected, tcpListener);
             Console.WriteLine("AudioAngle Client Connected : '{0}'", tcpClient.Client.RemoteEndPoint);

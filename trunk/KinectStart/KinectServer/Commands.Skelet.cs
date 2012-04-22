@@ -37,6 +37,7 @@ namespace KinectServer
         private void SkeletClientConnected(IAsyncResult ar)
         {
             var tcpListener = ar.AsyncState as TcpListener;
+            if(Stopped) return;
             var tcpClient = tcpListener.EndAcceptTcpClient(ar);
             tcpListener.BeginAcceptSocket(SkeletClientConnected, tcpListener);
             tcpClient.NoDelay = true;
