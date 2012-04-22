@@ -88,6 +88,7 @@ namespace KinectServer
         public bool Stop()
         {
             Stopped = true;
+            _httpListener.Stop();
             AudioServerListener.AsParallel().ForAll(listener => listener.Stop());
             ServerListener.AsParallel().ForAll(listener => listener.Stop());
             AudioAngleServerListener.AsParallel().ForAll(listener => listener.Stop());
@@ -146,6 +147,7 @@ namespace KinectServer
             var start = StartSkelet();
             start &= StartAudio();
             start &= StartAudioAngle();
+            start &= StartHttp();
             Console.WriteLine("Kinect gestartet");
             return start;
         }
