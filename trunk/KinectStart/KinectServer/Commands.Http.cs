@@ -54,12 +54,8 @@ namespace KinectServer
             }
         }
 
-        private void ProcessRequest(IAsyncResult ar)
+        private void ProcessRequest(TcpClient tcpClient)
         {
-            var tcpListener = ar.AsyncState as TcpListener;
-            if(Stopped) return;
-            var tcpClient = tcpListener.EndAcceptTcpClient(ar);
-            tcpListener.BeginAcceptTcpClient(HttpReqeust, tcpListener);
             string line;
             using (var reader = new StreamReader(tcpClient.GetStream()))
             {
@@ -87,6 +83,21 @@ namespace KinectServer
                 {
                     LoadResource(tcpClient, "", "index.html");
                 }
+            }
+        }
+
+        private void ProcessRequest(IAsyncResult ar)
+        {
+            var tcpListener = ar.AsyncState as TcpListener;
+            if(Stopped) return;
+            var tcpClient = tcpListener.EndAcceptTcpClient(ar);
+            tcpListener.BeginAcceptTcpClient(HttpReqeust, tcpListener);
+            try
+            {
+                ProcessRequest(tcpClient);
+            }
+            catch (Exception e)
+            {
             }
         }
 
