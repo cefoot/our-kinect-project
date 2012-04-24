@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectRotater", "KinectRotater\KinectRotater\KinectRotater.csproj", "{7EE55C7B-4608-4F36-8FBD-B62345CD6CE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectRotaterContent", "KinectRotater\KinectRotaterContent\KinectRotaterContent.contentproj", "{1D1232D2-6CEA-4B86-9115-27A74590C362}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectAddons", "..\KinectStart\KinectAddons\KinectAddons.csproj", "{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EE55C7B-4608-4F36-8FBD-B62345CD6CE6}.Debug|x86.ActiveCfg = Debug|x86
+		{7EE55C7B-4608-4F36-8FBD-B62345CD6CE6}.Debug|x86.Build.0 = Debug|x86
+		{7EE55C7B-4608-4F36-8FBD-B62345CD6CE6}.Release|x86.ActiveCfg = Release|x86
+		{7EE55C7B-4608-4F36-8FBD-B62345CD6CE6}.Release|x86.Build.0 = Release|x86
+		{1D1232D2-6CEA-4B86-9115-27A74590C362}.Debug|x86.ActiveCfg = Debug|x86
+		{1D1232D2-6CEA-4B86-9115-27A74590C362}.Release|x86.ActiveCfg = Release|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Debug|x86.ActiveCfg = Debug|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Debug|x86.Build.0 = Debug|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.ActiveCfg = Release|x86
+		{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
