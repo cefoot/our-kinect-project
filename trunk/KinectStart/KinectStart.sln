@@ -29,7 +29,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectClient", "KinectClien
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFluidSimulation", "DynamicFluidSimulation\DynamicFluidSimulation\DynamicFluidSimulation.csproj", "{0414BF7F-AEC3-4695-BCBE-17FD0A0F8D13}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "DynamicFluidSimulationContent", "DynamicFluidSimulation\DynamicFluidSimulationContent\DynamicFluidSimulationContent.contentproj", "{ED79A679-2922-4A06-BE65-471525D1F5F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFluidSimulationContent", "DynamicFluidSimulation\DynamicFluidSimulationContent\DynamicFluidSimulationContent.contentproj", "{ED79A679-2922-4A06-BE65-471525D1F5F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XNA3DView", "XNA3DView\XNA3DView\XNA3DView.csproj", "{3AE65908-844A-4996-A645-23893B2FFA65}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "XNA3DViewContent", "XNA3DView\XNA3DViewContent\XNA3DViewContent.contentproj", "{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +147,22 @@ Global
 		{ED79A679-2922-4A06-BE65-471525D1F5F0}.Release|Any CPU.ActiveCfg = Release|x86
 		{ED79A679-2922-4A06-BE65-471525D1F5F0}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{ED79A679-2922-4A06-BE65-471525D1F5F0}.Release|x86.ActiveCfg = Release|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Debug|x86.ActiveCfg = Debug|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Debug|x86.Build.0 = Debug|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Release|Any CPU.ActiveCfg = Release|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Release|x86.ActiveCfg = Release|x86
+		{3AE65908-844A-4996-A645-23893B2FFA65}.Release|x86.Build.0 = Release|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Debug|x86.ActiveCfg = Debug|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Release|Any CPU.ActiveCfg = Release|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{80F98D1E-9A4E-4E45-B99F-98D65FF343D2}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
