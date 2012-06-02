@@ -1,9 +1,0 @@
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\bin\x86\Debug\Content\SpriteFont1.xnb
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\bin\x86\Debug\FaceCameraGame.exe
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\bin\x86\Debug\FaceCameraGame.pdb
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\bin\x86\Debug\FaceCamera.dll
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\bin\x86\Debug\FaceCamera.pdb
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\obj\x86\Debug\FaceCameraGame.exe
-C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCameraGame\FaceCameraGame\obj\x86\Debug\FaceCameraGame.pdb
