@@ -1,0 +1,12 @@
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\bin\x86\Debug\FaceCamera.dll
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\bin\x86\Debug\FaceCamera.pdb
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\obj\x86\Debug\FaceCamera.dll
+C:\Users\overflow\Documents\Visual Studio 2010\Projects\FaceCamera\FaceCamera\obj\x86\Debug\FaceCamera.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\bin\x86\Debug\FaceCamera.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\bin\x86\Debug\FaceCamera.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\obj\x86\Debug\FaceCamera.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\obj\x86\Debug\FaceCamera.pdb
+c:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\FaceCamera\FaceCamera\obj\x86\Debug\FaceCamera.csprojResolveAssemblyReference.cache
