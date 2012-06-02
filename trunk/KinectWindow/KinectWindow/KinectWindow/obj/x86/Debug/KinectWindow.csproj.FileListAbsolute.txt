@@ -1,0 +1,13 @@
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\obj\x86\Debug\KinectWindow.csprojResolveAssemblyReference.cache
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\Content\Wall.xnb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\KinectWindow.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\KinectWindow.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\obj\x86\Debug\KinectWindow.exe
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\obj\x86\Debug\KinectWindow.pdb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\Content\Wall1.xnb
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\FaceCamera.dll
+C:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\FaceCamera.pdb
+c:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\Content\ant.xnb
+c:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\Content\fbx\texture.xnb
+c:\Users\Chris\Documents\Visual Studio 2010\Projects\Kinect\KinectWindow\KinectWindow\KinectWindow\bin\x86\Debug\Content\fbx\texture_0.xnb
