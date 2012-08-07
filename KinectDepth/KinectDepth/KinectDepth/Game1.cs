@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Sockets;
+using System.Threading;
 using KinectAddons;
 using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
@@ -46,11 +49,37 @@ namespace KinectDepth
         /// </summary>
         protected override void Initialize()
         {
-            Sensor = KinectSensor.KinectSensors[0];
-            Sensor.Start();
-            Sensor.DepthStream.Enable(DepthImageFormat.Resolution80x60Fps30);
+           // Sensor = KinectSensor.KinectSensors[0];
+           // Sensor.Start();
+           // Sensor.DepthStream.Enable(DepthImageFormat.Resolution80x60Fps30);
+
+            var client = new TcpClient
+            {
+                NoDelay = true
+            };
+            client.BeginConnect("WS201736", 669, ServerDepthConnected, client);
 
             base.Initialize();
+        }
+
+        private void ServerDepthConnected(IAsyncResult ar)
+        {
+            var tcpClient = ar.AsyncState as TcpClient;
+            tcpClient.EndConnect(ar);
+            ThreadPool.QueueUserWorkItem(DepthRecieving, tcpClient);
+        }
+
+        private void DepthRecieving(object state)
+        {
+            var client = state as TcpClient;
+            using (var stream = new BufferedStream(client.GetStream()))
+            {
+                while (client.Connected)
+                {
+                    var _deserializeJointData = stream.DeserializeDepthData();
+                    ThreadPool.QueueUserWorkItem(DepthRecieved, _deserializeJointData);
+                }
+            }
         }
 
         protected KinectSensor Sensor { get; set; }
@@ -90,9 +119,19 @@ namespace KinectDepth
 
         protected override void Dispose(bool disposing)
         {
-            Sensor.DepthStream.Disable();
-            Sensor.Stop();
+            //HAllo Welt Sensor.DepthStream.Disable();
+            //HAllo Welt Sensor.Stop();
             base.Dispose(disposing);
+        }
+
+        private void DepthRecieved(object state)
+        {
+            var _deserializeDepthData = state as short[];
+            if (_deserializeDepthData == null)
+            {
+                return;
+            }
+            UpdateAngles(_deserializeDepthData);
         }
 
         /// <summary>
@@ -105,16 +144,11 @@ namespace KinectDepth
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
+            base.Update(gameTime);
+        }
 
-            var depthImageFrame = Sensor.DepthStream.OpenNextFrame(500);
-            if (depthImageFrame == null)
-            {
-                base.Update(gameTime);
-                return;
-            }
-            var pixlData = new short[depthImageFrame.PixelDataLength];
-            depthImageFrame.CopyPixelDataTo(pixlData);
-            depthImageFrame.Dispose();
+        private void UpdateAngles(IList<short> pixlData)
+        {
 
             double left = 0d;
             double right = 0d;
@@ -150,7 +184,6 @@ namespace KinectDepth
                 LeftVector = LeftVector * (float)AvrB * 0.2f;
                 RightVector = RightVector * (float)AvrA * 0.2f;
             }
-            base.Update(gameTime);
         }
 
         /// <summary>

@@ -11,39 +11,40 @@
       <File id="C6F9C31B-6130-4443-A5CC-EF0664552ECD/f:RelayCommand.cs" caret="755" fromTop="0" />
       <File id="236F1E68-243F-476E-A89E-93E41BF943F3/f:DebugFont.spritefont" caret="0" fromTop="0" />
       <File id="EC16ADF8-C94C-4443-BAA5-C0A308AE3224/f:PrimitiveLine.cs" caret="2639" fromTop="0" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8197" fromTop="46" />
+      <File id="EC16ADF8-C94C-4443-BAA5-C0A308AE3224/f:SkeletonExtensions.cs" caret="2446" fromTop="22" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="4291" fromTop="14" />
     </RecentFiles>
     <RecentEdits>
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="1749" fromTop="17" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="40" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="37" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="7" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="2" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="21" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="18" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="25" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="10" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="29" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="25" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="18" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="22" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="15" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7220" fromTop="36" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="911" fromTop="20" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="4319" fromTop="8" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7778" fromTop="33" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7748" fromTop="33" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2841" fromTop="28" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7748" fromTop="33" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5711" fromTop="43" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5726" fromTop="24" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2525" fromTop="16" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7748" fromTop="29" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5703" fromTop="22" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5418" fromTop="30" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2804" fromTop="17" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="7582" fromTop="32" />
-      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8197" fromTop="46" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="981" fromTop="20" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5143" fromTop="8" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8776" fromTop="33" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8746" fromTop="33" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="3826" fromTop="28" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8746" fromTop="33" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5143" fromTop="43" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5143" fromTop="24" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="3510" fromTop="16" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8746" fromTop="29" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5143" fromTop="22" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="3789" fromTop="17" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="8580" fromTop="32" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="9195" fromTop="46" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="1759" fromTop="22" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="1979" fromTop="28" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2295" fromTop="41" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2273" fromTop="37" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2370" fromTop="41" />
+      <File id="EC16ADF8-C94C-4443-BAA5-C0A308AE3224/f:SkeletonExtensions.cs" caret="2700" fromTop="29" />
+      <File id="EC16ADF8-C94C-4443-BAA5-C0A308AE3224/f:SkeletonExtensions.cs" caret="3172" fromTop="41" />
+      <File id="EC16ADF8-C94C-4443-BAA5-C0A308AE3224/f:SkeletonExtensions.cs" caret="3117" fromTop="39" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2779" fromTop="51" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2709" fromTop="34" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="2779" fromTop="7" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="4640" fromTop="18" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5231" fromTop="17" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="5143" fromTop="4" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="4627" fromTop="18" />
+      <File id="CBE90131-E231-4CD9-8463-F34CC9EA24AE/f:Game1.cs" caret="4291" fromTop="14" />
     </RecentEdits>
   </RecentFiles>
   <NAntValidationSettings>
@@ -63,7 +64,7 @@
       <Item value="depthImageFrame" priority="2" />
       <Item value="NewsStyleUriParser`0" priority="0" />
       <Item value="new" priority="7" />
-      <Item value="short" priority="1" />
+      <Item value="short" priority="4" />
       <Item value="for" priority="1" />
       <Item value="x" priority="0" />
       <Item value="left" priority="4" />
@@ -113,6 +114,8 @@
       <Item value="RightVector" priority="3" />
       <Item value="if" priority="0" />
       <Item value="vec" priority="1" />
+      <Item value="UpdateAngles`0" priority="0" />
+      <Item value="_deserializeDepthData" priority="0" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:Microsoft.Kinect.KinectSensor">
       <Item value="DepthStream" priority="3" />
