@@ -82,8 +82,8 @@ namespace KinectMouse
             
             //label1.Text = rightHand.SkeletPoint.Z.ToString(); //- jetzt wenn due Hand nach vorne bewegt wird dann ein Click machen
             var tmp = rightHand.ScaleOwn(Screen.PrimaryScreen.Bounds.Width,Screen.PrimaryScreen.Bounds.Height);
-            Cursor.Position = new Point((int) tmp.SkeletPoint.X, (int) tmp.SkeletPoint.Y);
-            mousePosStack.Enqueue(Cursor.Position);
+            //Cursor.Position = new Point((int) tmp.SkeletPoint.X, (int) tmp.SkeletPoint.Y);
+            mousePosStack.Enqueue(new Point((int)tmp.SkeletPoint.X, (int)tmp.SkeletPoint.Y));
             while (mousePosStack.Count > 10)
             {
                 mousePosStack.Dequeue();

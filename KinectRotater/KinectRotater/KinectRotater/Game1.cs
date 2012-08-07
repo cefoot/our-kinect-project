@@ -110,7 +110,7 @@ namespace KinectRotater
             {
                 NoDelay = true
             };
-            //client.BeginConnect("WS201736", 666, ServerSkeletConnected, client);
+            client.BeginConnect("WS201736", 666, ServerSkeletConnected, client);
             base.Initialize();
         }
 
@@ -301,6 +301,7 @@ namespace KinectRotater
         private Color GetColor(Coordinate coord)
         {
             if (coord.Equals(_coords[5, 5, 5])) return Color.Red;
+            if (coord.Equals(Nearest)) return Color.Salmon;
             var clr = Color.White;
             var f = coord.Position.Z - _coords[5, 5, 5].Position.Z;
             f *= 1.2f;
@@ -363,13 +364,24 @@ namespace KinectRotater
 
         private void UpdateTouched(Vector3 relativeLeftHand)
         {
-            var distance = Nearest.Position - _coords[5, 5, 5].Position;
-            var tmp = relativeLeftHand * distance.Length();
-            var d = QubeLengthCnt * QubePixDist;
-            var s = (Nearest.Position - tmp).Length();
-            var b = Math.Asin(s / d) * ((2 * Math.PI) / 180);
-            //TODO s für jeweils xy xz yz berechnen und dann rot setzen
+            var vectorToStartPoint = Nearest.Position - _coords[5, 5, 5].Position;
+            var vectorToRequestedPoint = relativeLeftHand * vectorToStartPoint.Length();
+            _rotX = CalculateRot(new Vector2(vectorToStartPoint.Y, vectorToStartPoint.Z), new Vector2(vectorToRequestedPoint.Y, vectorToRequestedPoint.Z));
+            _rotY = CalculateRot(new Vector2(vectorToStartPoint.X, vectorToStartPoint.Z), new Vector2(vectorToRequestedPoint.X, vectorToRequestedPoint.Z));
+            _rotZ = CalculateRot(new Vector2(vectorToStartPoint.X, vectorToStartPoint.Y), new Vector2(vectorToRequestedPoint.X, vectorToRequestedPoint.Y));
+        }
 
+        private static float CalculateRot(Vector2 from, Vector2 to)
+        {
+            from.Normalize();
+            to.Normalize();
+            var length = (from - to).Length();
+            var alpha = Math.Asin(length / 2);
+            var b = alpha * ((2 * Math.PI) / 180);
+            return (float) b;
+
+
+            //return (float) Math.Acos(Vector2.Dot(from, to));
         }
 
         private void Touch(Vector3 relativePos)
@@ -462,7 +474,7 @@ namespace KinectRotater
             foreach (var coord in _coords)
             {
                 var x = Math.Cos(_rotZ) * (coord.Position.X - middlePnt.X) - Math.Sin(_rotZ) * (coord.Position.Y - middlePnt.Y) + middlePnt.X;
-                var y = Math.Sin(_rotZ) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotZ) * (coord.Position.Y - middlePnt.Y) + middlePnt.X;
+                var y = Math.Sin(_rotZ) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotZ) * (coord.Position.Y - middlePnt.Y) + middlePnt.Y;
                 coord.Position = new Vector3((float)x, (float)y, coord.Position.Z);
             }
         }
@@ -474,7 +486,7 @@ namespace KinectRotater
             foreach (var coord in _coords)
             {
                 var x = Math.Cos(_rotY) * (coord.Position.X - middlePnt.X) - Math.Sin(_rotY) * (coord.Position.Z - middlePnt.Z) + middlePnt.X;
-                var z = Math.Sin(_rotY) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotY) * (coord.Position.Z - middlePnt.Z) + middlePnt.X;
+                var z = Math.Sin(_rotY) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotY) * (coord.Position.Z - middlePnt.Z) + middlePnt.Z;
                 coord.Position = new Vector3((float)x, coord.Position.Y, (float)z);
             }
         }
@@ -486,7 +498,7 @@ namespace KinectRotater
             foreach (var coord in _coords)
             {
                 var y = Math.Cos(_rotX) * (coord.Position.Y - middlePnt.Y) - Math.Sin(_rotX) * (coord.Position.Z - middlePnt.Z) + middlePnt.Y;
-                var z = Math.Sin(_rotX) * (coord.Position.Y - middlePnt.Y) + Math.Cos(_rotX) * (coord.Position.Z - middlePnt.Z) + middlePnt.Y;
+                var z = Math.Sin(_rotX) * (coord.Position.Y - middlePnt.Y) + Math.Cos(_rotX) * (coord.Position.Z - middlePnt.Z) + middlePnt.Z;
                 coord.Position = new Vector3(coord.Position.X, (float)y, (float)z);
             }
         }
