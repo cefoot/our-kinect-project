@@ -51,10 +51,12 @@ namespace KinectServer
         {
             Stopped = true;
             ServerListener = new List<TcpListener>();
+            DepthServerListener = new List<TcpListener>();
             AudioServerListener = new List<TcpListener>();
             AudioAngleServerListener = new List<TcpListener>();
 
             ConnectedSkeletClients = new List<TcpClient>();
+            ConnectedDepthClients = new List<TcpClient>();
             ConnectedAudioClients = new List<TcpClient>();
             ConnectedAudioAngleClients = new List<TcpClient>();
 
@@ -62,6 +64,7 @@ namespace KinectServer
             foreach (var ipAddress in hostAddress.AddressList)
             {
                 ServerListener.Add(new TcpListener(ipAddress, Settings.Default.ServerPort));
+                DepthServerListener.Add(new TcpListener(ipAddress, Settings.Default.DepthServerPort));
                 AudioServerListener.Add(new TcpListener(ipAddress, Settings.Default.AudioServerPort));
                 AudioAngleServerListener.Add(new TcpListener(ipAddress, Settings.Default.AudioAnlgeServerPort));
             }
@@ -92,6 +95,7 @@ namespace KinectServer
             AudioServerListener.AsParallel().ForAll(listener => listener.Stop());
             ServerListener.AsParallel().ForAll(listener => listener.Stop());
             AudioAngleServerListener.AsParallel().ForAll(listener => listener.Stop());
+            DepthServerListener.AsParallel().ForAll(listener => listener.Stop());
             Kinect.SkeletonFrameReady -= RuntimeSkeletonFrameReady;
             Kinect.SkeletonStream.Disable();
             Kinect.AudioSource.Stop();
@@ -126,6 +130,7 @@ namespace KinectServer
             Kinect.Start();// alt Initialize(RuntimeOptions.UseSkeletalTracking);//was will ich haben
             Kinect.ElevationAngle = Settings.Default.KinectAngle;//neigung
             Kinect.SkeletonStream.Enable();
+            Kinect.DepthStream.Enable((DepthImageFormat) Enum.Parse(typeof(DepthImageFormat),Settings.Default.DepthImageFormat,true));
             foreach (var tcpListener in ServerListener)
             {
                 tcpListener.Start();
@@ -143,11 +148,18 @@ namespace KinectServer
                 tcpListener.Start();
                 tcpListener.BeginAcceptTcpClient(AudioAngleClientConnected, tcpListener);
             }
+
+            foreach (var tcpListener in DepthServerListener)
+            {
+                tcpListener.Start();
+                tcpListener.BeginAcceptTcpClient(DepthClientConnected, tcpListener);
+            }
             Stopped = false;
             var start = StartSkelet();
             start &= StartAudio();
             start &= StartAudioAngle();
             start &= StartHttp();
+            start &= StartDepth();
             Console.WriteLine("Kinect gestartet");
             return start;
         }
