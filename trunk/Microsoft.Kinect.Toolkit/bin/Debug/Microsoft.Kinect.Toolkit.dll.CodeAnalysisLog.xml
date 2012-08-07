@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="c:\microsoft visual studio 10.0\team tools\static analysis tools\fxcop\Xml\CodeAnalysisReport.xsl"?>
+<FxCopReport Version="10.0">
+ <Targets>
+  <Target Name="D:\workspaceKinect\Microsoft.Kinect.Toolkit\bin\Debug\Microsoft.Kinect.Toolkit.dll">
+   <Modules>
+    <Module Name="microsoft.kinect.toolkit.dll">
+     <Messages>
+      <Message TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016" Status="Active" Created="2012-07-17 14:46:41Z" FixCategory="NonBreaking">
+       <Issue Certainty="95" Level="Error">Fügen Sie "'Microsoft.Kinect.Toolkit.dll'" ein AssemblyVersion-Attribut hinzu.</Issue>
+      </Message>
+     </Messages>
+    </Module>
+   </Modules>
+  </Target>
+ </Targets>
+ <Rules>
+  <Rule TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016">
+   <Name>Assemblys mit AssemblyVersionAttribute markieren</Name>
+   <Description>Assemblys müssen Versionsnummern verwenden. Die Versionsnummer ist Bestandteil der Identität einer Assembly. Die Versionszuweisung erfolgt über das AssemblyVersion-Attribut.</Description>
+   <Resolution Name="Default">Fügen Sie "{0}" ein AssemblyVersion-Attribut hinzu.</Resolution>
+   <Owner />
+   <Url>http://msdn.microsoft.com/library/ms182155(VS.100).aspx</Url>
+   <Email>[none]</Email>
+   <MessageLevel Certainty="95">Error</MessageLevel>
+   <File Name="designrules.dll" Version="10.0.0.0" />
+  </Rule>
+ </Rules>
+ <Localized>
+  <String Key="Category">Kategorie</String>
+  <String Key="Certainty">Sicherheit</String>
+  <String Key="CollapseAll">Alle reduzieren</String>
+  <String Key="CheckId">Prüf-ID</String>
+  <String Key="Error">Fehler</String>
+  <String Key="Errors">Fehler</String>
+  <String Key="ExpandAll">Alle erweitern</String>
+  <String Key="Help">Hilfe</String>
+  <String Key="Line">Zeile</String>
+  <String Key="Messages">Meldung(en)</String>
+  <String Key="LocationNotStoredInPdb">[Nicht in PDB gespeicherter Speicherort]</String>
+  <String Key="Project">Projekt</String>
+  <String Key="Resolution">Auflösung</String>
+  <String Key="Rule">Regel</String>
+  <String Key="RuleFile">Regeldatei</String>
+  <String Key="RuleDescription">Regelbeschreibung</String>
+  <String Key="Source">Quelle</String>
+  <String Key="Status">Status</String>
+  <String Key="Target">Ziel</String>
+  <String Key="Warning">Warnung</String>
+  <String Key="Warnings">Warnung(en)</String>
+  <String Key="ReportTitle">Codeanalysebericht</String>
+ </Localized>
+</FxCopReport>

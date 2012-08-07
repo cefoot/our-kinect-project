@@ -1,0 +1,9 @@
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\bin\x86\Debug\KinectDepth.exe
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\bin\x86\Debug\KinectDepth.pdb
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\obj\x86\Debug\KinectDepth.exe
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\obj\x86\Debug\KinectDepth.pdb
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\bin\x86\Debug\Content\DebugFont.xnb
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\bin\x86\Debug\KinectAddons.dll
+D:\workspaceKinect\KinectDepth\KinectDepth\KinectDepth\bin\x86\Debug\KinectAddons.pdb

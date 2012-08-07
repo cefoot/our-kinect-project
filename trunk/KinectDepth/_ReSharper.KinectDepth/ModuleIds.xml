@@ -1,0 +1,5 @@
+<Modules>
+  <Module PersistentId="CBE90131-E231-4CD9-8463-F34CC9EA24AE" ModuleId="KinectDepth" />
+  <Module PersistentId="C6F9C31B-6130-4443-A5CC-EF0664552ECD" ModuleId="Microsoft.Kinect.Toolkit" />
+  <Module PersistentId="EC16ADF8-C94C-4443-BAA5-C0A308AE3224" ModuleId="KinectAddons" />
+</Modules>
