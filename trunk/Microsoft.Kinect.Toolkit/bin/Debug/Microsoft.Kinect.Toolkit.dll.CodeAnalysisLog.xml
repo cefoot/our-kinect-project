@@ -6,7 +6,7 @@
    <Modules>
     <Module Name="microsoft.kinect.toolkit.dll">
      <Messages>
-      <Message TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016" Status="Active" Created="2012-07-17 14:46:41Z" FixCategory="NonBreaking">
+      <Message TypeName="MarkAssembliesWithAssemblyVersion" Category="Microsoft.Design" CheckId="CA1016" Status="Active" Created="2012-08-07 14:35:25Z" FixCategory="NonBreaking">
        <Issue Certainty="95" Level="Error">Fügen Sie "'Microsoft.Kinect.Toolkit.dll'" ein AssemblyVersion-Attribut hinzu.</Issue>
       </Message>
      </Messages>

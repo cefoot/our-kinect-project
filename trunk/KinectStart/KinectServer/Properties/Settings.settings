@@ -20,5 +20,11 @@
     <Setting Name="HttpPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">999</Value>
     </Setting>
+    <Setting Name="DepthServerPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">669</Value>
+    </Setting>
+    <Setting Name="DepthImageFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Resolution80x60Fps30</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

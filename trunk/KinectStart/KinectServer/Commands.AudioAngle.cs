@@ -65,7 +65,7 @@ namespace KinectServer
             }
             finally
             {
-                ConnectedSkeletClients.Remove(client);
+                ConnectedAudioAngleClients.Remove(client);
             }
         }
 
