@@ -34,6 +34,9 @@ namespace KinectInfoScreen
         private Sprite _obstacle;
         private const float BaseLine = 24;
 
+        private Dictionary<char, Vertices> _letterMapping;
+        private string _text;
+
         private float _force = 1000f;
 
         public KinectInfoScreen()
@@ -163,39 +166,39 @@ namespace KinectInfoScreen
             alphabet.GetData(data);
 
             List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
-            Dictionary<char, Vertices> letterMapping = new Dictionary<char, Vertices>();
+            _letterMapping = new Dictionary<char, Vertices>();
             Vertices[] listArray = list.ToArray();
-            letterMapping.Add('A', listArray[0]);
-            letterMapping.Add('B', listArray[2]);
-            letterMapping.Add('C', listArray[1]);
-            letterMapping.Add('D', listArray[3]);
-            letterMapping.Add('E', listArray[4]);
-            letterMapping.Add('F', listArray[6]);
-            letterMapping.Add('G', listArray[5]);
-            letterMapping.Add('H', listArray[7]);
-            letterMapping.Add('I', listArray[8]);
-            letterMapping.Add('J', listArray[9]);
-            letterMapping.Add('K', listArray[10]);
-            letterMapping.Add('L', listArray[12]);
-            letterMapping.Add('M', listArray[13]);
-            letterMapping.Add('N', listArray[14]);
-            letterMapping.Add('O', listArray[11]);
-            letterMapping.Add('P', listArray[15]);
-            letterMapping.Add('Q', listArray[16]);
-            letterMapping.Add('R', listArray[19]);
-            letterMapping.Add('S', listArray[17]);
-            letterMapping.Add('T', listArray[18]);
-            letterMapping.Add('U', listArray[20]);
-            letterMapping.Add('V', listArray[21]);
-            letterMapping.Add('W', listArray[22]);
-            letterMapping.Add('X', listArray[23]);
-            letterMapping.Add('Y', listArray[24]);
-            letterMapping.Add('Z', listArray[25]);
+            _letterMapping.Add('A', listArray[0]);
+            _letterMapping.Add('B', listArray[2]);
+            _letterMapping.Add('C', listArray[1]);
+            _letterMapping.Add('D', listArray[3]);
+            _letterMapping.Add('E', listArray[4]);
+            _letterMapping.Add('F', listArray[6]);
+            _letterMapping.Add('G', listArray[5]);
+            _letterMapping.Add('H', listArray[7]);
+            _letterMapping.Add('I', listArray[8]);
+            _letterMapping.Add('J', listArray[9]);
+            _letterMapping.Add('K', listArray[10]);
+            _letterMapping.Add('L', listArray[12]);
+            _letterMapping.Add('M', listArray[13]);
+            _letterMapping.Add('N', listArray[14]);
+            _letterMapping.Add('O', listArray[11]);
+            _letterMapping.Add('P', listArray[15]);
+            _letterMapping.Add('Q', listArray[16]);
+            _letterMapping.Add('R', listArray[19]);
+            _letterMapping.Add('S', listArray[17]);
+            _letterMapping.Add('T', listArray[18]);
+            _letterMapping.Add('U', listArray[20]);
+            _letterMapping.Add('V', listArray[21]);
+            _letterMapping.Add('W', listArray[22]);
+            _letterMapping.Add('X', listArray[23]);
+            _letterMapping.Add('Y', listArray[24]);
+            _letterMapping.Add('Z', listArray[25]);
 
             //letterMapping.Add(' ', listArray[26]);
 
             //call method with string you want to print
-            this.BuildText(letterMapping, "Hello World".ToUpper());
+            BuildText("Hello  World");
 
 
             _ragdoll = new Ragdoll(World, this, new Vector2(0, 4));
@@ -210,15 +213,19 @@ namespace KinectInfoScreen
 
         }
 
+        Dictionary<BreakableBody,Vector2> _letterStartPos = new Dictionary<BreakableBody, Vector2>();
 
-        public void BuildText(Dictionary<char, Vertices> letterMapping, string text)
+
+        public void BuildText(string text)
         {
-            char[] textChar = text.ToCharArray();
+            _text = text;
+            char[] textChar = text.ToUpper().ToCharArray();
             float yOffset = -5f;
             float xOffset = -14f;
 
             yOffset = 0f;
-            xOffset = -14f;
+            xOffset = -18f;
+            _letterStartPos.Clear();
 
             for (int i = 0; i < textChar.Length; i++)
             {
@@ -228,7 +235,7 @@ namespace KinectInfoScreen
                 Vertices polygon;//letterMapping[letter];
 
 
-                if (letterMapping.TryGetValue(letter, out polygon))
+                if (_letterMapping.TryGetValue(letter, out polygon))
                 {
                     Vector2 centroid = -polygon.GetCentroid();
                     polygon.Translate(ref centroid);
@@ -245,8 +252,11 @@ namespace KinectInfoScreen
 
                     BreakableBody breakableBodyLetter = new BreakableBody(triangulated, World, 1);
                     breakableBodyLetter.MainBody.Position = new Vector2(xOffset, yOffset);
+                    _letterStartPos[breakableBodyLetter] = new Vector2(xOffset, yOffset);
                     breakableBodyLetter.Strength = 100;
+
                     World.AddBreakableBody(breakableBodyLetter);
+         //           _currentUsedLetters.Add(breakableBodyLetter);
                 }
                 if (letter.Equals('\n'))
                 {
@@ -271,11 +281,12 @@ namespace KinectInfoScreen
                 //_ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
                 var toMoveDown = _groundlines[skeletIdx] - BaseLine;
                 ApplyForce(_ragdoll.Body, skeletonPoints[skeletIdx][JointType.Spine], _force, toMoveDown);
-                ApplyForce(_ragdoll.LeftFoot, skeletonPoints[skeletIdx][JointType.FootLeft], _force / 10f, toMoveDown);
-                ApplyForce(_ragdoll.RightFoot, skeletonPoints[skeletIdx][JointType.FootRight], _force / 10f, toMoveDown);
-                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], _force / 10f, toMoveDown);
-                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], _force / 10f, toMoveDown);
-                ApplyForce(_ragdoll.Head, skeletonPoints[skeletIdx][JointType.Head], _force / 10f, toMoveDown);
+                var strenghtExt = _force/30f;
+                ApplyForce(_ragdoll.LeftFoot, skeletonPoints[skeletIdx][JointType.FootLeft], strenghtExt, toMoveDown);
+                ApplyForce(_ragdoll.RightFoot, skeletonPoints[skeletIdx][JointType.FootRight], strenghtExt, toMoveDown);
+                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], strenghtExt, toMoveDown);
+                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], strenghtExt, toMoveDown);
+                ApplyForce(_ragdoll.Head, skeletonPoints[skeletIdx][JointType.Head], strenghtExt, toMoveDown);
                 skeletIdx++;
             }
             Debug.WriteLine("SkeletFoot:{0}", _ragdoll.LeftFoot.Position.Y);
@@ -311,7 +322,22 @@ namespace KinectInfoScreen
                                     }, ref aabb);
             }
 
+            if(input.IsNewKeyPress(Keys.R))
+            {
+                ResetLetter();
+            }
+
             base.HandleInput(input, gameTime);
+        }
+
+        private void ResetLetter()
+        {
+            foreach (var currentLetter in _letterStartPos)
+            {
+                currentLetter.Key.Broken = false;
+                currentLetter.Key.MainBody.Position = new Vector2(currentLetter.Value.X, currentLetter.Value.Y);
+                //BuildText(_text);
+            }
         }
 
         public override void Draw(GameTime gameTime)

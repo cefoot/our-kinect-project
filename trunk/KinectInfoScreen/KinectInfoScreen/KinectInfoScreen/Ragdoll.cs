@@ -81,38 +81,41 @@ namespace KinectInfoScreen
         //Torso
         private void CreateBody(World world, Vector2 position)
         {
+
+            var mass = 2f;
+
             //Head
             _head = BodyFactory.CreateCircle(world, 0.9f, 10f);
             _head.BodyType = BodyType.Dynamic;
             _head.AngularDamping = LimbAngularDamping;
-            _head.Mass = 2f;
+            _head.Mass = mass;
             _head.Position = position;
 
             //Body
             _body = BodyFactory.CreateRoundedRectangle(world, 2f, 4f, 0.5f, 0.7f, 2, 10f);
             _body.BodyType = BodyType.Dynamic;
-            _body.Mass = 2f;
+            _body.Mass = mass;
             _body.Position = position + new Vector2(0f, 3f);
 
             //Left Arm
             _lowerLeftArm = BodyFactory.CreateCapsule(world, 1f, 0.45f, ArmDensity);
             _lowerLeftArm.BodyType = BodyType.Dynamic;
             _lowerLeftArm.AngularDamping = LimbAngularDamping;
-            _lowerLeftArm.Mass = 2f;
+            _lowerLeftArm.Mass = mass;
             _lowerLeftArm.Rotation = 1.4f;
             _lowerLeftArm.Position = position + new Vector2(-4f, 2.2f);
 
             _upperLeftArm = BodyFactory.CreateCapsule(world, 1f, 0.45f, ArmDensity);
             _upperLeftArm.BodyType = BodyType.Dynamic;
             _upperLeftArm.AngularDamping = LimbAngularDamping;
-            _upperLeftArm.Mass = 2f;
+            _upperLeftArm.Mass = mass;
             _upperLeftArm.Rotation = 1.4f;
             _upperLeftArm.Position = position + new Vector2(-2f, 1.8f);
 
             _leftHand = BodyFactory.CreateCapsule(world, 0.3f, 0.3f, ArmDensity);
             _leftHand.BodyType = BodyType.Dynamic;
             _leftHand.AngularDamping = LimbAngularDamping;
-            _leftHand.Mass = 2f;
+            _leftHand.Mass = mass;
             _leftHand.Rotation = 1.4f;
             _leftHand.Position = position + new Vector2(-4f, 2.7f);
 
@@ -120,21 +123,21 @@ namespace KinectInfoScreen
             _lowerRightArm = BodyFactory.CreateCapsule(world, 1f, 0.45f, ArmDensity);
             _lowerRightArm.BodyType = BodyType.Dynamic;
             _lowerRightArm.AngularDamping = LimbAngularDamping;
-            _lowerRightArm.Mass = 2f;
+            _lowerRightArm.Mass = mass;
             _lowerRightArm.Rotation = -1.4f;
             _lowerRightArm.Position = position + new Vector2(4f, 2.2f);
 
             _upperRightArm = BodyFactory.CreateCapsule(world, 1f, 0.45f, ArmDensity);
             _upperRightArm.BodyType = BodyType.Dynamic;
             _upperRightArm.AngularDamping = LimbAngularDamping;
-            _upperRightArm.Mass = 2f;
+            _upperRightArm.Mass = mass;
             _upperRightArm.Rotation = -1.4f;
             _upperRightArm.Position = position + new Vector2(2f, 1.8f);
 
             _rightHand = BodyFactory.CreateCapsule(world, 0.3f, 0.3f, ArmDensity);
             _rightHand.BodyType = BodyType.Dynamic;
             _rightHand.AngularDamping = LimbAngularDamping;
-            _rightHand.Mass = 2f;
+            _rightHand.Mass = mass;
             _rightHand.Rotation = 1.4f;
             _rightHand.Position = position + new Vector2(4f, 2.7f);
 
@@ -142,19 +145,19 @@ namespace KinectInfoScreen
             _lowerLeftLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _lowerLeftLeg.BodyType = BodyType.Dynamic;
             _lowerLeftLeg.AngularDamping = LimbAngularDamping;
-            _lowerLeftLeg.Mass = 2f;
+            _lowerLeftLeg.Mass = mass;
             _lowerLeftLeg.Position = position + new Vector2(-0.6f, 8f);
 
             _upperLeftLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _upperLeftLeg.BodyType = BodyType.Dynamic;
             _upperLeftLeg.AngularDamping = LimbAngularDamping;
-            _upperLeftLeg.Mass = 2f;
+            _upperLeftLeg.Mass = mass;
             _upperLeftLeg.Position = position + new Vector2(-0.6f, 6f);
 
             _leftFoot = BodyFactory.CreateCapsule(world, 0.5f, 0.5f, LegDensity);
             _leftFoot.BodyType = BodyType.Dynamic;
             _leftFoot.AngularDamping = LimbAngularDamping;
-            _leftFoot.Mass = 2f;
+            _leftFoot.Mass = mass;
             _leftFoot.Position = position + new Vector2(-0.6f, 8.5f);
 
 
@@ -162,19 +165,19 @@ namespace KinectInfoScreen
             _lowerRightLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _lowerRightLeg.BodyType = BodyType.Dynamic;
             _lowerRightLeg.AngularDamping = LimbAngularDamping;
-            _lowerRightLeg.Mass = 2f;
+            _lowerRightLeg.Mass = mass;
             _lowerRightLeg.Position = position + new Vector2(0.6f, 8f);
 
             _upperRightLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _upperRightLeg.BodyType = BodyType.Dynamic;
             _upperRightLeg.AngularDamping = LimbAngularDamping;
-            _upperRightLeg.Mass = 2f;
+            _upperRightLeg.Mass = mass;
             _upperRightLeg.Position = position + new Vector2(0.6f, 6f);
 
             _rightFoot = BodyFactory.CreateCapsule(world, 0.5f, 0.5f, LegDensity);
             _rightFoot.BodyType = BodyType.Dynamic;
             _rightFoot.AngularDamping = LimbAngularDamping;
-            _rightFoot.Mass = 2f;
+            _rightFoot.Mass = mass;
             _rightFoot.Position = position + new Vector2(0.6f, 8.5f);
 
         }
