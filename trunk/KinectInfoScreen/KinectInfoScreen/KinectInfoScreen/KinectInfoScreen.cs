@@ -57,49 +57,95 @@ namespace KinectInfoScreen
 
             _border = new Border(World, this, ScreenManager.GraphicsDevice.Viewport);
 
-            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("Samples/alphabet");
+            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("alphabet");
 
             uint[] data = new uint[alphabet.Width * alphabet.Height];
             alphabet.GetData(data);
 
             List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
+            Dictionary<char,Vertices> letterMapping = new Dictionary<char,Vertices>();
+            Vertices[] listArray = list.ToArray();
+            letterMapping.Add('A', listArray[0]);
+            letterMapping.Add('B', listArray[2]);
+            letterMapping.Add('C', listArray[1]);
+            letterMapping.Add('D', listArray[3]);
+            letterMapping.Add('E', listArray[4]);
+            letterMapping.Add('F', listArray[6]);
+            letterMapping.Add('G', listArray[5]);
+            letterMapping.Add('H', listArray[7]);
+            letterMapping.Add('I', listArray[8]);
+            letterMapping.Add('J', listArray[9]);
+            letterMapping.Add('K', listArray[10]);
+            letterMapping.Add('L', listArray[12]);
+            letterMapping.Add('M', listArray[13]);
+            letterMapping.Add('N', listArray[14]);
+            letterMapping.Add('O', listArray[11]);
+            letterMapping.Add('P', listArray[15]);
+            letterMapping.Add('Q', listArray[16]);
+            letterMapping.Add('R', listArray[19]); 
+            letterMapping.Add('S', listArray[17]);
+            letterMapping.Add('T', listArray[18]);
+            letterMapping.Add('U', listArray[20]);
+            letterMapping.Add('V', listArray[21]);
+            letterMapping.Add('W', listArray[22]);
+            letterMapping.Add('X', listArray[23]);
+            letterMapping.Add('Y', listArray[24]);
+            letterMapping.Add('Z', listArray[25]);
+            
+            //letterMapping.Add(' ', listArray[26]);
+               
+            //call method with string you want to print
+            this.buildText(letterMapping, "AAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAA".ToUpper());
+           
+               
+           
+        }
 
+
+        public void buildText(Dictionary<char,Vertices> letterMapping,string text)
+        {
+            char[] textChar = text.ToCharArray();
             float yOffset = -5f;
             float xOffset = -14f;
-            for (int i = 0; i < list.Count; i++)
+
+            yOffset = 0f;
+            xOffset = -14f;
+
+            for (int i = 0; i < textChar.Length;i++)
             {
-                if (i == 9)
+                char letter = textChar[i];
+
+
+                Vertices polygon;//letterMapping[letter];
+                
+                
+                if (letterMapping.TryGetValue(letter,out polygon))
                 {
-                    yOffset = 0f;
+                    Vector2 centroid = -polygon.GetCentroid();
+                    polygon.Translate(ref centroid);
+                    polygon = SimplifyTools.CollinearSimplify(polygon);
+                    polygon = SimplifyTools.ReduceByDistance(polygon, 4);
+                    List<Vertices> triangulated = BayazitDecomposer.ConvexPartition(polygon);
+
+                    float scale = 1.0f;
+                    Vector2 vertScale = new Vector2(ConvertUnits.ToSimUnits(1)) * scale;
+                    foreach (Vertices vertices in triangulated)
+                    {
+                        vertices.Scale(ref vertScale);
+                    }
+
+                    BreakableBody breakableBody = new BreakableBody(triangulated, World, 1);
+                    breakableBody.MainBody.Position = new Vector2(xOffset, yOffset);
+                    breakableBody.Strength = 100;
+                    World.AddBreakableBody(breakableBody);
+                }
+                if (letter.Equals('\n'))
+                {
+                    yOffset += 5f;
                     xOffset = -14f;
-                }
-                if (i == 18)
-                {
-                    yOffset = 5f;
-                    xOffset = -12.25f;
-                }
-                Vertices polygon = list[i];
-                Vector2 centroid = -polygon.GetCentroid();
-                polygon.Translate(ref centroid);
-                polygon = SimplifyTools.CollinearSimplify(polygon);
-                polygon = SimplifyTools.ReduceByDistance(polygon, 4);
-                List<Vertices> triangulated = BayazitDecomposer.ConvexPartition(polygon);
 
-#if WINDOWS_PHONE
-                const float scale = 0.6f;
-#else
-                const float scale = 1f;
-#endif
-                Vector2 vertScale = new Vector2(ConvertUnits.ToSimUnits(1)) * scale;
-                foreach (Vertices vertices in triangulated)
-                {
-                    vertices.Scale(ref vertScale);
-                }
 
-                BreakableBody breakableBody = new BreakableBody(triangulated, World, 1);
-                breakableBody.MainBody.Position = new Vector2(xOffset, yOffset);
-                breakableBody.Strength = 100;
-                World.AddBreakableBody(breakableBody);
+                }
 
                 xOffset += 3.5f;
             }

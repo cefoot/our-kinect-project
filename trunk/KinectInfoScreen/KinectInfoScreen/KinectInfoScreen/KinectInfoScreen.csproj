@@ -116,7 +116,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvancedDemo5.cs" />
     <Compile Include="AssetCreator.cs" />
     <Compile Include="BackgroundScreen.cs" />
     <Compile Include="Border.cs" />
@@ -126,6 +125,7 @@
     <Compile Include="GameScreen.cs" />
     <Compile Include="IDemoScreen.cs" />
     <Compile Include="InputHelper.cs" />
+    <Compile Include="KinectInfoScreen.cs" />
     <Compile Include="LineBatch.cs" />
     <Compile Include="PhysicsGameScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
