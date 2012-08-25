@@ -37,13 +37,24 @@ namespace KinectAddons
 
         public static Joint ScaleOwn(this Joint jnt, int width, int height)
         {
-            var position = jnt.Position;
-            var xVal = position.X + 1.0f;//damit nichtmehr negativ
-            var yVal = position.Y * -1 + 1.0f;//umdrehen damit 0 oben
+            jnt.Position = jnt.Position.ScaleOwn(width,height);
+            return jnt;
+        }
+
+        public static SkeletonPoint Rescale(this SkeletonPoint skeletPnt, int widthFrom, int heightFrom,int widthTo,int heightTo)
+        {
+            var xVal = skeletPnt.X / widthFrom * widthTo;
+            var yVal = skeletPnt.Y / heightFrom * heightTo;
+            return new SkeletonPoint { X = xVal, Y = yVal, Z = skeletPnt.Z };
+        }
+
+        public static SkeletonPoint ScaleOwn(this SkeletonPoint skeletPnt, int width, int height)
+        {
+            var xVal = skeletPnt.X + 1.0f;//damit nichtmehr negativ
+            var yVal = skeletPnt.Y * -1 + 1.0f;//umdrehen damit 0 oben
             var posX = ((float)width / 2) * xVal;
             var posY = ((float)height / 2) * yVal;
-            jnt.Position = new SkeletonPoint{X=posX,Y=posY,Z = position.Z};
-            return jnt;
+            return new SkeletonPoint { X = posX, Y = posY, Z = skeletPnt.Z };
         }
 
         public static Joint ScaleOwn(this Joint jnt, int width, int height, int depth)
