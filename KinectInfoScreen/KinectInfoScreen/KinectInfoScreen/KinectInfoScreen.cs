@@ -27,11 +27,21 @@ namespace KinectInfoScreen
 
         private List<Dictionary<JointType, SkeletonPoint>> _trackedSkelets;
 
+        private List<float> _groundlines;
+
+        private int _triangleCount = -2;
+        private Ragdoll _ragdoll;
+        private Sprite _obstacle;
+        private const float BaseLine = 26;
+
+        private float _force = 1000f;
+
         public KinectInfoScreen()
         {
             _skeletClient = new TcpClient { NoDelay = true };
             _skeletClient.BeginConnect("WS201736", 666, ServerConnected, null);
             _trackedSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
+            _groundlines = new List<float>();
         }
 
         #region skelet recieving
@@ -59,6 +69,7 @@ namespace KinectInfoScreen
                 return;
             }
             var tmpSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
+            var skeletIdx = 0;
             foreach (var skelets in deserializeJointData.Skelletons)//.AsParallel().Select(skelleton => skelleton.First(jnt => jnt.JointType == TypeOfJoint)).Select(transferableJoint => transferableJoint.SkeletPoint.ScaleOwn(80, 60)))
             {
                 var skelet = new Dictionary<JointType, SkeletonPoint>();
@@ -67,15 +78,41 @@ namespace KinectInfoScreen
                     skelet[transferableJoint.JointType] = new SkeletonPoint
                                                               {
                                                                   X =
-                                                                      transferableJoint.SkeletPoint.X * 30,
+                                                                      transferableJoint.SkeletPoint.X * 30f,
                                                                   Y =
-                                                                  transferableJoint.SkeletPoint.Y * -20,
+                                                                  transferableJoint.SkeletPoint.Y * -20f,
                                                               };
                 }
+                if (_groundlines.Count < skeletIdx + 1)
+                {
+                    var groundLine = skelet[JointType.FootLeft].Y + skelet[JointType.FootRight].Y;
+                    groundLine /= 2f;
+                    Debug.WriteLine("Skelet[{0}]groundline:{1}", skeletIdx + 1, groundLine);
+                    _groundlines.Add(groundLine);
+                }
                 tmpSkelets.Add(skelet);
+                UpdateTimer();
+                skeletIdx++;
             }
             _trackedSkelets = tmpSkelets;
         }
+
+        private void UpdateTimer()
+        {
+            if (DeleteTimer == null)
+            {
+                DeleteTimer = new Timer(DeleteSkelets, null, 1000, Timeout.Infinite);
+            }
+            DeleteTimer.Change(1000, Timeout.Infinite);
+        }
+
+        private void DeleteSkelets(object state)
+        {
+            _trackedSkelets.Clear();
+            _groundlines.Clear();
+        }
+
+        private System.Threading.Timer DeleteTimer { get; set; }
 
         #endregion
 
@@ -126,7 +163,7 @@ namespace KinectInfoScreen
             alphabet.GetData(data);
 
             List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
-            Dictionary<char,Vertices> letterMapping = new Dictionary<char,Vertices>();
+            Dictionary<char, Vertices> letterMapping = new Dictionary<char, Vertices>();
             Vertices[] listArray = list.ToArray();
             letterMapping.Add('A', listArray[0]);
             letterMapping.Add('B', listArray[2]);
@@ -145,7 +182,7 @@ namespace KinectInfoScreen
             letterMapping.Add('O', listArray[11]);
             letterMapping.Add('P', listArray[15]);
             letterMapping.Add('Q', listArray[16]);
-            letterMapping.Add('R', listArray[19]); 
+            letterMapping.Add('R', listArray[19]);
             letterMapping.Add('S', listArray[17]);
             letterMapping.Add('T', listArray[18]);
             letterMapping.Add('U', listArray[20]);
@@ -154,18 +191,27 @@ namespace KinectInfoScreen
             letterMapping.Add('X', listArray[23]);
             letterMapping.Add('Y', listArray[24]);
             letterMapping.Add('Z', listArray[25]);
-            
+
             //letterMapping.Add(' ', listArray[26]);
-               
+
             //call method with string you want to print
-            this.buildText(letterMapping, "AAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAA".ToUpper());
-           
-               
-           
+            this.BuildText(letterMapping, "Hello World".ToUpper());
+
+
+            _ragdoll = new Ragdoll(World, this, new Vector2(0, 4));
+            // create sprite based on body
+            var rectangle = BodyFactory.CreateRectangle(World, 5f, 1.5f, 1f);
+            var shape = rectangle.FixtureList[0].Shape;
+            World.RemoveBody(rectangle);
+            _obstacle = new Sprite(ScreenManager.Assets.TextureFromShape(shape,
+                                                                         MaterialType.Dots,
+                                                                         Color.SandyBrown, 0.8f));
+
+
         }
 
 
-        public void buildText(Dictionary<char,Vertices> letterMapping,string text)
+        public void BuildText(Dictionary<char, Vertices> letterMapping, string text)
         {
             char[] textChar = text.ToCharArray();
             float yOffset = -5f;
@@ -174,15 +220,15 @@ namespace KinectInfoScreen
             yOffset = 0f;
             xOffset = -14f;
 
-            for (int i = 0; i < textChar.Length;i++)
+            for (int i = 0; i < textChar.Length; i++)
             {
                 char letter = textChar[i];
 
 
                 Vertices polygon;//letterMapping[letter];
-                
-                
-                if (letterMapping.TryGetValue(letter,out polygon))
+
+
+                if (letterMapping.TryGetValue(letter, out polygon))
                 {
                     Vector2 centroid = -polygon.GetCentroid();
                     polygon.Translate(ref centroid);
@@ -210,34 +256,36 @@ namespace KinectInfoScreen
 
                 }
                 xOffset += 3.5f;
-               
             }
-
-            _ragdoll = new Ragdoll(World, this, Vector2.Zero);
-            // create sprite based on body
-            var rectangle = BodyFactory.CreateRectangle(World, 5f, 1.5f, 1f);
-            var shape = rectangle.FixtureList[0].Shape;
-            World.RemoveBody(rectangle);
-            _obstacle = new Sprite(ScreenManager.Assets.TextureFromShape(shape,
-                                                                         MaterialType.Dots,
-                                                                         Color.SandyBrown, 0.8f));
         }
-
-        private float _force = 1000f;
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+            var skeletIdx = 0;
             var skeletonPoints = _trackedSkelets.ToArray();
             if (skeletonPoints.Length > 0)
             {
-                var skeletonPoint = skeletonPoints[0][JointType.HipCenter];
+                var skeletonPoint = skeletonPoints[skeletIdx][JointType.HipCenter];
 
                 //_ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
-                _ragdoll.Body.ApplyForce(_force*(new Vector2(skeletonPoint.X, skeletonPoint.Y) - _ragdoll.Body.Position));
+                var toMoveDown = _groundlines[skeletIdx] - BaseLine;
+                ApplyForce(_ragdoll.Body, skeletonPoints[skeletIdx][JointType.HipCenter], _force, toMoveDown);
+                ApplyForce(_ragdoll.LeftFood, skeletonPoints[skeletIdx][JointType.FootLeft], _force / 40f, toMoveDown);
+                ApplyForce(_ragdoll.RightFood, skeletonPoints[skeletIdx][JointType.FootRight], _force / 40f, toMoveDown);
+                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], _force / 40f, toMoveDown);
+                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], _force / 40f, toMoveDown);
+                skeletIdx++;
             }
+            Debug.WriteLine("SkeletFoot:{0}", _ragdoll.LeftFood.Position.Y);
             //Debug.WriteLine("RagPos:{0}:{1}", _ragdoll.Body.Position.X, _ragdoll.Body.Position.Y);
             //_ragdoll.Body.Position
+        }
+
+        private void ApplyForce(Body body, SkeletonPoint skeletonPoint, float strenght, float toMoveDown)
+        {
+
+            body.ApplyForce(strenght * (new Vector2(skeletonPoint.X, skeletonPoint.Y - toMoveDown) - body.Position));
         }
 
         public override void HandleInput(InputHelper input, GameTime gameTime)
@@ -284,10 +332,6 @@ namespace KinectInfoScreen
             DebugView.RemoveFlags(DebugViewFlags.Shape);
             base.UnloadContent();
         }
-
-        private int _triangleCount = -2;
-        private Ragdoll _ragdoll;
-        private Sprite _obstacle;
 
         private List<VertexPositionColor> GetTriangleStrip(Vector3[] points, float thickness)
         {

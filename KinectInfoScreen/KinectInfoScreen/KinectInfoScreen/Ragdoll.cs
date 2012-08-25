@@ -53,6 +53,26 @@ namespace KinectInfoScreen
             get { return _body; }
         }
 
+        public Body LeftFood
+        {
+            get { return _lowerLeftLeg; }
+        }
+
+        public Body RightFood
+        {
+            get { return _lowerRightLeg; }
+        }
+
+        public Body RightHand
+        {
+            get { return _lowerRightArm; }
+        }
+
+        public Body LeftHand
+        {
+            get { return _lowerLeftArm; }
+        }
+
         //Torso
         private void CreateBody(World world, Vector2 position)
         {
