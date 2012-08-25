@@ -1,11 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using FarseerPhysics;
 using FarseerPhysics.Collision;
 using FarseerPhysics.Common;
 using FarseerPhysics.Common.Decomposition;
 using FarseerPhysics.Common.PolygonManipulation;
 using FarseerPhysics.Dynamics;
+using FarseerPhysics.Factories;
+using KinectAddons;
+using Microsoft.Kinect;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,6 +22,62 @@ namespace KinectInfoScreen
     internal class KinectInfoScreen : PhysicsGameScreen, IDemoScreen
     {
         private Border _border;
+
+        private TcpClient _skeletClient;
+
+        private List<Dictionary<JointType, SkeletonPoint>> _trackedSkelets;
+
+        public KinectInfoScreen()
+        {
+            _skeletClient = new TcpClient { NoDelay = true };
+            _skeletClient.BeginConnect("WS201736", 666, ServerConnected, null);
+            _trackedSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
+        }
+
+        #region skelet recieving
+
+        private void ServerConnected(IAsyncResult ar)
+        {
+            _skeletClient.EndConnect(ar);
+            ThreadPool.QueueUserWorkItem(SkeletonsRecieving);
+        }
+        private void SkeletonsRecieving(object state)
+        {
+            var networkStream = _skeletClient.GetStream();
+            while (_skeletClient.Connected)
+            {
+                var deserializeJointData = networkStream.DeserializeJointData();
+                ThreadPool.QueueUserWorkItem(SkeletsRecieved, deserializeJointData);
+            }
+        }
+
+        private void SkeletsRecieved(object state)
+        {
+            var deserializeJointData = state as TrackedSkelletons;
+            if (deserializeJointData == null)
+            {
+                return;
+            }
+            var tmpSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
+            foreach (var skelets in deserializeJointData.Skelletons)//.AsParallel().Select(skelleton => skelleton.First(jnt => jnt.JointType == TypeOfJoint)).Select(transferableJoint => transferableJoint.SkeletPoint.ScaleOwn(80, 60)))
+            {
+                var skelet = new Dictionary<JointType, SkeletonPoint>();
+                foreach (var transferableJoint in skelets)
+                {
+                    skelet[transferableJoint.JointType] = new SkeletonPoint
+                                                              {
+                                                                  X =
+                                                                      transferableJoint.SkeletPoint.X * 30,
+                                                                  Y =
+                                                                  transferableJoint.SkeletPoint.Y * -20,
+                                                              };
+                }
+                tmpSkelets.Add(skelet);
+            }
+            _trackedSkelets = tmpSkelets;
+        }
+
+        #endregion
 
         #region IDemoScreen Members
 
@@ -146,9 +209,43 @@ namespace KinectInfoScreen
 
 
                 }
-
                 xOffset += 3.5f;
+                var breakableBody = new BreakableBody(triangulated, World, 1)
+                                        {
+                                            MainBody =
+                                                {
+                                                    Position = new Vector2(xOffset, yOffset)
+                                                },
+                                            Strength = 100
+                                        };
+                World.AddBreakableBody(breakableBody);
             }
+
+            _ragdoll = new Ragdoll(World, this, Vector2.Zero);
+            // create sprite based on body
+            var rectangle = BodyFactory.CreateRectangle(World, 5f, 1.5f, 1f);
+            var shape = rectangle.FixtureList[0].Shape;
+            World.RemoveBody(rectangle);
+            _obstacle = new Sprite(ScreenManager.Assets.TextureFromShape(shape,
+                                                                         MaterialType.Dots,
+                                                                         Color.SandyBrown, 0.8f));
+        }
+
+        private float _force = 1000f;
+
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
+        {
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+            var skeletonPoints = _trackedSkelets.ToArray();
+            if (skeletonPoints.Length > 0)
+            {
+                var skeletonPoint = skeletonPoints[0][JointType.HipCenter];
+
+                //_ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
+                _ragdoll.Body.ApplyForce(_force*(new Vector2(skeletonPoint.X, skeletonPoint.Y) - _ragdoll.Body.Position));
+            }
+            //Debug.WriteLine("RagPos:{0}:{1}", _ragdoll.Body.Position.X, _ragdoll.Body.Position.Y);
+            //_ragdoll.Body.Position
         }
 
         public override void HandleInput(InputHelper input, GameTime gameTime)
@@ -179,14 +276,51 @@ namespace KinectInfoScreen
         public override void Draw(GameTime gameTime)
         {
             _border.Draw();
+            DrawSkelet();
             base.Draw(gameTime);
+        }
+
+        private void DrawSkelet()
+        {
+            ScreenManager.SpriteBatch.Begin(0, null, null, null, null, null, Camera.View);
+            _ragdoll.Draw();
+            ScreenManager.SpriteBatch.End();
         }
 
         public override void UnloadContent()
         {
             DebugView.RemoveFlags(DebugViewFlags.Shape);
-            
             base.UnloadContent();
+        }
+
+        private int _triangleCount = -2;
+        private Ragdoll _ragdoll;
+        private Sprite _obstacle;
+
+        private List<VertexPositionColor> GetTriangleStrip(Vector3[] points, float thickness)
+        {
+            var lastPoint = Vector3.Zero;
+            var list = new List<VertexPositionColor>();
+            for (var i = 0; i < points.Length; i++)
+            {
+                if (i == 0) { lastPoint = points[i]; continue; }
+                //the direction of the current line
+                var direction = lastPoint - points[i];
+                direction.Normalize();
+                //the perpendiculat to the current line
+                var normal = Vector3.Cross(direction, Vector3.UnitZ);
+                normal.Normalize();
+                var p1 = lastPoint + normal * thickness; _triangleCount++;
+                var p2 = lastPoint - normal * thickness; _triangleCount++;
+                var p3 = points[i] + normal * thickness; _triangleCount++;
+                var p4 = points[i] - normal * thickness; _triangleCount++;
+                list.Add(new VertexPositionColor(p1, Color.Black));
+                list.Add(new VertexPositionColor(p2, Color.Black));
+                list.Add(new VertexPositionColor(p3, Color.Black));
+                list.Add(new VertexPositionColor(p4, Color.Black));
+                lastPoint = points[i];
+            }
+            return list;
         }
     }
 }
