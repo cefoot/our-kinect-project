@@ -33,7 +33,7 @@ namespace KinectRotater
 
         private Vector3 RelativeLeftHand { get; set; }
 
-        
+
 
         private float _minF = float.MaxValue;
 
@@ -61,6 +61,8 @@ namespace KinectRotater
         private float _rotY;
 
         private float _rotZ;
+        private Matrix _toNullMatrix;
+        private Matrix _toMiddleMatrix;
 
         protected TransferableJoint RightHand { get; set; }
 
@@ -111,9 +113,11 @@ namespace KinectRotater
                 NoDelay = true
             };
             client.BeginConnect("WS201736", 666, ServerSkeletConnected, client);
+            _toNullMatrix = Matrix.CreateTranslation(-400, -200, -150);
+            _toMiddleMatrix = Matrix.CreateTranslation(400, 200, 150);
             base.Initialize();
         }
-
+        #region recieve skelet
         private void ServerSkeletConnected(IAsyncResult ar)
         {
             try
@@ -156,14 +160,16 @@ namespace KinectRotater
             }
         }
 
+        #endregion
         const float QubeLengthCnt = 11;
         const int QubePixDist = 20;
 
         private void InitQube()
         {
-            _rotX =  0;
+            _rotX = 0;
             _rotY = 0;
             _rotZ = 0;
+            //middle {X:400 Y:200 Z:150}
             var x = 300;
             for (var x1 = 0; x1 < QubeLengthCnt; x1++)
             {
@@ -326,10 +332,10 @@ namespace KinectRotater
                 this.Exit();
 
             var newState = Keyboard.GetState();
+            ProcessHands();
             Rotate(newState.GetPressedKeys());
             AutoRotate();
             EnableDebug(newState);
-            ProcessHands();
 
             base.Update(gameTime);
         }
@@ -364,11 +370,42 @@ namespace KinectRotater
 
         private void UpdateTouched(Vector3 relativeLeftHand)
         {
-            var vectorToStartPoint = Nearest.Position - _coords[5, 5, 5].Position;
-            var vectorToRequestedPoint = relativeLeftHand * vectorToStartPoint.Length();
-            _rotX = CalculateRot(new Vector2(vectorToStartPoint.Y, vectorToStartPoint.Z), new Vector2(vectorToRequestedPoint.Y, vectorToRequestedPoint.Z));
-            _rotY = CalculateRot(new Vector2(vectorToStartPoint.X, vectorToStartPoint.Z), new Vector2(vectorToRequestedPoint.X, vectorToRequestedPoint.Z));
-            _rotZ = CalculateRot(new Vector2(vectorToStartPoint.X, vectorToStartPoint.Y), new Vector2(vectorToRequestedPoint.X, vectorToRequestedPoint.Y));
+            MoveQubeToNull();
+
+            var position = _coords[5, 5, 5].Position;
+            var vectorToStartPoint = Nearest.Position - position;
+            var angleXYToStart = Correct(Math.Atan2(vectorToStartPoint.Y, vectorToStartPoint.X));
+             var angleXYToHand = Correct(Math.Atan2(relativeLeftHand.Y, relativeLeftHand.X));
+            _rotZ = angleXYToHand - angleXYToStart;
+            //_rotX = Correct(Math.Atan2(vectorToStartPoint.Y, vectorToStartPoint.Z)) - Correct(Math.Atan2(relativeLeftHand.Y, relativeLeftHand.Z));
+            _rotY = Correct(Math.Atan2(relativeLeftHand.X, relativeLeftHand.Z))- Correct(Math.Atan2(vectorToStartPoint.X, vectorToStartPoint.Z));
+            MoveQubeToMiddle();
+        }
+
+        private float Correct(double atan2)
+        {
+            if(atan2 < 0)
+            {
+                atan2 += Math.PI*2;
+            }
+            return (float) atan2;
+        }
+
+        private void MoveQubeToMiddle()
+        {
+            var translation = _toMiddleMatrix;// Matrix.CreateTranslation(400, 200, 150 - HandDist * 10);
+            foreach (var coordinate in _coords)
+            {
+                coordinate.Position = Vector3.Transform(coordinate.Position, translation);
+            }
+        }
+
+        private void MoveQubeToNull()
+        {
+            foreach (var coordinate in _coords)
+            {
+                coordinate.Position = Vector3.Transform(coordinate.Position, _toNullMatrix);
+            }
         }
 
         private static float CalculateRot(Vector2 from, Vector2 to)
@@ -378,7 +415,7 @@ namespace KinectRotater
             var length = (from - to).Length();
             var alpha = Math.Asin(length / 2);
             var b = alpha * ((2 * Math.PI) / 180);
-            return (float) b;
+            return (float)b;
 
 
             //return (float) Math.Acos(Vector2.Dot(from, to));
@@ -401,22 +438,20 @@ namespace KinectRotater
 
         private void AutoRotate()
         {
-            RotateRoundX();
-            RotateRoundY();
-            RotateRoundZ();
             _rotX = UpdateRotation(_rotX);
             _rotY = UpdateRotation(_rotY);
             _rotZ = UpdateRotation(_rotZ);
+            MoveQubeToNull();
+            RotateRoundX();
+            RotateRoundY();
+            RotateRoundZ();
+            MoveQubeToMiddle();
         }
 
         private static float UpdateRotation(float rot)
         {
             if (rot == 0) return rot;
-            rot *= 0.95f;
-            if (Math.Abs(rot) <= 0.01)
-            {
-                rot = 0;
-            }
+            rot *= 0.1f;
             return rot;
         }
 
@@ -470,36 +505,30 @@ namespace KinectRotater
         private void RotateRoundZ()
         {
             if (_rotZ == 0) return;
-            var middlePnt = _coords[5, 5, 5].Position;
+            var rotation = Matrix.CreateRotationZ(_rotZ);
             foreach (var coord in _coords)
             {
-                var x = Math.Cos(_rotZ) * (coord.Position.X - middlePnt.X) - Math.Sin(_rotZ) * (coord.Position.Y - middlePnt.Y) + middlePnt.X;
-                var y = Math.Sin(_rotZ) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotZ) * (coord.Position.Y - middlePnt.Y) + middlePnt.Y;
-                coord.Position = new Vector3((float)x, (float)y, coord.Position.Z);
+                coord.Position = Vector3.Transform(coord.Position, rotation);
             }
         }
 
         private void RotateRoundY()
         {
             if (_rotY == 0) return;
-            var middlePnt = _coords[5, 5, 5].Position;
+            var rotation = Matrix.CreateRotationY(_rotY);
             foreach (var coord in _coords)
             {
-                var x = Math.Cos(_rotY) * (coord.Position.X - middlePnt.X) - Math.Sin(_rotY) * (coord.Position.Z - middlePnt.Z) + middlePnt.X;
-                var z = Math.Sin(_rotY) * (coord.Position.X - middlePnt.X) + Math.Cos(_rotY) * (coord.Position.Z - middlePnt.Z) + middlePnt.Z;
-                coord.Position = new Vector3((float)x, coord.Position.Y, (float)z);
+                coord.Position = Vector3.Transform(coord.Position, rotation);
             }
         }
 
         private void RotateRoundX()
         {
             if (_rotX == 0) return;
-            var middlePnt = _coords[5, 5, 5].Position;
+            var rotation = Matrix.CreateRotationX(_rotX);
             foreach (var coord in _coords)
             {
-                var y = Math.Cos(_rotX) * (coord.Position.Y - middlePnt.Y) - Math.Sin(_rotX) * (coord.Position.Z - middlePnt.Z) + middlePnt.Y;
-                var z = Math.Sin(_rotX) * (coord.Position.Y - middlePnt.Y) + Math.Cos(_rotX) * (coord.Position.Z - middlePnt.Z) + middlePnt.Z;
-                coord.Position = new Vector3(coord.Position.X, (float)y, (float)z);
+                coord.Position = Vector3.Transform(coord.Position, rotation);
             }
         }
     }
