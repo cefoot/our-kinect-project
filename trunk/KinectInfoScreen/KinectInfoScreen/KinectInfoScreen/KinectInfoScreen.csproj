@@ -68,6 +68,7 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Kinect, Version=1.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
       <Private>False</Private>
     </Reference>
@@ -130,6 +131,7 @@
     <Compile Include="PhysicsGameScreen.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Ragdoll.cs" />
     <Compile Include="ScreenManagerComponent.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteFonts.cs" />
@@ -146,6 +148,10 @@
     <ProjectReference Include="..\..\..\2DPhysik\Farseer Physics Engine 3.3 XNA\Farseer Physics XNA.csproj">
       <Project>{0A850700-1ABB-4288-A391-6726B90EBEB9}</Project>
       <Name>Farseer Physics XNA</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\KinectStart\KinectAddons\KinectAddons.csproj">
+      <Project>{EC16ADF8-C94C-4443-BAA5-C0A308AE3224}</Project>
+      <Name>KinectAddons</Name>
     </ProjectReference>
     <ProjectReference Include="..\KinectInfoScreenContent\KinectInfoScreenContent.contentproj">
       <Name>KinectInfoScreenContent</Name>
