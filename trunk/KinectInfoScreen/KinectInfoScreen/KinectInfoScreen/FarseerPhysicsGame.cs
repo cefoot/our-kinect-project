@@ -8,18 +8,16 @@ namespace KinectInfoScreen
     /// </summary>
     public class FarseerPhysicsGame : Game
     {
-        private readonly GraphicsDeviceManager _graphics;
+        private GraphicsDeviceManager _graphics;
 
         public FarseerPhysicsGame()
         {
             Window.Title = "Farseer Samples Framework";
-            _graphics = new GraphicsDeviceManager(this)
-                            {
-                                PreferMultiSampling = true,
-                                PreferredBackBufferWidth = 1280,
-                                PreferredBackBufferHeight = 720
-                            };
+            _graphics = new GraphicsDeviceManager(this);
+            _graphics.PreferMultiSampling = true;
 #if WINDOWS || XBOX
+            _graphics.PreferredBackBufferWidth = 1280;
+            _graphics.PreferredBackBufferHeight = 720;
             ConvertUnits.SetDisplayUnitToSimUnitRatio(24f);
             IsFixedTimeStep = true;
 #elif WINDOWS_PHONE
@@ -53,10 +51,10 @@ namespace KinectInfoScreen
         protected override void Initialize()
         {
             base.Initialize();
-            AdvancedDemo5 advanced5 = new AdvancedDemo5();
+            var advanced5 = new AdvancedDemo5();
+
             ScreenManager.AddScreen(new BackgroundScreen());
             ScreenManager.AddScreen(advanced5);
-            
         }
     }
 }
