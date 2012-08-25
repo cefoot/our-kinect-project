@@ -51,7 +51,7 @@ namespace KinectInfoScreen
         protected override void Initialize()
         {
             base.Initialize();
-            var advanced5 = new AdvancedDemo5();
+            var advanced5 = new KinectInfoScreen();
 
             ScreenManager.AddScreen(new BackgroundScreen());
             ScreenManager.AddScreen(advanced5);
