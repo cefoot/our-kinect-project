@@ -32,7 +32,7 @@ namespace KinectInfoScreen
         private int _triangleCount = -2;
         private Ragdoll _ragdoll;
         private Sprite _obstacle;
-        private const float BaseLine = 26;
+        private const float BaseLine = 24;
 
         private float _force = 1000f;
 
@@ -270,14 +270,15 @@ namespace KinectInfoScreen
 
                 //_ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
                 var toMoveDown = _groundlines[skeletIdx] - BaseLine;
-                ApplyForce(_ragdoll.Body, skeletonPoints[skeletIdx][JointType.HipCenter], _force, toMoveDown);
-                ApplyForce(_ragdoll.LeftFood, skeletonPoints[skeletIdx][JointType.FootLeft], _force / 40f, toMoveDown);
-                ApplyForce(_ragdoll.RightFood, skeletonPoints[skeletIdx][JointType.FootRight], _force / 40f, toMoveDown);
-                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], _force / 40f, toMoveDown);
-                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], _force / 40f, toMoveDown);
+                ApplyForce(_ragdoll.Body, skeletonPoints[skeletIdx][JointType.Spine], _force, toMoveDown);
+                ApplyForce(_ragdoll.LeftFoot, skeletonPoints[skeletIdx][JointType.FootLeft], _force / 10f, toMoveDown);
+                ApplyForce(_ragdoll.RightFoot, skeletonPoints[skeletIdx][JointType.FootRight], _force / 10f, toMoveDown);
+                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], _force / 10f, toMoveDown);
+                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], _force / 10f, toMoveDown);
+                ApplyForce(_ragdoll.Head, skeletonPoints[skeletIdx][JointType.Head], _force / 10f, toMoveDown);
                 skeletIdx++;
             }
-            Debug.WriteLine("SkeletFoot:{0}", _ragdoll.LeftFood.Position.Y);
+            Debug.WriteLine("SkeletFoot:{0}", _ragdoll.LeftFoot.Position.Y);
             //Debug.WriteLine("RagPos:{0}:{1}", _ragdoll.Body.Position.X, _ragdoll.Body.Position.Y);
             //_ragdoll.Body.Position
         }

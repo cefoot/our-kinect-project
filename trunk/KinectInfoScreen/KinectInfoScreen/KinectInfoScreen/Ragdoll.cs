@@ -53,24 +53,29 @@ namespace KinectInfoScreen
             get { return _body; }
         }
 
-        public Body LeftFood
+        public Body LeftFoot
         {
-            get { return _lowerLeftLeg; }
+            get { return _leftFoot; }
         }
 
-        public Body RightFood
+        public Body RightFoot
         {
-            get { return _lowerRightLeg; }
+            get { return _rightFoot; }
         }
 
         public Body RightHand
         {
-            get { return _lowerRightArm; }
+            get { return _rightHand; }
         }
 
         public Body LeftHand
         {
-            get { return _lowerLeftArm; }
+            get { return _leftHand; }
+        }
+
+        public Body Head
+        {
+            get { return _head; }
         }
 
         //Torso
