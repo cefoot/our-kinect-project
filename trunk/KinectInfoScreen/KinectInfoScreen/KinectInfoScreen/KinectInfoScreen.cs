@@ -197,10 +197,10 @@ namespace KinectInfoScreen
                         vertices.Scale(ref vertScale);
                     }
 
-                    BreakableBody breakableBody = new BreakableBody(triangulated, World, 1);
-                    breakableBody.MainBody.Position = new Vector2(xOffset, yOffset);
-                    breakableBody.Strength = 100;
-                    World.AddBreakableBody(breakableBody);
+                    BreakableBody breakableBodyLetter = new BreakableBody(triangulated, World, 1);
+                    breakableBodyLetter.MainBody.Position = new Vector2(xOffset, yOffset);
+                    breakableBodyLetter.Strength = 100;
+                    World.AddBreakableBody(breakableBodyLetter);
                 }
                 if (letter.Equals('\n'))
                 {
@@ -210,15 +210,7 @@ namespace KinectInfoScreen
 
                 }
                 xOffset += 3.5f;
-                var breakableBody = new BreakableBody(triangulated, World, 1)
-                                        {
-                                            MainBody =
-                                                {
-                                                    Position = new Vector2(xOffset, yOffset)
-                                                },
-                                            Strength = 100
-                                        };
-                World.AddBreakableBody(breakableBody);
+               
             }
 
             _ragdoll = new Ragdoll(World, this, Vector2.Zero);

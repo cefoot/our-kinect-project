@@ -19,13 +19,19 @@ namespace KinectInfoScreen
         private Sprite _lowerArm;
 
         private Body _lowerLeftArm;
+        private Body _leftHand;
         private Body _lowerLeftLeg;
+        private Body _leftFoot;
         private Sprite _lowerLeg;
         private Body _lowerRightArm;
+        private Body _rightHand;
         private Body _lowerRightLeg;
+        private Body _rightFoot;
         private PhysicsGameScreen _screen;
         private Sprite _torso;
         private Sprite _upperArm;
+        private Sprite _hand;
+        private Sprite _foot;
 
         private Body _upperLeftArm;
         private Body _upperLeftLeg;
@@ -78,6 +84,13 @@ namespace KinectInfoScreen
             _upperLeftArm.Rotation = 1.4f;
             _upperLeftArm.Position = position + new Vector2(-2f, 1.8f);
 
+            _leftHand = BodyFactory.CreateCapsule(world, 0.3f, 0.3f, ArmDensity);
+            _leftHand.BodyType = BodyType.Dynamic;
+            _leftHand.AngularDamping = LimbAngularDamping;
+            _leftHand.Mass = 2f;
+            _leftHand.Rotation = 1.4f;
+            _leftHand.Position = position + new Vector2(-4f, 2.7f);
+
             //Right Arm
             _lowerRightArm = BodyFactory.CreateCapsule(world, 1f, 0.45f, ArmDensity);
             _lowerRightArm.BodyType = BodyType.Dynamic;
@@ -93,6 +106,13 @@ namespace KinectInfoScreen
             _upperRightArm.Rotation = -1.4f;
             _upperRightArm.Position = position + new Vector2(2f, 1.8f);
 
+            _rightHand = BodyFactory.CreateCapsule(world, 0.3f, 0.3f, ArmDensity);
+            _rightHand.BodyType = BodyType.Dynamic;
+            _rightHand.AngularDamping = LimbAngularDamping;
+            _rightHand.Mass = 2f;
+            _rightHand.Rotation = 1.4f;
+            _rightHand.Position = position + new Vector2(4f, 2.7f);
+
             //Left Leg
             _lowerLeftLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _lowerLeftLeg.BodyType = BodyType.Dynamic;
@@ -106,6 +126,13 @@ namespace KinectInfoScreen
             _upperLeftLeg.Mass = 2f;
             _upperLeftLeg.Position = position + new Vector2(-0.6f, 6f);
 
+            _leftFoot = BodyFactory.CreateCapsule(world, 0.5f, 0.5f, LegDensity);
+            _leftFoot.BodyType = BodyType.Dynamic;
+            _leftFoot.AngularDamping = LimbAngularDamping;
+            _leftFoot.Mass = 2f;
+            _leftFoot.Position = position + new Vector2(-0.6f, 8.5f);
+
+
             //Right Leg
             _lowerRightLeg = BodyFactory.CreateCapsule(world, 1f, 0.5f, LegDensity);
             _lowerRightLeg.BodyType = BodyType.Dynamic;
@@ -118,6 +145,13 @@ namespace KinectInfoScreen
             _upperRightLeg.AngularDamping = LimbAngularDamping;
             _upperRightLeg.Mass = 2f;
             _upperRightLeg.Position = position + new Vector2(0.6f, 6f);
+
+            _rightFoot = BodyFactory.CreateCapsule(world, 0.5f, 0.5f, LegDensity);
+            _rightFoot.BodyType = BodyType.Dynamic;
+            _rightFoot.AngularDamping = LimbAngularDamping;
+            _rightFoot.Mass = 2f;
+            _rightFoot.Position = position + new Vector2(0.6f, 8.5f);
+
         }
 
         private void CreateJoints(World world)
@@ -145,6 +179,18 @@ namespace KinectInfoScreen
             jLeftArm.Length = 0.02f;
             world.AddJoint(jLeftArm);
 
+            //lowerLeftArm -> leftHand
+
+            //lowerLeftArm -> upperLeftArm
+            DistanceJoint jLeftHand = new DistanceJoint(_leftHand,_lowerLeftArm,
+                                                       new Vector2(0f, -0.5f),
+                                                       new Vector2(0f, 0.5f));
+            jLeftHand.CollideConnected = true;
+            jLeftHand.DampingRatio = dampingRatio;
+            jLeftHand.Frequency = frequency;
+            jLeftHand.Length = 0.002f;
+            world.AddJoint(jLeftHand);
+
             //upperLeftArm -> body
             DistanceJoint jLeftArmBody = new DistanceJoint(_upperLeftArm, _body,
                                                            new Vector2(0f, -1f),
@@ -164,6 +210,17 @@ namespace KinectInfoScreen
             jRightArm.Frequency = frequency;
             jRightArm.Length = 0.02f;
             world.AddJoint(jRightArm);
+
+            //lowerRightArm -> rightHand
+            DistanceJoint jRightHand = new DistanceJoint(_rightHand,_lowerRightArm,
+                                                       new Vector2(0f, -0.5f),
+                                                       new Vector2(0f, 0.5f));
+            jRightHand.CollideConnected = true;
+            jRightHand.DampingRatio = dampingRatio;
+            jRightHand.Frequency = frequency;
+            jRightHand.Length = 0.002f;
+            world.AddJoint(jRightHand);
+
 
             //upperRightArm -> body
             DistanceJoint jRightArmBody = new DistanceJoint(_upperRightArm, _body,
@@ -186,6 +243,17 @@ namespace KinectInfoScreen
             jLeftLeg.Length = 0.05f;
             world.AddJoint(jLeftLeg);
 
+            //lowerLeftleg -> leftFood
+            DistanceJoint jLeftFoot = new DistanceJoint(_leftFoot,_lowerLeftLeg,
+                                                       new Vector2(0f, -0.8f),
+                                                       new Vector2(0f, 0.8f));
+            jLeftFoot.CollideConnected = true;
+            jLeftFoot.DampingRatio = dampingRatio;
+            jLeftFoot.Frequency = frequency;
+            jLeftFoot.Length = 0.05f;
+            world.AddJoint(jLeftFoot);
+
+
             //upperLeftLeg -> body
             DistanceJoint jLeftLegBody = new DistanceJoint(_upperLeftLeg, _body,
                                                            new Vector2(0f, -1.1f),
@@ -205,6 +273,17 @@ namespace KinectInfoScreen
             jRightLeg.Frequency = frequency;
             jRightLeg.Length = 0.05f;
             world.AddJoint(jRightLeg);
+
+            //lowerRightLeg -> rightFoot
+            DistanceJoint jRightFoot = new DistanceJoint(_rightFoot,_lowerRightLeg,
+                                                        new Vector2(0f, -0.8f),
+                                                        new Vector2(0f, 0.8f));
+            jRightFoot.CollideConnected = true;
+            jRightFoot.DampingRatio = dampingRatio;
+            jRightFoot.Frequency = frequency;
+            jRightFoot.Length = 0.05f;
+            world.AddJoint(jRightFoot);
+
 
             //upperRightleg -> body
             DistanceJoint jRightLegBody = new DistanceJoint(_upperRightLeg, _body,
@@ -233,6 +312,12 @@ namespace KinectInfoScreen
                                                                 MaterialType.Squares, Color.DimGray, 0.8f));
             _lowerLeg = new Sprite(creator.TextureFromVertices(PolygonTools.CreateCapsule(2f, 0.5f, 16),
                                                                 MaterialType.Squares, Color.DarkSlateGray, 0.8f));
+
+            _hand = new Sprite(creator.TextureFromVertices(PolygonTools.CreateCapsule(0.7f, 0.3f, 16),
+                                                                MaterialType.Squares, Color.DimGray, 0.8f));
+
+            _foot = new Sprite(creator.TextureFromVertices(PolygonTools.CreateCapsule(1.1f, 0.5f, 16),
+                                                                MaterialType.Squares, Color.DimGray, 0.8f));
         }
 
         public void Draw()
@@ -263,6 +348,18 @@ namespace KinectInfoScreen
 
             batch.Draw(_face.Texture, ConvertUnits.ToDisplayUnits(_head.Position), null,
                         Color.White, _head.Rotation, _face.Origin, 1f, SpriteEffects.None, 0f);
+
+            batch.Draw(_hand.Texture, ConvertUnits.ToDisplayUnits(_leftHand.Position), null,
+                        Color.White, _leftHand.Rotation, _hand.Origin, 1f, SpriteEffects.None, 0f);
+            batch.Draw(_hand.Texture, ConvertUnits.ToDisplayUnits(_rightHand.Position), null,
+                        Color.White, _rightHand.Rotation, _hand.Origin, 1f, SpriteEffects.None, 0f);
+
+            batch.Draw(_foot.Texture, ConvertUnits.ToDisplayUnits(_rightFoot.Position), null,
+                        Color.White, _rightFoot.Rotation, _foot.Origin, 1f, SpriteEffects.None, 0f);
+            batch.Draw(_foot.Texture, ConvertUnits.ToDisplayUnits(_leftFoot.Position), null,
+                        Color.White, _leftFoot.Rotation, _foot.Origin, 1f, SpriteEffects.None, 0f);
+
+            
         }
     }
 }
