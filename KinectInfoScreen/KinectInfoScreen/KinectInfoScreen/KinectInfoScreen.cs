@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace KinectInfoScreen
 {
-    internal class AdvancedDemo5 : PhysicsGameScreen, IDemoScreen
+    internal class KinectInfoScreen : PhysicsGameScreen, IDemoScreen
     {
         private Border _border;
 
@@ -51,11 +51,13 @@ namespace KinectInfoScreen
         {
             base.LoadContent();
 
+            DebugView.AppendFlags(DebugViewFlags.Shape);
+
             World.Gravity = Vector2.Zero;
 
             _border = new Border(World, this, ScreenManager.GraphicsDevice.Viewport);
 
-            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("alphabet");
+            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("Samples/alphabet");
 
             uint[] data = new uint[alphabet.Width * alphabet.Height];
             alphabet.GetData(data);
@@ -136,6 +138,7 @@ namespace KinectInfoScreen
 
         public override void UnloadContent()
         {
+            DebugView.RemoveFlags(DebugViewFlags.Shape);
             
             base.UnloadContent();
         }

@@ -18,6 +18,14 @@
     <XnaOutputType>Game</XnaOutputType>
     <ApplicationIcon>Game.ico</ApplicationIcon>
     <Thumbnail>GameThumbnail.png</Thumbnail>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -131,6 +139,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\2DPhysik\DebugView XNA\DebugView XNA.csproj">
+      <Project>{FC7845FA-13FE-4FF8-822A-A577F3F59B00}</Project>
+      <Name>DebugView XNA</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\2DPhysik\Farseer Physics Engine 3.3 XNA\Farseer Physics XNA.csproj">
       <Project>{0A850700-1ABB-4288-A391-6726B90EBEB9}</Project>
       <Name>Farseer Physics XNA</Name>

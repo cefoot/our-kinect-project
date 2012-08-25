@@ -1,5 +1,6 @@
 ﻿using System;
 using FarseerPhysics;
+using FarseerPhysics.DebugViews;
 using FarseerPhysics.Dynamics;
 using FarseerPhysics.Dynamics.Joints;
 using Microsoft.Xna.Framework;
@@ -10,6 +11,7 @@ namespace KinectInfoScreen
     public class PhysicsGameScreen : GameScreen
     {
         public Camera2D Camera;
+        protected DebugViewXNA DebugView;
         protected World World;
 
         private float _agentForce;
@@ -26,6 +28,7 @@ namespace KinectInfoScreen
             _userAgent = null;
             World = null;
             Camera = null;
+            DebugView = null;
         }
 
         public bool EnableCameraControl { get; set; }
@@ -42,7 +45,7 @@ namespace KinectInfoScreen
             base.LoadContent();
 
             //We enable diagnostics to show get values for our performance counters.
-            Settings.EnableDiagnostics = true;
+            Settings.EnableDiagnostics = false;
 
             if (World == null)
             {
@@ -51,6 +54,16 @@ namespace KinectInfoScreen
             else
             {
                 World.Clear();
+            }
+
+            if (DebugView == null)
+            {
+                DebugView = new DebugViewXNA(World);
+                DebugView.RemoveFlags(DebugViewFlags.Shape);
+                DebugView.RemoveFlags(DebugViewFlags.Joint);
+                DebugView.DefaultShapeColor = Color.White;
+                DebugView.SleepingShapeColor = Color.LightGray;
+                DebugView.LoadContent(ScreenManager.GraphicsDevice, ScreenManager.Content);
             }
 
             if (Camera == null)
@@ -269,6 +282,14 @@ namespace KinectInfoScreen
 
         private void EnableOrDisableFlag(DebugViewFlags flag)
         {
+            if ((DebugView.Flags & flag) == flag)
+            {
+                DebugView.RemoveFlags(flag);
+            }
+            else
+            {
+                DebugView.AppendFlags(flag);
+            }
         }
 
         public override void Draw(GameTime gameTime)
@@ -276,6 +297,7 @@ namespace KinectInfoScreen
             Matrix projection = Camera.SimProjection;
             Matrix view = Camera.SimView;
 
+            DebugView.RenderDebugData(ref projection, ref view);
             base.Draw(gameTime);
         }
     }
