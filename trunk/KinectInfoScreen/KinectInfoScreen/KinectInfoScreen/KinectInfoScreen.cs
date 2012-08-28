@@ -25,12 +25,9 @@ namespace KinectInfoScreen
 
         private TcpClient _skeletClient;
 
-        private List<Dictionary<JointType, SkeletonPoint>> _trackedSkelets;
-
-        private List<float> _groundlines;
+        private List<SkeletContainer> TrackedSkelets { get; set; }
 
         private int _triangleCount = -2;
-        private Ragdoll _ragdoll;
         private Sprite _obstacle;
         private const float BaseLine = 24;
 
@@ -42,9 +39,8 @@ namespace KinectInfoScreen
         public KinectInfoScreen()
         {
             _skeletClient = new TcpClient { NoDelay = true };
-            _skeletClient.BeginConnect("WS201736", 666, ServerConnected, null);
-            _trackedSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
-            _groundlines = new List<float>();
+            _skeletClient.BeginConnect("ws201736", 666, ServerConnected, null);
+            TrackedSkelets = new List<SkeletContainer>();
         }
 
         #region skelet recieving
@@ -71,51 +67,42 @@ namespace KinectInfoScreen
             {
                 return;
             }
-            var tmpSkelets = new List<Dictionary<JointType, SkeletonPoint>>();
             var skeletIdx = 0;
             foreach (var skelets in deserializeJointData.Skelletons)//.AsParallel().Select(skelleton => skelleton.First(jnt => jnt.JointType == TypeOfJoint)).Select(transferableJoint => transferableJoint.SkeletPoint.ScaleOwn(80, 60)))
             {
-                var skelet = new Dictionary<JointType, SkeletonPoint>();
-                foreach (var transferableJoint in skelets)
+                lock (TrackedSkelets)
                 {
-                    skelet[transferableJoint.JointType] = new SkeletonPoint
-                                                              {
-                                                                  X =
-                                                                      transferableJoint.SkeletPoint.X * 30f,
-                                                                  Y =
-                                                                  transferableJoint.SkeletPoint.Y * -20f,
-                                                              };
+                    var skelet = new Dictionary<JointType, SkeletonPoint>();
+                    foreach (var transferableJoint in skelets)
+                    {
+                        skelet[transferableJoint.JointType] = new SkeletonPoint
+                        {
+                            X =
+                                transferableJoint.SkeletPoint.X * 30f,
+                            Y =
+                            transferableJoint.SkeletPoint.Y * -20f,
+                        };
+                    }
+                    GetTrackedSkelet(skeletIdx, skelet).Joints = skelet;
+                    GetTrackedSkelet(skeletIdx).UpdateDeleteTimer();
+                    skeletIdx++;
                 }
-                if (_groundlines.Count < skeletIdx + 1)
-                {
-                    var groundLine = skelet[JointType.FootLeft].Y + skelet[JointType.FootRight].Y;
-                    groundLine /= 2f;
-                    Debug.WriteLine("Skelet[{0}]groundline:{1}", skeletIdx + 1, groundLine);
-                    _groundlines.Add(groundLine);
-                }
-                tmpSkelets.Add(skelet);
-                UpdateTimer();
-                skeletIdx++;
             }
-            _trackedSkelets = tmpSkelets;
         }
 
-        private void UpdateTimer()
+        private SkeletContainer GetTrackedSkelet(int skeletIdx, Dictionary<JointType, SkeletonPoint> skelet = null)
         {
-            if (DeleteTimer == null)
+            while (TrackedSkelets.Count < skeletIdx + 1)
             {
-                DeleteTimer = new Timer(DeleteSkelets, null, 1000, Timeout.Infinite);
+                var skeletContainer = new SkeletContainer(World);
+                if (skelet != null)
+                {
+                    skeletContainer.Joints = skelet;
+                }
+                TrackedSkelets.Add(skeletContainer);
             }
-            DeleteTimer.Change(1000, Timeout.Infinite);
+            return TrackedSkelets[skeletIdx];
         }
-
-        private void DeleteSkelets(object state)
-        {
-            _trackedSkelets.Clear();
-            _groundlines.Clear();
-        }
-
-        private System.Threading.Timer DeleteTimer { get; set; }
 
         #endregion
 
@@ -201,7 +188,6 @@ namespace KinectInfoScreen
             BuildText("Hello  World");
 
 
-            _ragdoll = new Ragdoll(World, this, new Vector2(0, 4));
             // create sprite based on body
             var rectangle = BodyFactory.CreateRectangle(World, 5f, 1.5f, 1f);
             var shape = rectangle.FixtureList[0].Shape;
@@ -213,7 +199,7 @@ namespace KinectInfoScreen
 
         }
 
-        Dictionary<BreakableBody,Vector2> _letterStartPos = new Dictionary<BreakableBody, Vector2>();
+        Dictionary<BreakableBody, Vector2> _letterStartPos = new Dictionary<BreakableBody, Vector2>();
 
 
         public void BuildText(string text)
@@ -250,13 +236,18 @@ namespace KinectInfoScreen
                         vertices.Scale(ref vertScale);
                     }
 
-                    BreakableBody breakableBodyLetter = new BreakableBody(triangulated, World, 1);
+                    var breakableBodyLetter = new BreakableBody(triangulated, World, 1);
                     breakableBodyLetter.MainBody.Position = new Vector2(xOffset, yOffset);
                     _letterStartPos[breakableBodyLetter] = new Vector2(xOffset, yOffset);
                     breakableBodyLetter.Strength = 100;
+                    breakableBodyLetter.Parts.ForEach(fixt =>
+                    {
+                        fixt.CollisionCategories = Category.Cat1;
+                        fixt.CollidesWith = Category.Cat1;
+                    });
 
                     World.AddBreakableBody(breakableBodyLetter);
-         //           _currentUsedLetters.Add(breakableBodyLetter);
+                    //           _currentUsedLetters.Add(breakableBodyLetter);
                 }
                 if (letter.Equals('\n'))
                 {
@@ -272,32 +263,38 @@ namespace KinectInfoScreen
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
-            var skeletIdx = 0;
-            var skeletonPoints = _trackedSkelets.ToArray();
-            if (skeletonPoints.Length > 0)
+            foreach (var skeletContainer in TrackedSkelets)
             {
-                var skeletonPoint = skeletonPoints[skeletIdx][JointType.HipCenter];
+                var skeletJoints = skeletContainer.Joints;
+                skeletContainer.CreateRagdoll(this);
+                UpdateRagdoll(skeletContainer.Ragdoll, skeletJoints);
 
-                //_ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
-                var toMoveDown = _groundlines[skeletIdx] - BaseLine;
-                ApplyForce(_ragdoll.Body, skeletonPoints[skeletIdx][JointType.Spine], _force, toMoveDown);
-                var strenghtExt = _force/30f;
-                ApplyForce(_ragdoll.LeftFoot, skeletonPoints[skeletIdx][JointType.FootLeft], strenghtExt, toMoveDown);
-                ApplyForce(_ragdoll.RightFoot, skeletonPoints[skeletIdx][JointType.FootRight], strenghtExt, toMoveDown);
-                ApplyForce(_ragdoll.LeftHand, skeletonPoints[skeletIdx][JointType.HandLeft], strenghtExt, toMoveDown);
-                ApplyForce(_ragdoll.RightHand, skeletonPoints[skeletIdx][JointType.HandRight], strenghtExt, toMoveDown);
-                ApplyForce(_ragdoll.Head, skeletonPoints[skeletIdx][JointType.Head], strenghtExt, toMoveDown);
-                skeletIdx++;
             }
-            Debug.WriteLine("SkeletFoot:{0}", _ragdoll.LeftFoot.Position.Y);
-            //Debug.WriteLine("RagPos:{0}:{1}", _ragdoll.Body.Position.X, _ragdoll.Body.Position.Y);
-            //_ragdoll.Body.Position
+            //ragdoll.Body.Position
         }
 
-        private void ApplyForce(Body body, SkeletonPoint skeletonPoint, float strenght, float toMoveDown)
+        private void UpdateRagdoll(Ragdoll ragdoll, Dictionary<JointType, SkeletonPoint> skeletonPoint)
         {
+            //ragdoll.Body.Position = new Vector2(skeletonPoint.X, skeletonPoint.Y);
+            var toMoveDown = 0;// _groundlines[skeletIdx] - BaseLine;
+            ApplyForce(ragdoll.Body, skeletonPoint[JointType.Spine], _force, toMoveDown, ragdoll);
+            var strenghtExt = _force / 30f;
+            ApplyForce(ragdoll.LeftFoot, skeletonPoint[JointType.FootLeft], strenghtExt, toMoveDown, ragdoll);
+            ApplyForce(ragdoll.RightFoot, skeletonPoint[JointType.FootRight], strenghtExt, toMoveDown, ragdoll);
+            ApplyForce(ragdoll.LeftHand, skeletonPoint[JointType.HandLeft], strenghtExt, toMoveDown, ragdoll);
+            ApplyForce(ragdoll.RightHand, skeletonPoint[JointType.HandRight], strenghtExt, toMoveDown, ragdoll);
+            ApplyForce(ragdoll.Head, skeletonPoint[JointType.Head], strenghtExt, toMoveDown, ragdoll);
+        }
 
-            body.ApplyForce(strenght * (new Vector2(skeletonPoint.X, skeletonPoint.Y - toMoveDown) - body.Position));
+        private void ApplyForce(Body body, SkeletonPoint skeletonPoint, float strenght, float toMoveDown, Ragdoll ragdoll)
+        {
+            var force = (new Vector2(skeletonPoint.X, skeletonPoint.Y - toMoveDown) - body.Position);
+            if (force.Length() > 10f)
+            {
+                ragdoll.CollisionCategories = Category.Cat1;
+                ragdoll.CollidesWith = Category.Cat1;
+            }
+            body.ApplyForce(strenght * force);
         }
 
         public override void HandleInput(InputHelper input, GameTime gameTime)
@@ -322,7 +319,7 @@ namespace KinectInfoScreen
                                     }, ref aabb);
             }
 
-            if(input.IsNewKeyPress(Keys.R))
+            if (input.IsNewKeyPress(Keys.R))
             {
                 ResetLetter();
             }
@@ -350,7 +347,11 @@ namespace KinectInfoScreen
         private void DrawSkelet()
         {
             ScreenManager.SpriteBatch.Begin(0, null, null, null, null, null, Camera.View);
-            _ragdoll.Draw();
+            foreach (var skelet in TrackedSkelets)
+            {
+                if (skelet.Ragdoll == null) continue;
+                skelet.Ragdoll.Draw();
+            }
             ScreenManager.SpriteBatch.End();
         }
 

@@ -133,6 +133,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Ragdoll.cs" />
     <Compile Include="ScreenManagerComponent.cs" />
+    <Compile Include="SkeletContainer.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="SpriteFonts.cs" />
   </ItemGroup>
