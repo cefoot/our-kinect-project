@@ -37,15 +37,20 @@ namespace KinectAddons
 
         public static Joint ScaleOwn(this Joint jnt, int width, int height)
         {
-            jnt.Position = jnt.Position.ScaleOwn(width,height);
+            jnt.Position = jnt.Position.ScaleOwn(width, height);
             return jnt;
         }
 
-        public static SkeletonPoint Rescale(this SkeletonPoint skeletPnt, int widthFrom, int heightFrom,int widthTo,int heightTo)
+        public static SkeletonPoint Rescale(this SkeletonPoint skeletPnt, int widthFrom, int heightFrom, int widthTo, int heightTo)
         {
             var xVal = skeletPnt.X / widthFrom * widthTo;
             var yVal = skeletPnt.Y / heightFrom * heightTo;
             return new SkeletonPoint { X = xVal, Y = yVal, Z = skeletPnt.Z };
+        }
+
+        public static Vector3 ToVector3(this SkeletonPoint skeletPnt)
+        {
+            return new Vector3(skeletPnt.X, skeletPnt.Y, skeletPnt.Z);
         }
 
         public static SkeletonPoint ScaleOwn(this SkeletonPoint skeletPnt, int width, int height)
@@ -74,7 +79,7 @@ namespace KinectAddons
 
         public static Vector2 Convert(this SkeletonPoint point)
         {
-            return new Vector2(point.X,point.Y);
+            return new Vector2(point.X, point.Y);
         }
     }
 }
