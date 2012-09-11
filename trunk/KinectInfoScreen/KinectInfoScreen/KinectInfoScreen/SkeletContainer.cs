@@ -15,13 +15,14 @@ namespace KinectInfoScreen
             World = world;
             Joints = new Dictionary<JointType, SkeletonPoint>();
             GroundLine = 0;
-            DeleteTimer = new Timer(DeleteSkelets, null, 1000, Timeout.Infinite);
+            DeleteTimer = new Timer(DeleteSkelets, null, Timeout.Infinite, Timeout.Infinite);
         }
 
         public void CreateRagdoll(PhysicsGameScreen screen)
         {
             if (Ragdoll != null) return;
             Ragdoll = new Ragdoll(World, screen, GetRagdolPos());
+            UpdateDeleteTimer();
         }
 
         private Vector2 GetRagdolPos()
@@ -29,11 +30,17 @@ namespace KinectInfoScreen
             return new Vector2(0, 0);
         }
 
+        private bool timerDisposed = false;
+
         private void DeleteSkelets(object state)
         {
+            var timer = DeleteTimer;
+            timerDisposed = true;
+            timer.Dispose();
             var doll = Ragdoll;
             Ragdoll = null;
-            doll.Remove(World);
+            DeleteTimer = null;
+            doll.RemoveFrom(World);
             //TODO event damit aus List Raus
         }
 
@@ -44,6 +51,8 @@ namespace KinectInfoScreen
 
         public void UpdateDeleteTimer()
         {
+            if(Ragdoll==null) return;//noch nicht initialisiert
+            if(timerDisposed) return;
             var timer = DeleteTimer;
             timer.Change(1000, Timeout.Infinite);
         }

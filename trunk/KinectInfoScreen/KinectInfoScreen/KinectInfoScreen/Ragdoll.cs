@@ -437,7 +437,7 @@ namespace KinectInfoScreen
             
         }
 
-        public void Remove(World world)
+        public void RemoveFrom(World world)
         {
             foreach (var bodyPart in _bodyParts)
             {

@@ -31,7 +31,7 @@ namespace KinectInfoScreen
         private Sprite _obstacle;
         private const float BaseLine = 24;
 
-        private Dictionary<char, Vertices> _letterMapping;
+        private Dictionary<char, List<Vertices>> _letterMapping;
         private string _text;
 
         private float _force = 1000f;
@@ -153,34 +153,34 @@ namespace KinectInfoScreen
             alphabet.GetData(data);
 
             List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
-            _letterMapping = new Dictionary<char, Vertices>();
+            _letterMapping = new Dictionary<char, List<Vertices>>();
             Vertices[] listArray = list.ToArray();
-            _letterMapping.Add('A', listArray[0]);
-            _letterMapping.Add('B', listArray[2]);
-            _letterMapping.Add('C', listArray[1]);
-            _letterMapping.Add('D', listArray[3]);
-            _letterMapping.Add('E', listArray[4]);
-            _letterMapping.Add('F', listArray[6]);
-            _letterMapping.Add('G', listArray[5]);
-            _letterMapping.Add('H', listArray[7]);
-            _letterMapping.Add('I', listArray[8]);
-            _letterMapping.Add('J', listArray[9]);
-            _letterMapping.Add('K', listArray[10]);
-            _letterMapping.Add('L', listArray[12]);
-            _letterMapping.Add('M', listArray[13]);
-            _letterMapping.Add('N', listArray[14]);
-            _letterMapping.Add('O', listArray[11]);
-            _letterMapping.Add('P', listArray[15]);
-            _letterMapping.Add('Q', listArray[16]);
-            _letterMapping.Add('R', listArray[19]);
-            _letterMapping.Add('S', listArray[17]);
-            _letterMapping.Add('T', listArray[18]);
-            _letterMapping.Add('U', listArray[20]);
-            _letterMapping.Add('V', listArray[21]);
-            _letterMapping.Add('W', listArray[22]);
-            _letterMapping.Add('X', listArray[23]);
-            _letterMapping.Add('Y', listArray[24]);
-            _letterMapping.Add('Z', listArray[25]);
+            _letterMapping.Add('A', ParseLetter(listArray[0]));
+            _letterMapping.Add('B', ParseLetter(listArray[2]));
+            _letterMapping.Add('C', ParseLetter(listArray[1]));
+            _letterMapping.Add('D', ParseLetter(listArray[3]));
+            _letterMapping.Add('E', ParseLetter(listArray[4]));
+            _letterMapping.Add('F', ParseLetter(listArray[6]));
+            _letterMapping.Add('G', ParseLetter(listArray[5]));
+            _letterMapping.Add('H', ParseLetter(listArray[7]));
+            _letterMapping.Add('I', ParseLetter(listArray[8]));
+            _letterMapping.Add('J', ParseLetter(listArray[9]));
+            _letterMapping.Add('K', ParseLetter(listArray[10]));
+            _letterMapping.Add('L', ParseLetter(listArray[12]));
+            _letterMapping.Add('M', ParseLetter(listArray[13]));
+            _letterMapping.Add('N', ParseLetter(listArray[14]));
+            _letterMapping.Add('O', ParseLetter(listArray[11]));
+            _letterMapping.Add('P', ParseLetter(listArray[15]));
+            _letterMapping.Add('Q', ParseLetter(listArray[16]));
+            _letterMapping.Add('R', ParseLetter(listArray[19]));
+            _letterMapping.Add('S', ParseLetter(listArray[17]));
+            _letterMapping.Add('T', ParseLetter(listArray[18]));
+            _letterMapping.Add('U', ParseLetter(listArray[20]));
+            _letterMapping.Add('V', ParseLetter(listArray[21]));
+            _letterMapping.Add('W', ParseLetter(listArray[22]));
+            _letterMapping.Add('X', ParseLetter(listArray[23]));
+            _letterMapping.Add('Y', ParseLetter(listArray[24]));
+            _letterMapping.Add('Z', ParseLetter(listArray[25]));
 
             //letterMapping.Add(' ', listArray[26]);
 
@@ -218,25 +218,14 @@ namespace KinectInfoScreen
                 char letter = textChar[i];
 
 
-                Vertices polygon;//letterMapping[letter];
+                List<Vertices> polygon;//letterMapping[letter];
 
 
                 if (_letterMapping.TryGetValue(letter, out polygon))
                 {
-                    Vector2 centroid = -polygon.GetCentroid();
-                    polygon.Translate(ref centroid);
-                    polygon = SimplifyTools.CollinearSimplify(polygon);
-                    polygon = SimplifyTools.ReduceByDistance(polygon, 4);
-                    List<Vertices> triangulated = BayazitDecomposer.ConvexPartition(polygon);
 
-                    float scale = 1.0f;
-                    Vector2 vertScale = new Vector2(ConvertUnits.ToSimUnits(1)) * scale;
-                    foreach (Vertices vertices in triangulated)
-                    {
-                        vertices.Scale(ref vertScale);
-                    }
 
-                    var breakableBodyLetter = new BreakableBody(triangulated, World, 1);
+                    var breakableBodyLetter = new BreakableBody(polygon, World, 1, Guid.NewGuid());
                     breakableBodyLetter.MainBody.Position = new Vector2(xOffset, yOffset);
                     _letterStartPos[breakableBodyLetter] = new Vector2(xOffset, yOffset);
                     breakableBodyLetter.Strength = 100;
@@ -258,6 +247,23 @@ namespace KinectInfoScreen
                 }
                 xOffset += 3.5f;
             }
+        }
+
+        private List<Vertices> ParseLetter(Vertices polygon)
+        {
+            Vector2 centroid = -polygon.GetCentroid();
+            polygon.Translate(ref centroid);
+            polygon = SimplifyTools.CollinearSimplify(polygon);
+            polygon = SimplifyTools.ReduceByDistance(polygon, 4);
+            List<Vertices> triangulated = BayazitDecomposer.ConvexPartition(polygon);
+
+            float scale = 1.0f;
+            Vector2 vertScale = new Vector2(ConvertUnits.ToSimUnits(1)) * scale;
+            foreach (Vertices vertices in triangulated)
+            {
+                vertices.Scale(ref vertScale);
+            }
+            return triangulated;
         }
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
@@ -329,11 +335,29 @@ namespace KinectInfoScreen
 
         private void ResetLetter()
         {
-            foreach (var currentLetter in _letterStartPos)
+            try
             {
-                currentLetter.Key.Broken = false;
-                currentLetter.Key.MainBody.Position = new Vector2(currentLetter.Value.X, currentLetter.Value.Y);
-                //BuildText(_text);
+                var keyCollection = _letterStartPos.Keys;
+                var breakableBodies = new BreakableBody[keyCollection.Count];
+                keyCollection.CopyTo(breakableBodies,0);
+                foreach (var currentLetter in breakableBodies)
+                {
+                    var letter = currentLetter;
+                    var pieces = World.BodyList.FindAll(body => body.UserData != null && body.UserData == letter.MainBody.UserData);
+                    var removed = new List<Body>();
+                    foreach (var piece in pieces)
+                    {
+                        if(removed.Contains(piece)) continue;
+                        removed.Add(piece);
+                        World.RemoveBody(piece);
+                    }
+                }
+                World.ProcessChanges();
+                BuildText("Hello World");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
             }
         }
 
