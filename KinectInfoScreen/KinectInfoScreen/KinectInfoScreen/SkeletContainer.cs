@@ -22,6 +22,8 @@ namespace KinectInfoScreen
         {
             if (Ragdoll != null) return;
             Ragdoll = new Ragdoll(World, screen, GetRagdolPos());
+            Ragdoll.CollisionCategories = Category.Cat2;
+            Ragdoll.CollidesWith = Ragdoll.CollisionCategories;
             UpdateDeleteTimer();
         }
 

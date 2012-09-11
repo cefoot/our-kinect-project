@@ -31,7 +31,7 @@ namespace KinectInfoScreen
         private Sprite _obstacle;
         private const float BaseLine = 24;
 
-        private Dictionary<char, List<Vertices>> _letterMapping;
+        private Dictionary<char, List<Vertices>> _charMapping;
         private string _text;
 
         private float _force = 1000f;
@@ -47,8 +47,16 @@ namespace KinectInfoScreen
 
         private void ServerConnected(IAsyncResult ar)
         {
-            _skeletClient.EndConnect(ar);
-            ThreadPool.QueueUserWorkItem(SkeletonsRecieving);
+            try
+            {
+                _skeletClient.EndConnect(ar);
+                ThreadPool.QueueUserWorkItem(SkeletonsRecieving);
+            }
+            catch (SocketException ex)
+            {
+                Debug.WriteLine("Fehler beim Verbinden zum Host");
+                Debug.WriteLine(ex);
+            }
         }
         private void SkeletonsRecieving(object state)
         {
@@ -146,48 +154,22 @@ namespace KinectInfoScreen
             World.Gravity = Vector2.Zero;
 
             _border = new Border(World, this, ScreenManager.GraphicsDevice.Viewport);
+            _charMapping = new Dictionary<char, List<Vertices>>();
 
-            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("alphabet");
-
-            uint[] data = new uint[alphabet.Width * alphabet.Height];
-            alphabet.GetData(data);
-
-            List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
-            _letterMapping = new Dictionary<char, List<Vertices>>();
-            Vertices[] listArray = list.ToArray();
-            _letterMapping.Add('A', ParseLetter(listArray[0]));
-            _letterMapping.Add('B', ParseLetter(listArray[2]));
-            _letterMapping.Add('C', ParseLetter(listArray[1]));
-            _letterMapping.Add('D', ParseLetter(listArray[3]));
-            _letterMapping.Add('E', ParseLetter(listArray[4]));
-            _letterMapping.Add('F', ParseLetter(listArray[6]));
-            _letterMapping.Add('G', ParseLetter(listArray[5]));
-            _letterMapping.Add('H', ParseLetter(listArray[7]));
-            _letterMapping.Add('I', ParseLetter(listArray[8]));
-            _letterMapping.Add('J', ParseLetter(listArray[9]));
-            _letterMapping.Add('K', ParseLetter(listArray[10]));
-            _letterMapping.Add('L', ParseLetter(listArray[12]));
-            _letterMapping.Add('M', ParseLetter(listArray[13]));
-            _letterMapping.Add('N', ParseLetter(listArray[14]));
-            _letterMapping.Add('O', ParseLetter(listArray[11]));
-            _letterMapping.Add('P', ParseLetter(listArray[15]));
-            _letterMapping.Add('Q', ParseLetter(listArray[16]));
-            _letterMapping.Add('R', ParseLetter(listArray[19]));
-            _letterMapping.Add('S', ParseLetter(listArray[17]));
-            _letterMapping.Add('T', ParseLetter(listArray[18]));
-            _letterMapping.Add('U', ParseLetter(listArray[20]));
-            _letterMapping.Add('V', ParseLetter(listArray[21]));
-            _letterMapping.Add('W', ParseLetter(listArray[22]));
-            _letterMapping.Add('X', ParseLetter(listArray[23]));
-            _letterMapping.Add('Y', ParseLetter(listArray[24]));
-            _letterMapping.Add('Z', ParseLetter(listArray[25]));
+            LoadAlphabet();
+            LoadNumbers();
+            LoadChars();
 
             //letterMapping.Add(' ', listArray[26]);
 
             //call method with string you want to print
-            BuildText("Hello  World");
+            //var builder = new StringBuilder();
+            //builder.AppendLine("Franz(Peter) jagt im komplett verwahrlosten Taxi quer durch Bayern!?\n1234567890");
+            //var dat = DateTime.Now;
+            //builder.AppendFormat("{0}:{1} {2}.{3}.{4}", dat.Hour, dat.Minute, dat.Day, dat.Month, dat.Year);
+            //BuildText(builder.ToString());
 
-
+            BuildText(System.IO.File.ReadAllText(System.IO.Path.Combine(ScreenManager.Content.RootDirectory, "maximal.txt")));
             // create sprite based on body
             var rectangle = BodyFactory.CreateRectangle(World, 5f, 1.5f, 1f);
             var shape = rectangle.FixtureList[0].Shape;
@@ -199,6 +181,82 @@ namespace KinectInfoScreen
 
         }
 
+        private void LoadAlphabet()
+        {
+            Texture2D alphabet = ScreenManager.Content.Load<Texture2D>("alphabet");
+
+            uint[] data = new uint[alphabet.Width * alphabet.Height];
+            alphabet.GetData(data);
+
+            List<Vertices> list = PolygonTools.CreatePolygon(data, alphabet.Width, 3.5f, 20, true, true);
+            Vertices[] listArray = list.ToArray();
+            _charMapping.Add('A', GetBreakableParts(listArray[0]));
+            _charMapping.Add('B', GetBreakableParts(listArray[2]));
+            _charMapping.Add('C', GetBreakableParts(listArray[1]));
+            _charMapping.Add('D', GetBreakableParts(listArray[3]));
+            _charMapping.Add('E', GetBreakableParts(listArray[4]));
+            _charMapping.Add('F', GetBreakableParts(listArray[6]));
+            _charMapping.Add('G', GetBreakableParts(listArray[5]));
+            _charMapping.Add('H', GetBreakableParts(listArray[7]));
+            _charMapping.Add('I', GetBreakableParts(listArray[8]));
+            _charMapping.Add('J', GetBreakableParts(listArray[9]));
+            _charMapping.Add('K', GetBreakableParts(listArray[10]));
+            _charMapping.Add('L', GetBreakableParts(listArray[12]));
+            _charMapping.Add('M', GetBreakableParts(listArray[13]));
+            _charMapping.Add('N', GetBreakableParts(listArray[14]));
+            _charMapping.Add('O', GetBreakableParts(listArray[11]));
+            _charMapping.Add('P', GetBreakableParts(listArray[15]));
+            _charMapping.Add('Q', GetBreakableParts(listArray[16]));
+            _charMapping.Add('R', GetBreakableParts(listArray[19]));
+            _charMapping.Add('S', GetBreakableParts(listArray[17]));
+            _charMapping.Add('T', GetBreakableParts(listArray[18]));
+            _charMapping.Add('U', GetBreakableParts(listArray[20]));
+            _charMapping.Add('V', GetBreakableParts(listArray[21]));
+            _charMapping.Add('W', GetBreakableParts(listArray[22]));
+            _charMapping.Add('X', GetBreakableParts(listArray[23]));
+            _charMapping.Add('Y', GetBreakableParts(listArray[24]));
+            _charMapping.Add('Z', GetBreakableParts(listArray[25]));
+        }
+
+        private void LoadChars()
+        {
+            Texture2D chars = ScreenManager.Content.Load<Texture2D>("chars");
+
+            uint[] data = new uint[chars.Width * chars.Height];
+            chars.GetData(data);
+
+            List<Vertices> list = PolygonTools.CreatePolygon(data, chars.Width, 3.5f, 20, true, true);
+            Vertices[] listArray = list.ToArray();
+            _charMapping.Add('!', GetBreakableParts(listArray[0]));
+            _charMapping.Add('(', GetBreakableParts(listArray[1]));
+            _charMapping.Add(')', GetBreakableParts(listArray[2]));
+            _charMapping.Add('?', GetBreakableParts(listArray[3]));
+            _charMapping.Add(':', GetBreakableParts(listArray[4]));
+            _charMapping.Add('.', GetBreakableParts(listArray[5]));
+            _charMapping.Add(',', GetBreakableParts(listArray[6]));
+        }
+
+        private void LoadNumbers()
+        {
+            Texture2D numbers = ScreenManager.Content.Load<Texture2D>("numbers");
+
+            uint[] data = new uint[numbers.Width * numbers.Height];
+            numbers.GetData(data);
+
+            List<Vertices> list = PolygonTools.CreatePolygon(data, numbers.Width, 3.5f, 20, true, true);
+            Vertices[] listArray = list.ToArray();
+            _charMapping.Add('0', GetBreakableParts(listArray[0]));
+            _charMapping.Add('1', GetBreakableParts(listArray[1]));
+            _charMapping.Add('2', GetBreakableParts(listArray[2]));
+            _charMapping.Add('3', GetBreakableParts(listArray[3]));
+            _charMapping.Add('4', GetBreakableParts(listArray[4]));
+            _charMapping.Add('5', GetBreakableParts(listArray[5]));
+            _charMapping.Add('6', GetBreakableParts(listArray[6]));
+            _charMapping.Add('7', GetBreakableParts(listArray[7]));
+            _charMapping.Add('8', GetBreakableParts(listArray[8]));
+            _charMapping.Add('9', GetBreakableParts(listArray[9]));
+        }
+
         Dictionary<BreakableBody, Vector2> _letterStartPos = new Dictionary<BreakableBody, Vector2>();
 
 
@@ -206,50 +264,42 @@ namespace KinectInfoScreen
         {
             _text = text;
             char[] textChar = text.ToUpper().ToCharArray();
-            float yOffset = -5f;
-            float xOffset = -14f;
-
-            yOffset = 0f;
-            xOffset = -18f;
+            float yOffset = -13f;
+            float xOffset = -25f;
             _letterStartPos.Clear();
 
             for (int i = 0; i < textChar.Length; i++)
             {
                 char letter = textChar[i];
-
-
-                List<Vertices> polygon;//letterMapping[letter];
-
-
-                if (_letterMapping.TryGetValue(letter, out polygon))
+                if (letter.Equals('\n') || xOffset > 25f || yOffset > 13f)
                 {
-
-
-                    var breakableBodyLetter = new BreakableBody(polygon, World, 1, Guid.NewGuid());
+                    yOffset += 2f;
+                    xOffset = -25f;
+                }
+                List<Vertices> vertices;//letterMapping[letter];
+                if (_charMapping.TryGetValue(letter, out vertices))
+                {
+                    var breakableBodyLetter = new BreakableBody(vertices, World, 1, Guid.NewGuid());
                     breakableBodyLetter.MainBody.Position = new Vector2(xOffset, yOffset);
-                    _letterStartPos[breakableBodyLetter] = new Vector2(xOffset, yOffset);
-                    breakableBodyLetter.Strength = 100;
+                    _letterStartPos[breakableBodyLetter] = breakableBodyLetter.MainBody.Position;
+                    breakableBodyLetter.Strength = 30;
                     breakableBodyLetter.Parts.ForEach(fixt =>
                     {
                         fixt.CollisionCategories = Category.Cat1;
-                        fixt.CollidesWith = Category.Cat1;
+                        fixt.CollidesWith = fixt.CollisionCategories;
                     });
 
                     World.AddBreakableBody(breakableBodyLetter);
-                    //           _currentUsedLetters.Add(breakableBodyLetter);
+                    xOffset += 1.5f;
                 }
-                if (letter.Equals('\n'))
+                else if (letter == ' ')
                 {
-                    yOffset += 5f;
-                    xOffset = -14f;
-
-
+                    xOffset += 1.5f;
                 }
-                xOffset += 3.5f;
             }
         }
 
-        private List<Vertices> ParseLetter(Vertices polygon)
+        private List<Vertices> GetBreakableParts(Vertices polygon)
         {
             Vector2 centroid = -polygon.GetCentroid();
             polygon.Translate(ref centroid);
@@ -257,7 +307,7 @@ namespace KinectInfoScreen
             polygon = SimplifyTools.ReduceByDistance(polygon, 4);
             List<Vertices> triangulated = BayazitDecomposer.ConvexPartition(polygon);
 
-            float scale = 1.0f;
+            float scale = 0.4f;
             Vector2 vertScale = new Vector2(ConvertUnits.ToSimUnits(1)) * scale;
             foreach (Vertices vertices in triangulated)
             {
@@ -273,6 +323,7 @@ namespace KinectInfoScreen
             {
                 var skeletJoints = skeletContainer.Joints;
                 skeletContainer.CreateRagdoll(this);
+                if (skeletJoints == null || skeletJoints.Count == 0) continue;
                 UpdateRagdoll(skeletContainer.Ragdoll, skeletJoints);
 
             }
@@ -292,13 +343,13 @@ namespace KinectInfoScreen
             ApplyForce(ragdoll.Head, skeletonPoint[JointType.Head], strenghtExt, toMoveDown, ragdoll);
         }
 
-        private void ApplyForce(Body body, SkeletonPoint skeletonPoint, float strenght, float toMoveDown, Ragdoll ragdoll)
+        private void ApplyForce(Body body, SkeletonPoint desiredPoint, float strenght, float toMoveDown, Ragdoll ragdoll)
         {
-            var force = (new Vector2(skeletonPoint.X, skeletonPoint.Y - toMoveDown) - body.Position);
+            var force = (new Vector2(desiredPoint.X, desiredPoint.Y - toMoveDown) - body.Position);
             if (force.Length() > 10f)
             {
                 ragdoll.CollisionCategories = Category.Cat1;
-                ragdoll.CollidesWith = Category.Cat1;
+                ragdoll.CollidesWith = ragdoll.CollisionCategories;
             }
             body.ApplyForce(strenght * force);
         }
@@ -330,6 +381,11 @@ namespace KinectInfoScreen
                 ResetLetter();
             }
 
+            if (input.IsNewKeyPress(Keys.NumPad1))
+            {
+                GetTrackedSkelet(0);
+            }
+
             base.HandleInput(input, gameTime);
         }
 
@@ -339,7 +395,7 @@ namespace KinectInfoScreen
             {
                 var keyCollection = _letterStartPos.Keys;
                 var breakableBodies = new BreakableBody[keyCollection.Count];
-                keyCollection.CopyTo(breakableBodies,0);
+                keyCollection.CopyTo(breakableBodies, 0);
                 foreach (var currentLetter in breakableBodies)
                 {
                     var letter = currentLetter;
@@ -347,13 +403,13 @@ namespace KinectInfoScreen
                     var removed = new List<Body>();
                     foreach (var piece in pieces)
                     {
-                        if(removed.Contains(piece)) continue;
+                        if (removed.Contains(piece)) continue;
                         removed.Add(piece);
                         World.RemoveBody(piece);
                     }
                 }
                 World.ProcessChanges();
-                BuildText("Hello World");
+                BuildText(_text);
             }
             catch (Exception ex)
             {
