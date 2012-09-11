@@ -37,7 +37,7 @@ namespace FarseerPhysics.Dynamics
         {
             _world = world;
             _world.ContactManager.PostSolve += PostSolve;
-            MainBody = new Body(_world);
+            MainBody = new Body(_world, userData);
             MainBody.BodyType = BodyType.Dynamic;
 
             foreach (Vertices part in vertices)
