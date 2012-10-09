@@ -39,7 +39,7 @@ namespace BugProviderService
             Log(e.ExceptionObject.ToString());
         }
 
-        private static void Log(String msg)
+        public static void Log(String msg)
         {
             File.AppendAllText(@"D:\work\event.log", String.Concat(msg, Environment.NewLine));
         }
