@@ -71,13 +71,7 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
     	    {
     	        if (message.successful)
     	        {
-    	            dom.byId('status').innerHTML += '<div>CometD handshake successful</div>';
-    	            cometd.subscribe('/hello/world', function(message)
-    	            		{
-    	            			dom.byId('status').innerHTML += '<div>';
-    	            			dom.byId('status').innerHTML += message.data;
-    	            			dom.byId('status').innerHTML += '</div>';
-    	            		});
+    	            dom.byId('status').innerHTML = '<div>CometD handshake successful</div>';
     	            cometd.subscribe('/ticket/move', function(message){
     	            	var ticket = dom.byId(message.data.id);
     	            	ticket.style.left = message.data.x;
@@ -89,18 +83,13 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
     	            		addDiv(message.data);
     	            	}
     	            });
+    	        	cometd.publish('/service/hello', 'Hello, World');
     	        }
     	        else
     	        {
-    	        	dom.byId('status').innerHTML += '<div>CometD handshake failed</div>';
+    	        	dom.byId('status').innerHTML = '<div>CometD handshake failed</div>';
     	        }
     	    });
-
-    dom.byId('greeter').onclick = function()
-    {
-    	cometd.publish('/service/hello', 'Hello, World');
-    	cometd.publish('/hello/world', 'Hello, World from da Button');
-    };
     function getRandomColor() {
         var letters = '0123456789ABCDEF'.split('');
         var color = '#';
