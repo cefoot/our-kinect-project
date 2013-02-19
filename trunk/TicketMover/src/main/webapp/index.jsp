@@ -14,11 +14,8 @@
 <body>
     <h2>TicketMover</h2>
     <div id="status"></div>
-    <button id="greeter">
-        Send Hello to Server
-    </button>
     <button id="ticketAdder">
-        +
+        add dummy Ticket
     </button>
 </body>
 </html>
