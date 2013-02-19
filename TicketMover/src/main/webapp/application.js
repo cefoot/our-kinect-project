@@ -5,13 +5,11 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
     {
     	var styleLeft = parseFloat(this.style.left);
     	var styleTop = parseFloat(this.style.top);
-    	console.log(this.style.left);
-    	console.log(this.style.top);
     	var mouseEvent = arguments[0];
     	var startX = mouseEvent.pageX - styleLeft;
     	var startY = mouseEvent.pageY - styleTop;
+    	this.style.zIndex = 5;//bring to front
     	this.onmousemove = function(){
-    		//console.log(arguments);
         	var mouseEvent = arguments[0];
         	this.style.left = (mouseEvent.pageX - startX)+"px";
         	this.style.top = (mouseEvent.pageY - startY)+"px";
@@ -22,6 +20,7 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
         	cometd.publish('/ticket/move', pos);
     	};
     	this.onmouseup = function(){
+        	this.style.zIndex = 0;//send to back
     		this.onmousemove = null;
     	};
     };
@@ -33,6 +32,8 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
     	div.style.height = divObj.style.height;
     	div.style.position = divObj.style.position;
     	div.style.backgroundColor = divObj.style.backgroundColor; 
+    	div.style.webkitUserSelect = "none";//deactivate text selection
+    	div.style.zIndex = 0;//all in back
     	div.onmousedown = dragStart;
     	div.id = divObj.id;
     	var tbl = document.createElement("table");
