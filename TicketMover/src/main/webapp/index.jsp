@@ -17,6 +17,8 @@
     <button id="greeter">
         Send Hello to Server
     </button>
-	<div style="position: absolute;left: 250px;top: 250px;background-color: red;width: 150px;height: 150px;" id="jira111" ></div>
+    <button id="ticketAdder">
+        +
+    </button>
 </body>
 </html>
