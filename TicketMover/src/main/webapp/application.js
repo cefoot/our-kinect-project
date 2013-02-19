@@ -1,28 +1,50 @@
 require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], function(cometd, dom, doc)
 {
 	var words = ["Lorem","ipsum","dolor","sit","amet ","consetetur","sadipscing",".","elitr ","sed","diam",".","nonumy","eirmod",",","tempor","invidunt","ut","labore","et","dolore","magna","aliquyam","erat ","sed","diam","voluptua ","At","vero","eos","et","accusam","et","justo","duo","dolores","et","ea",".","rebum ","Stet","clita","kasd","gubergren ","no","sea","takimata","sanctus","est","Lorem","ipsum","dolor",",","sit","amet ","Lorem","ipsum","dolor","sit","amet ","consetetur","sadipscing","elitr ","sed","diam","nonumy","eirmod","tempor","invidunt","ut","labore","et","dolore","magna","aliquyam","erat ","sed","diam","voluptua ","At","vero",".","eos",",","et","accusam","et","justo","duo","dolores","et","ea","rebum ","Stet","clita","kasd","gubergren ","no","sea","takimata","sanctus","est","Lorem","ipsum","dolor","sit","amet",",","."];
+	var isTouch = false;
+	var isTouchChecked = false;
     var dragStart = function()
     {
     	var styleLeft = parseFloat(this.style.left);
     	var styleTop = parseFloat(this.style.top);
     	var mouseEvent = arguments[0];
+    	if(isTouch){
+    		mouseEvent = arguments[0].touches[0];
+    	}
     	var startX = mouseEvent.pageX - styleLeft;
     	var startY = mouseEvent.pageY - styleTop;
     	this.style.zIndex = 5;//bring to front
-    	this.onmousemove = function(){
-        	var mouseEvent = arguments[0];
-        	this.style.left = (mouseEvent.pageX - startX)+"px";
-        	this.style.top = (mouseEvent.pageY - startY)+"px";
-        	var pos = new Object();
-        	pos.x = this.style.left;
-        	pos.y = this.style.top;
-        	pos.id = this.id;
-        	cometd.publish('/ticket/move', pos);
-    	};
-    	this.onmouseup = function(){
-        	this.style.zIndex = 0;//send to back
-    		this.onmousemove = null;
-    	};
+    	if(!isTouch){
+    		this.onmousemove = function(){
+            	var mouseEvent = arguments[0];
+            	this.style.left = (mouseEvent.pageX - startX)+"px";
+            	this.style.top = (mouseEvent.pageY - startY)+"px";
+            	var pos = new Object();
+            	pos.x = this.style.left;
+            	pos.y = this.style.top;
+            	pos.id = this.id;
+            	cometd.publish('/ticket/move', pos);
+        	};
+        	this.onmouseup = function(){
+            	this.style.zIndex = 0;//send to back
+        		this.onmousemove = null;
+        	};
+    	}else{
+    		this.ontouchmove = function(){
+            	var mouseEvent = arguments[0].touches[0];
+            	this.style.left = (mouseEvent.pageX - startX)+"px";
+            	this.style.top = (mouseEvent.pageY - startY)+"px";
+            	var pos = new Object();
+            	pos.x = this.style.left;
+            	pos.y = this.style.top;
+            	pos.id = this.id;
+            	cometd.publish('/ticket/move', pos);
+        	};
+        	this.ontouchend = function(){
+            	this.style.zIndex = 0;//send to back
+        		this.ontouchmove = null;
+        	};
+    	}
     };
     var addDiv = function(divObj){
     	var div = document.createElement("div");
@@ -34,7 +56,15 @@ require(['dojox/cometd', 'dojo/dom', 'dojo/dom-construct', 'dojo/domReady!'], fu
     	div.style.backgroundColor = divObj.style.backgroundColor; 
     	div.style.webkitUserSelect = "none";//deactivate text selection
     	div.style.zIndex = 0;//all in back
-    	div.onmousedown = dragStart;
+    	if(!isTouchChecked && typeof div.ontouchmove !='undefined'){
+    		isTouch = true;	
+    	}
+    	if(isTouch){
+        	div.ontouchstart = dragStart;
+    	}else{
+        	div.onmousedown = dragStart;	
+    	}
+    	isTouchChecked = true;
     	div.id = divObj.id;
     	var tbl = document.createElement("table");
     	tbl.style.width = "100%";
