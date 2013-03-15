@@ -215,8 +215,7 @@ namespace Microsoft.Samples.Kinect.DepthBasics
                     
                     for(int i=this.depthPixels.Length-1 ;i>0;--i)
                     {
-                        
-                            //i = x + y * this.imageHeight;
+                                                    //i = x + y * this.imageHeight;
 
                             // discard the portion of the depth that contains only the player index
                             int depth = (ushort)(this.depthPixels[i] >> DepthImageFrame.PlayerIndexBitmaskWidth);
@@ -253,7 +252,7 @@ namespace Microsoft.Samples.Kinect.DepthBasics
                                 label7.Content = backgroundPoint.Z.ToString();
 
                                 //System.Diagnostics.Debug.WriteLine(heightAboveGround+" at "+oneDtoTwoD(i)+" "+" "+mapYtoAngle(oneDtoTwoD(i).Item2));
-                                if (heightAboveGround < 1)
+                                if (heightAboveGround > 1 && heightAboveGround<2)
                                 {
 
                                     // Write out blue byte
@@ -336,42 +335,6 @@ namespace Microsoft.Samples.Kinect.DepthBasics
             }
         }
 
-        private int findHeightAboveGround(int depth, int i)
-        {
-            int xPos = oneDtoTwoD(i).Item1;
-            int yPos = oneDtoTwoD(i).Item2;
-            double minDist = 15;
-            int minPos = int.MaxValue;
-            
-            for (int yCount = yPos + 1; yCount < this.imageHeight; yCount++)
-            {
-                float backDepth = config.getBackgroundAt(xPos + yPos * this.imageHeight);
-                //double dist=calcDist(xPos, yPos, depth, xPos, yCount, backDepth);
-
-                //if (dist < minDist)
-                //{
-                //    minDist = dist;
-                //    minPos = i;
-                //}
-                if (Math.Abs(depth - backDepth) < minDist - Math.Abs(yPos - yCount))
-                {
-                    return yCount;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("depth: "+depth+" backdepth: "+backDepth+" yPos "+yPos+" yCount "+yCount);
-                }
-            }
-
-            return int.MaxValue;
-
-        }
-
-        private double calcDist(int xPos, int yPos, int depth, int xPos_2, int yCount, float backDepth)
-        {
-            return Math.Sqrt(Math.Pow((yPos - yCount),2) + Math.Pow(((float)depth - backDepth),2));
-        }
-
         private int twoDtoOneD(int x, int y)
         {
             return x + this.imageHeight * y;
@@ -386,10 +349,6 @@ namespace Microsoft.Samples.Kinect.DepthBasics
 
         }
 
-        private float mapYtoAngle(int y)
-        {
-            return (this.kinectDepthFOW / this.imageHeight) * y;
-        }
 
         private void configureBackground()
         {
@@ -412,7 +371,7 @@ namespace Microsoft.Samples.Kinect.DepthBasics
                         Console.WriteLine("Done.");
                         //create 3d background
                         this.config.create3DBackgorund(this.coordMaper, DepthImageFormat.Resolution640x480Fps30);
-                        this.config.calculatePlane();
+                        this.config.calculatePlanes();
                         this.backgroundIsCaptured = true;
                     }
                     else
