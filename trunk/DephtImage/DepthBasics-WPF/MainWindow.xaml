@@ -95,7 +95,7 @@
         <Label Content="Label" Grid.Row="2" Height="28" Margin="557,22,0,0" Name="label4" VerticalAlignment="Top" HorizontalAlignment="Left" Width="118" />
         <Label Content="Label" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="278,86,0,0" Name="label5" VerticalAlignment="Top" Width="119" />
         <Label Content="Label" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="427,86,0,0" Name="label6" VerticalAlignment="Top" Width="106" />
-        <Label Content="Label" Grid.Row="2" Height="28" Margin="0,86,431,0" Name="label7" VerticalAlignment="Top" HorizontalAlignment="Right" Width="124" />
+        <Label Content="Label" Grid.Row="2" Height="28" Margin="557,86,0,0" Name="label7" VerticalAlignment="Top" HorizontalAlignment="Left" Width="124" />
         <Label Content="Label" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="681,22,0,0" Name="label8" VerticalAlignment="Top" Width="129" />
     </Grid>
 </Window>
