@@ -1,0 +1,13 @@
+F:\DepthImage\DepthBasics-WPF\bin\Debug\DepthBasics-WPF.exe
+F:\DepthImage\DepthBasics-WPF\bin\Debug\DepthBasics-WPF.pdb
+F:\DepthImage\DepthBasics-WPF\obj\Debug\ResolveAssemblyReference.cache
+F:\DepthImage\DepthBasics-WPF\obj\Debug\MainWindow.baml
+F:\DepthImage\DepthBasics-WPF\obj\Debug\MainWindow.g.cs
+F:\DepthImage\DepthBasics-WPF\obj\Debug\App.g.cs
+F:\DepthImage\DepthBasics-WPF\obj\Debug\DepthBasics-WPF_MarkupCompile.cache
+F:\DepthImage\DepthBasics-WPF\obj\Debug\DepthBasics-WPF.g.resources
+F:\DepthImage\DepthBasics-WPF\obj\Debug\Microsoft.Samples.Kinect.DepthBasics.Properties.Resources.resources
+F:\DepthImage\DepthBasics-WPF\obj\Debug\GenerateResource.read.1.tlog
+F:\DepthImage\DepthBasics-WPF\obj\Debug\GenerateResource.write.1.tlog
+F:\DepthImage\DepthBasics-WPF\obj\Debug\DepthBasics-WPF.exe
+F:\DepthImage\DepthBasics-WPF\obj\Debug\DepthBasics-WPF.pdb
