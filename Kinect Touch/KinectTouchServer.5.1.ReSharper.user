@@ -1,0 +1,250 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="livetemplates.csharp.usevar">True</setting>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/d:Properties/f:Settings.Designer.cs" caret="1420" fromTop="18" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="703" fromTop="14" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml.cs" caret="5754" fromTop="128" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml" caret="262" fromTop="5" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="11" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="2" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="23" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="8" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="11" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="13" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="10" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="1" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="12" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="16" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="8" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="12" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="18" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="624" fromTop="9" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="18" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="19" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1000" fromTop="15" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="967" fromTop="15" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1144" fromTop="20" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="624" fromTop="14" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="2618" fromTop="28" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="2262" fromTop="20" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="2449" fromTop="24" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1922" fromTop="9" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="1730" fromTop="7" />
+      <File id="7519622D-A686-4747-8683-5FC055C3A0ED/f:Program.cs" caret="703" fromTop="14" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml.cs" caret="5751" fromTop="22" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml.cs" caret="443" fromTop="11" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml.cs" caret="5754" fromTop="28" />
+      <File id="41FDA10B-4750-499A-B205-C00C9E6939DA/f:MainWindow.xaml" caret="262" fromTop="5" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir>C:\Program Files (x86)\NUnit 2.5.4\bin\net-2.0\</NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="while" priority="2" />
+      <Item value="do" priority="0" />
+      <Item value="Console`0" priority="15" />
+      <Item value="new" priority="14" />
+      <Item value="ConsoleKeyInfo" priority="0" />
+      <Item value="B" priority="0" />
+      <Item value="false" priority="6" />
+      <Item value="ConsoleKey`0" priority="0" />
+      <Item value="Microsoft" priority="1" />
+      <Item value="Kinect" priority="2" />
+      <Item value="KinectSensor`0" priority="2" />
+      <Item value="using" priority="2" />
+      <Item value="kinectSensor" priority="11" />
+      <Item value="DepthImageFormat`0" priority="0" />
+      <Item value="System" priority="0" />
+      <Item value="KinectTouchServer" priority="0" />
+      <Item value="Properties" priority="6" />
+      <Item value="Settings`0" priority="6" />
+      <Item value="float" priority="3" />
+      <Item value="out" priority="0" />
+      <Item value="DepthImageFrame`0" priority="0" />
+      <Item value="depthImage" priority="16" />
+      <Item value="backGround" priority="4" />
+      <Item value="for" priority="10" />
+      <Item value="depthImageFrame" priority="10" />
+      <Item value="DepthImagePixel" priority="1" />
+      <Item value="foreach" priority="2" />
+      <Item value="f" priority="0" />
+      <Item value="forr" priority="4" />
+      <Item value="Length" priority="5" />
+      <Item value="pixlData" priority="3" />
+      <Item value="var" priority="8" />
+      <Item value="double" priority="0" />
+      <Item value="d" priority="0" />
+      <Item value="tmpBackGround" priority="2" />
+      <Item value="short" priority="1" />
+      <Item value="WaitCallback" priority="0" />
+      <Item value="DepthImageStream`0" priority="0" />
+      <Item value="state" priority="1" />
+      <Item value="stream" priority="0" />
+      <Item value="object" priority="1" />
+      <Item value="data" priority="1" />
+      <Item value="background" priority="4" />
+      <Item value="Rank" priority="1" />
+      <Item value="if" priority="8" />
+      <Item value="else" priority="0" />
+      <Item value="depthPixl" priority="0" />
+      <Item value="depthImagePixel" priority="3" />
+      <Item value="Math`0" priority="0" />
+      <Item value="break" priority="2" />
+      <Item value="bool" priority="0" />
+      <Item value="found" priority="2" />
+      <Item value="int" priority="1" />
+      <Item value="true" priority="2" />
+      <Item value="foundX" priority="4" />
+      <Item value="x" priority="2" />
+      <Item value="foundY" priority="5" />
+      <Item value="y" priority="1" />
+      <Item value="foundDepth" priority="3" />
+      <Item value="Thread`0" priority="0" />
+      <Item value="distance" priority="0" />
+      <Item value="Running" priority="1" />
+      <Item value="i" priority="1" />
+      <Item value="continue" priority="3" />
+      <Item value="tmpBackCount" priority="0" />
+      <Item value="cw" priority="0" />
+      <Item value="Screen`0" priority="0" />
+      <Item value="Point" priority="0" />
+      <Item value="CoordinateMapper`0" priority="1" />
+      <Item value="mapper" priority="1" />
+      <Item value="SkeletonPoint" priority="1" />
+      <Item value="DepthImagePoint`0" priority="0" />
+      <Item value="SkeletonPoint`0" priority="2" />
+      <Item value="tmpSkceletOneD" priority="1" />
+      <Item value="tmpSkelet" priority="1" />
+      <Item value="decimal" priority="1" />
+      <Item value="private" priority="0" />
+      <Item value="class" priority="0" />
+      <Item value="ColorImageFormat`0" priority="0" />
+      <Item value="colorImageFrame" priority="2" />
+      <Item value="ImageToBitmap`0" priority="0" />
+      <Item value="imageToBitmap" priority="0" />
+      <Item value="ImageFormat`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Console">
+      <Item value="ReadKey`0" priority="2" />
+      <Item value="WriteLine`0" priority="9" />
+      <Item value="Clear`0" priority="0" />
+      <Item value="Write`0" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.ConsoleKey">
+      <Item value="S" priority="0" />
+      <Item value="X" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.ConsoleKeyInfo">
+      <Item value="Key" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Kinect.KinectSensor">
+      <Item value="KinectSensors" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.KinectSensor">
+      <Item value="Start`0" priority="1" />
+      <Item value="DepthStream" priority="2" />
+      <Item value="Stop`0" priority="0" />
+      <Item value="CoordinateMapper" priority="2" />
+      <Item value="ColorStream" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.DepthImageStream">
+      <Item value="Enable`0" priority="0" />
+      <Item value="FrameWidth" priority="4" />
+      <Item value="FrameHeight" priority="6" />
+      <Item value="OpenNextFrame`0" priority="1" />
+      <Item value="FramePixelDataLength" priority="0" />
+      <Item value="Format" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Kinect.DepthImageFormat">
+      <Item value="Resolution320x240Fps30" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@KinectTouchServer.Properties.Settings">
+      <Item value="Default" priority="6" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:KinectTouchServer.Properties.Settings">
+      <Item value="ImageFormat" priority="0" />
+      <Item value="DepthImageW8Time" priority="2" />
+      <Item value="BackgroundFrameCount" priority="1" />
+      <Item value="Tollerance" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.DepthImageFrame">
+      <Item value="CopyDepthImagePixelDataTo`0" priority="1" />
+      <Item value="PixelDataLength" priority="0" />
+      <Item value="Width" priority="3" />
+      <Item value="Height" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.DepthImagePixel">
+      <Item value="Depth" priority="3" />
+      <Item value="IsKnownDepth" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Threading.ThreadPool">
+      <Item value="QueueUserWorkItem`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Math">
+      <Item value="Abs`0" priority="0" />
+      <Item value="Floor`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Threading.Thread">
+      <Item value="Sleep`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.Cursor">
+      <Item value="Position" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.Screen">
+      <Item value="PrimaryScreen" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Screen">
+      <Item value="WorkingArea" priority="0" />
+      <Item value="Bounds" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Drawing.Rectangle">
+      <Item value="Width" priority="0" />
+      <Item value="Height" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.CoordinateMapper">
+      <Item value="MapSkeletonPointToDepthPoint`0" priority="0" />
+      <Item value="MapDepthFrameToSkeletonFrame`0" priority="1" />
+      <Item value="MapDepthFrameToColorFrame`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.SkeletonPoint">
+      <Item value="Z" priority="4" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.ColorImageStream">
+      <Item value="Enable`0" priority="0" />
+      <Item value="CameraSettings" priority="0" />
+      <Item value="OpenNextFrame`0" priority="0" />
+      <Item value="Disable`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@Microsoft.Kinect.ColorImageFormat">
+      <Item value="RgbResolution1280x960Fps12" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Drawing.Bitmap">
+      <Item value="Save`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Drawing.Imaging.ImageFormat">
+      <Item value="Jpeg" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:Microsoft.Kinect.ColorImageFrame">
+      <Item value="CopyPixelDataTo`0" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+</Configuration>

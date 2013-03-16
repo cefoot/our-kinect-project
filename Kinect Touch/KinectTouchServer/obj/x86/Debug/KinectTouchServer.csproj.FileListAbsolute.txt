@@ -1,0 +1,6 @@
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\obj\x86\Debug\KinectTouchServer.exe
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\obj\x86\Debug\KinectTouchServer.pdb
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\bin\Debug\KinectTouchServer.exe.config
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\bin\Debug\KinectTouchServer.exe
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\bin\Debug\KinectTouchServer.pdb
+d:\workspace\Kinect\KinectTouchServer\KinectTouchServer\obj\x86\Debug\ResolveAssemblyReference.cache

@@ -1,0 +1,13 @@
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\bin\Debug\DepthMapper.exe
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\bin\Debug\DepthMapper.pdb
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\ResolveAssemblyReference.cache
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\MainWindow.baml
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\MainWindow.g.cs
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\App.g.cs
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\DepthMapper_MarkupCompile.cache
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\DepthMapper.g.resources
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\DepthMapper.Properties.Resources.resources
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\GenerateResource.read.1.tlog
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\GenerateResource.write.1.tlog
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\DepthMapper.exe
+d:\workspace\Kinect\KinectTouchServer\DepthMapper\obj\x86\Debug\DepthMapper.pdb
