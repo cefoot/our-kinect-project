@@ -1,0 +1,5 @@
+<Modules>
+  <Module PersistentId="EE7F79C1-7AAB-49C0-98AF-10C6AB420F78" ModuleId="KinectTouchServer" />
+  <Module PersistentId="7519622D-A686-4747-8683-5FC055C3A0ED" ModuleId="KinectTouchServer_1" />
+  <Module PersistentId="41FDA10B-4750-499A-B205-C00C9E6939DA" ModuleId="DepthMapper" />
+</Modules>
