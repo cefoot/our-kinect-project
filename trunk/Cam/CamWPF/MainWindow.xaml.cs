@@ -15,9 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Coding4Fun.Kinect.Wpf;
 using Microsoft.Kinect;
+using KinectUserHeight;
 using Color = System.Drawing.Color;
 using Size = System.Windows.Size;
-
 namespace CamWPF
 {
     /// <summary>
@@ -34,8 +34,7 @@ namespace CamWPF
 
         private List<Joint> _heads = new List<Joint>();
 
-        private BitmapSource _face;
-
+        private List<double> _heights = new List<double>(); private BitmapSource _face;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetupKinect();
@@ -99,11 +98,38 @@ namespace CamWPF
         {
             using (var skeletFrame = e.OpenSkeletonFrame())
             {
+                if (skeletFrame == null)
+                {
+                    return;
+                }
                 var skelets = new Skeleton[skeletFrame.SkeletonArrayLength];
                 skeletFrame.CopySkeletonDataTo(skelets);
                 _heads = skelets.Select(skeleton => skeleton.Joints[JointType.Head]).Where(head => head.TrackingState == JointTrackingState.Tracked).ToList();
+                _heads = skelets.Select(skeleton => skeleton.Joints[JointType.Head]).Where(head => head.TrackingState == JointTrackingState.Tracked).ToList();
+                _heights = calculateHeight(skelets);
             }
         }
+
+        private List<double> calculateHeight(Skeleton[] skeletons)
+        {
+
+            var skeletonsTracked = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).ToList();
+            List<double> skeletonHeights = new List<double>();
+            foreach (Skeleton skeleton in skeletonsTracked)
+            {
+                if (skeleton != null)
+                {
+                    // Calculate height.
+                    double height = Math.Round(skeleton.Height(), 2);
+                    skeletonHeights.Add(height);
+
+                }
+            }
+            return skeletonHeights;
+            
+        }
+
+
 
         void NuiColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
@@ -117,7 +143,13 @@ namespace CamWPF
                 var joints = _heads.ToArray();
                 foreach (var headPos in joints.Select(head => nui.CoordinateMapper.MapSkeletonPointToColorPoint(head.Position, ColorImageFormat.RgbResolution640x480Fps30)))
                 {
-                    myDrawingGroup.Children.Add(new ImageDrawing(_face, new Rect(headPos.X-40, headPos.Y-42, 80, 84)));
+                    myDrawingGroup.Children.Add(new ImageDrawing(_face, new Rect(headPos.X - 40, headPos.Y - 42, 80, 84)));
+
+                    tblHeight.Margin = new Thickness(headPos.X, headPos.Y, 0, 0);
+                    tblHeight.Text = _heights.First().ToString();
+
+
+                    //myDrawingGroup.Children.Add(new ImageDrawing(c. Properties.Resources.face, new Rect(40, 0, 45, 130)));
                 }
                 image1.Source = new DrawingImage(myDrawingGroup);
             }
