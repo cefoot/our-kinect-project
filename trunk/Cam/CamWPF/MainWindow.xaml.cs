@@ -32,9 +32,9 @@ namespace CamWPF
 
         private KinectSensor nui;
 
-        private List<Joint> _heads = new List<Joint>();
+        private List<SkeletData> _skeletData = new List<SkeletData>();
 
-        private List<double> _heights = new List<double>(); private BitmapSource _face;
+        private BitmapSource _face;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetupKinect();
@@ -104,32 +104,41 @@ namespace CamWPF
                 }
                 var skelets = new Skeleton[skeletFrame.SkeletonArrayLength];
                 skeletFrame.CopySkeletonDataTo(skelets);
-                _heads = skelets.Select(skeleton => skeleton.Joints[JointType.Head]).Where(head => head.TrackingState == JointTrackingState.Tracked).ToList();
-                _heads = skelets.Select(skeleton => skeleton.Joints[JointType.Head]).Where(head => head.TrackingState == JointTrackingState.Tracked).ToList();
-                _heights = calculateHeight(skelets);
-            }
-        }
-
-        private List<double> calculateHeight(Skeleton[] skeletons)
-        {
-
-            var skeletonsTracked = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).ToList();
-            List<double> skeletonHeights = new List<double>();
-            foreach (Skeleton skeleton in skeletonsTracked)
-            {
-                if (skeleton != null)
+                var datas = new List<SkeletData>();
+                foreach (var skeleton in skelets)
                 {
-                    // Calculate height.
-                    double height = Math.Round(skeleton.Height(), 2);
-                    skeletonHeights.Add(height);
-
+                    if(skeleton.TrackingState != SkeletonTrackingState.Tracked) continue;
+                    var data = new SkeletData();
+                    var head = skeleton.Joints[JointType.Head];
+                    data.HeadPosition = nui.CoordinateMapper.MapSkeletonPointToColorPoint(head.Position, ColorImageFormat.RgbResolution640x480Fps30);
+                    data.HeadDistance = head.Position.Z;
+                    data.Height = CalculateHeight(skeleton);
+                    datas.Add(data);
                 }
+                _skeletData = datas;
             }
-            return skeletonHeights;
-            
         }
 
+        class SkeletData
+        {
+            public double Height { get; set; }
+            public ColorImagePoint HeadPosition { get; set; }
+            public float HeadDistance { get; set; }
+        }
 
+        private static double CalculateHeight(Skeleton skeleton)
+        {
+            if (skeleton != null)
+            {
+                // Calculate height.
+                var height = Math.Round(skeleton.Height(), 2);
+                return height;
+            }
+            return 0d;
+        }
+
+        const double defaultWidth = 80d;
+        const double defaultHeight = 84d;
 
         void NuiColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
@@ -140,13 +149,16 @@ namespace CamWPF
                 image.CopyPixelDataTo(data);
                 var myDrawingGroup = new DrawingGroup();
                 myDrawingGroup.Children.Add(new ImageDrawing(data.ToBitmapSource(image.Width, image.Height), new Rect(new Size(image.Width, image.Height))));
-                var joints = _heads.ToArray();
-                foreach (var headPos in joints.Select(head => nui.CoordinateMapper.MapSkeletonPointToColorPoint(head.Position, ColorImageFormat.RgbResolution640x480Fps30)))
+                var skeletDatas = _skeletData.ToArray();
+                foreach (var skeletData in skeletDatas)
                 {
-                    myDrawingGroup.Children.Add(new ImageDrawing(_face, new Rect(headPos.X - 40, headPos.Y - 42, 80, 84)));
+                    var calcWidth = 50d/(skeletData.HeadDistance/3d);
+                    var calcHeight = 52.5d/(skeletData.HeadDistance/3d);
 
-                    tblHeight.Margin = new Thickness(headPos.X, headPos.Y, 0, 0);
-                    tblHeight.Text = _heights.First().ToString();
+                    myDrawingGroup.Children.Add(new ImageDrawing(_face, new Rect(skeletData.HeadPosition.X - ((int) calcWidth/2), skeletData.HeadPosition.Y - ((int) calcHeight/2), calcWidth, calcHeight)));
+
+                    tblHeight.Margin = new Thickness(skeletData.HeadPosition.X, skeletData.HeadPosition.Y, 0, 0);
+                    tblHeight.Text = skeletData.Height.ToString();
 
 
                     //myDrawingGroup.Children.Add(new ImageDrawing(c. Properties.Resources.face, new Rect(40, 0, 45, 130)));
