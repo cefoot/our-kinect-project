@@ -19,7 +19,6 @@ namespace PixelQube
             Force = force;
             Distance = distance == 0f ? (Pixel1.Position - Pixel2.Position).Length() : distance;
             Color = Color.White;
-            Debug.WriteLine(Distance);
         }
 
         public Color Color { get; set; }

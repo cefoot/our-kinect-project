@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace PixelQube
 {
     public class Pixel
     {
-        public Pixel(float absorption = 0.0f)
+        public Pixel(float absorption = 0.5f)
         {
             Absorption = absorption;
             Color = Color.White;
@@ -34,6 +35,7 @@ namespace PixelQube
         /// Speed of Pixel
         /// </summary>
         public Vector3 Speed { get; set; }
+        public Vector3 CurrentGravity { get; set; }
         public object Tag { get; set; }
         /// <summary>
         /// Absorption for Speed less or equal 1
@@ -42,9 +44,29 @@ namespace PixelQube
         /// <para>0 means instant absorption</para>
         /// </summary>
         public float Absorption { get; set; }
-        public void Move()
+        public void Move(Vector3 gravity, params Plane[] walls)
         {
-            Position += Speed;
+            bool collide = false;
+            foreach (var wall in walls)
+            {
+                var curDist = wall.DotCoordinate(Position);
+                if (curDist > 0)
+                {
+                    collide = true;
+                    Speed = new Vector3(
+                        wall.Normal.X == 0 ? Speed.X : wall.Normal.X * Speed.X,
+                        wall.Normal.Y == 0 ? Speed.Y : wall.Normal.Y * Speed.Y,
+                        wall.Normal.Z == 0 ? Speed.Z : wall.Normal.Z * Speed.Z
+                        );
+                    CurrentGravity = Vector3.Zero;
+                }
+            }
+            if (Speed.Y > 0 && Speed.Y > Math.Abs(gravity.Y))
+            {
+                CurrentGravity = Vector3.Zero;
+            }
+            Position += Speed + CurrentGravity;
+            CurrentGravity += gravity * Absorption;
             Speed *= Absorption;
         }
     }

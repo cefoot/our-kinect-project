@@ -23,8 +23,13 @@ namespace PixelQube
         Pixel Right { get; set; }
         ISet<Link> LinkList = new HashSet<Link>();
         float _fps = 1f;
-        float FPS
-        {
+        Vector3 CamPos { get; set; }
+        Vector3 LookAt { get; set; }
+        readonly Vector3 StartCamPos = new Vector3(5, 5, 180);
+        readonly Plane Ground = new Plane(new Vector3(-100, -50, 100), new Vector3(100, -50, -100), new Vector3(100, -50, 100));
+        Vector3 Gravity { get; set; }
+        float FPS                         
+        {                                 
             get { return _fps; }
             set
             {
@@ -42,6 +47,7 @@ namespace PixelQube
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             FPS = 60f;
+            Gravity = Vector3.Zero;
         }
 
         /// <summary>
@@ -135,10 +141,6 @@ namespace PixelQube
            
         }
 
-        Vector3 CamPos { get; set; }
-        Vector3 LookAt { get; set; }
-
-
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
@@ -147,7 +149,7 @@ namespace PixelQube
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             basicEffect = new BasicEffect(GraphicsDevice);
-            CamPos = new Vector3(5, 5, 80);
+            CamPos = StartCamPos;
             LookAt = new Vector3(5, 5, 10);
             basicEffect.View = Matrix.CreateLookAt(CamPos, LookAt, Vector3.Up);
             basicEffect.VertexColorEnabled = true;
@@ -185,10 +187,14 @@ namespace PixelQube
                 FPS++;
             if (Keyboard.GetState().GetPressedKeys().Contains(Keys.Subtract) || Keyboard.GetState().GetPressedKeys().Contains(Keys.OemMinus))
                 FPS--;
+            if (Keyboard.GetState().GetPressedKeys().Contains(Keys.G) && Gravity == Vector3.Zero)
+                Gravity = new Vector3(0f, -0.2f, 0f);
+            else if (Keyboard.GetState().GetPressedKeys().Contains(Keys.G))
+                Gravity = Vector3.Zero;
             foreach (var pxl in Qube)
             {
                 if (pxl == null) continue;
-                pxl.Move();
+                pxl.Move(Gravity, Ground);
             }
             foreach (var lnk in LinkList)
             {
@@ -216,8 +222,14 @@ namespace PixelQube
                     case Keys.NumPad2:
                         CamPos -= new Vector3(0, 5, 0);
                         continue;
+                    case Keys.NumPad9:
+                        CamPos -= new Vector3(0, 0, 5);
+                        continue;
+                    case Keys.NumPad3:
+                        CamPos += new Vector3(0, 0, 5);
+                        continue;
                     case Keys.NumPad5:
-                        CamPos = new Vector3(5, 5, 80);
+                        CamPos = StartCamPos;
                         continue;
                 }
             }
@@ -277,6 +289,7 @@ namespace PixelQube
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             basicEffect.CurrentTechnique.Passes[0].Apply();
+            //draw moveable stuff
             foreach (var link in LinkList)
             {
                 GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineStrip, new[] { 
@@ -284,6 +297,16 @@ namespace PixelQube
                     new VertexPositionColor(link.Pixel2.Position, link.Color) 
                 }, 0, 1);
             }
+            //draw solid stuff
+            GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, new []{
+                new VertexPositionColor(new Vector3(-100,-50,100), Color.Gray),
+                new VertexPositionColor(new Vector3(100,-50,-100), Color.Gray),
+                new VertexPositionColor(new Vector3(100,-50,100), Color.Gray),
+                
+                new VertexPositionColor(new Vector3(-100,-50,100), Color.Gray),
+                new VertexPositionColor(new Vector3(-100,-50,-100), Color.Gray),
+                new VertexPositionColor(new Vector3(100,-50,-100), Color.Gray),
+            },0, 2);
             base.Draw(gameTime);
         }
     }
