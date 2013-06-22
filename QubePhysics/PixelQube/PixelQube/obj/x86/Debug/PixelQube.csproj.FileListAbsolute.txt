@@ -1,6 +1,0 @@
-c:\users\chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\bin\x86\Debug\PixelQube.exe
-c:\users\chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\bin\x86\Debug\PixelQube.pdb
-c:\users\chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
-c:\users\chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\obj\x86\Debug\PixelQube.exe
-c:\users\chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\obj\x86\Debug\PixelQube.pdb
-C:\Users\Chris\documents\visual studio 2012\Projects\PixelQube\PixelQube\PixelQube\obj\x86\Debug\PixelQube.csprojResolveAssemblyReference.cache
