@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
+using OSCKinectTest.Properties;
 using Ventuz.OSC;
 
 namespace OSCKinectTest
@@ -17,12 +18,14 @@ namespace OSCKinectTest
         {
             Console.CancelKeyPress += ConsoleCancelKeyPress;
 
-            _skeletWriter = new UdpWriter("255.255.255.0", 666);
+            _skeletWriter = new UdpWriter(Settings.Default.Host, Settings.Default.Port);
             _sensor = GetSensor();
-            if(_sensor != null)
+            if (_sensor != null)
                 InitKinect(_sensor);
+              //          _skeletWriter.Send(new OscElement(Settings.Default.oscAddress, "Hello World"));
             Console.ReadKey();
-            _sensor.Stop();
+            if (_sensor != null)
+                _sensor.Stop();
         }
 
         static void ConsoleCancelKeyPress(object sender, ConsoleCancelEventArgs e)
@@ -62,17 +65,17 @@ namespace OSCKinectTest
 
         static void SensorColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
         {
-            Console.WriteLine("ColorFrame");
+            //Console.WriteLine("ColorFrame");
         }
 
         static void SensorDepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
         {
-            Console.WriteLine("DepthFrame");
+            //Console.WriteLine("DepthFrame");
         }
 
         static void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
-            Console.WriteLine("SkeletonFrame");
+            //Console.WriteLine("SkeletonFrame");
             using (var frame = e.OpenSkeletonFrame())
             {
                 if(frame.SkeletonArrayLength == 0)
@@ -89,7 +92,8 @@ namespace OSCKinectTest
                 }
                 Debug.WriteLine(frame.FloorClipPlane);
                 var head = skelet.Joints[JointType.Head];
-                _skeletWriter.Send(new OscElement("/kinect/skelet/head", head.Position.X, head.Position.Y, head.Position.Z));
+                _skeletWriter.Send(new OscElement(Settings.Default.oscAddress, head.Position.X, head.Position.Y, head.Position.Z));
+                Console.WriteLine("send");
             }
         }
     }

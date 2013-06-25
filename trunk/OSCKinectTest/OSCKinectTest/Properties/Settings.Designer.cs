@@ -49,5 +49,38 @@ namespace OSCKinectTest.Properties {
                 return ((float)(this["MaxRight"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string Host {
+            get {
+                return ((string)(this["Host"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("57111")]
+        public int Port {
+            get {
+                return ((int)(this["Port"]));
+            }
+            set {
+                this["Port"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("/kinect/head")]
+        public string oscAddress {
+            get {
+                return ((string)(this["oscAddress"]));
+            }
+            set {
+                this["oscAddress"] = value;
+            }
+        }
     }
 }
