@@ -19,10 +19,10 @@ namespace PaintSaver
         {
             switch (msg["data"].ToString())
             {
-                case "true":
+                case "start":
                     StartRecognize();
                     break;
-                case "false":
+                case "stop":
                     StopRecognize();
                     break;
             }
