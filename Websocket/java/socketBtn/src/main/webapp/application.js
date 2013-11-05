@@ -3,7 +3,7 @@ require(
 		function(cometd, dom, doc) {
 			cometd.configure({
 				url : location.protocol + '//' + location.host
-						+ config.contextPath + '/socketBtn',
+						+ '/socketBtn',
 				logLevel : 'warn'
 			});
 			cometd.addListener(
