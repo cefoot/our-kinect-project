@@ -33,4 +33,11 @@ public class WebsocketServer {
 		System.out.println(message.getData());
 	}
 
+	////don't care 
+//	@Listener("/handyMotion/")
+//	public void procesClientMotion(ServerSession session,
+//			ServerMessage message) {
+//		System.out.println(message.getData());
+//	}
+
 }

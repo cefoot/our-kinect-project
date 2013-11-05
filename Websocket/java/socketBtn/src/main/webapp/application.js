@@ -31,11 +31,10 @@ require(
 				}
 			};
 			function handleMotionEvent(event) {
-
 			    var x = Math.round(event.accelerationIncludingGravity.x*100)/100;
 			    var y = Math.round(event.accelerationIncludingGravity.y*100)/100;
 			    var z = Math.round(event.accelerationIncludingGravity.z*100)/100;
-				cometd.publish('/paint/', x+':'+y+':'+z);
+				cometd.publish('/handyMotion/', x+':'+y+':'+z);
 			    // Do something awesome.
 			};
 
