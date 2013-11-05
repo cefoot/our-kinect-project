@@ -17,20 +17,19 @@ namespace PaintSaver
             Program pro = new Program();
             pro.start();
             Console.ReadLine();
-          
         }
 
         private void start()
         {
             CometdSocket socket = new CometdSocket("ws://localhost:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
+            initKinectSensor();
+            registerEventListener();
         }
 
         private void initKinectSensor()
         {
             this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
-            
-
         }
 
         private void registerEventListener()
@@ -55,13 +54,10 @@ namespace PaintSaver
 
                     var skeleton = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).FirstOrDefault();
 
-                    
-
                     if (isRecording)
                     {
                         if (skeleton != null)
                         {
-
                             saveToFile(skeleton.Joints[JointType.HandRight].Position);
                         }
                     }
