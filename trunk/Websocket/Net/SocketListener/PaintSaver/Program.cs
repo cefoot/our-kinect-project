@@ -48,15 +48,33 @@ namespace PaintSaver
             {
                 if (frame != null)
                 {
+
+                    Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
+
+                    frame.CopySkeletonDataTo(skeletons);
+
+                    var skeleton = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).FirstOrDefault();
+
+                    
+
                     if (isRecording)
                     {
-                        
+                        if (skeleton != null)
+                        {
+
+                            saveToFile(skeleton.Joints[JointType.HandRight].Position);
+                        }
                     }
                     else
                     {
                     }
                 }
             }
+        }
+
+        private void saveToFile(SkeletonPoint skeletonPoint)
+        {
+            
         }
 
         private void PaintHandler(JsonObject msg)
