@@ -17,6 +17,24 @@ namespace PaintSaver
 
         private static void PaintHandler(JsonObject msg)
         {
+            switch (msg["data"].ToString())
+            {
+                case "true":
+                    StartRecognize();
+                    break;
+                case "false":
+                    StopRecognize();
+                    break;
+            }
+        }
+
+        private static void StopRecognize()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void StartRecognize()
+        {
             throw new NotImplementedException();
         }
     }
