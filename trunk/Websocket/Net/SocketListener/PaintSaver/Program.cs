@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using SimpleJson;
@@ -8,15 +9,25 @@ using Microsoft.Kinect;
 
 namespace PaintSaver
 {
-    class Program
+    class Program : IDisposable
     {
         KinectSensor kinect;
         Boolean isRecording = false;
+        private StreamWriter fileWriter;
+
         static void Main(string[] args)
         {
-            Program pro = new Program();
-            pro.start();
-            Console.ReadLine();
+            using (Program pro = new Program())
+            {
+                pro.start();
+                Console.ReadLine();
+            }
+        }
+
+        public Program()
+        {
+            fileWriter=new StreamWriter(File.OpenWrite("paint.csv"));
+            fileWriter.WriteLine("X;Y;Z");
         }
 
         private void start()
@@ -70,7 +81,7 @@ namespace PaintSaver
 
         private void saveToFile(SkeletonPoint skeletonPoint)
         {
-            
+            fileWriter.WriteLine("{0};{1};{2}", skeletonPoint.X, skeletonPoint.Y, skeletonPoint.Z);
         }
 
         private void PaintHandler(JsonObject msg)
@@ -96,6 +107,15 @@ namespace PaintSaver
         {
 
             this.isRecording = false;
+        }
+
+        /// <summary>
+        /// Führt anwendungsspezifische Aufgaben durch, die mit der Freigabe, der Zurückgabe oder dem Zurücksetzen von nicht verwalteten Ressourcen zusammenhängen.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            fileWriter.Dispose();
         }
     }
 }
