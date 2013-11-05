@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketListener", "SocketListener\SocketListener.csproj", "{7A9A81DD-0BB7-46CB-8082-8C7DE44A1EE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaintSaver", "PaintSaver\PaintSaver.csproj", "{A584582B-4E07-45EB-B37D-1E2CA83671C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +15,10 @@ Global
 		{7A9A81DD-0BB7-46CB-8082-8C7DE44A1EE4}.Debug|x86.Build.0 = Debug|x86
 		{7A9A81DD-0BB7-46CB-8082-8C7DE44A1EE4}.Release|x86.ActiveCfg = Release|x86
 		{7A9A81DD-0BB7-46CB-8082-8C7DE44A1EE4}.Release|x86.Build.0 = Release|x86
+		{A584582B-4E07-45EB-B37D-1E2CA83671C5}.Debug|x86.ActiveCfg = Debug|x86
+		{A584582B-4E07-45EB-B37D-1E2CA83671C5}.Debug|x86.Build.0 = Debug|x86
+		{A584582B-4E07-45EB-B37D-1E2CA83671C5}.Release|x86.ActiveCfg = Release|x86
+		{A584582B-4E07-45EB-B37D-1E2CA83671C5}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
