@@ -22,7 +22,8 @@ public class WebsocketServer {
 
 	@Listener("/service/hello")
 	public void processClientHello(ServerSession session, ServerMessage message) {
-		System.out.println("clientConnected");
+		System.out.println("clientConnected:" + session.getUserAgent() + ":"
+				+ message);
 	}
 
 	Map<String, Map<String, Object>> tickets = new HashMap<String, Map<String, Object>>();
@@ -33,11 +34,11 @@ public class WebsocketServer {
 		System.out.println(message.getData());
 	}
 
-	////don't care 
-//	@Listener("/handyMotion/")
-//	public void procesClientMotion(ServerSession session,
-//			ServerMessage message) {
-//		System.out.println(message.getData());
-//	}
+	// //don't care
+	// @Listener("/handyMotion/")
+	// public void procesClientMotion(ServerSession session,
+	// ServerMessage message) {
+	// System.out.println(message.getData());
+	// }
 
 }
