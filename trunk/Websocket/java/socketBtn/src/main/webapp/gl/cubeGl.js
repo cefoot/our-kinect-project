@@ -168,6 +168,7 @@
     		incAngleX = angles.incX;
     		incAngleY = angles.incY;
     	});
+    	send('/qube/hello','Hello World');
         var c = document.getElementById("example");
         var w = Math.floor(window.innerWidth * 0.9);
         var h = Math.floor(window.innerHeight * 0.9);

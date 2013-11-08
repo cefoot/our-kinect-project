@@ -1,7 +1,6 @@
 package de.cefoot;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -9,7 +8,9 @@ import org.cometd.annotation.Listener;
 import org.cometd.annotation.Service;
 import org.cometd.annotation.Session;
 import org.cometd.bayeux.server.BayeuxServer;
+import org.cometd.bayeux.server.ConfigurableServerChannel;
 import org.cometd.bayeux.server.LocalSession;
+import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
 
@@ -19,26 +20,46 @@ public class WebsocketServer {
 	private BayeuxServer bayeuxServer;
 	@Session
 	private LocalSession sender;
-
-	@Listener("/service/hello")
-	public void processClientHello(ServerSession session, ServerMessage message) {
-		System.out.println("clientConnected:" + session.getUserAgent() + ":"
-				+ message);
+	
+	HashMap<String, Object> curRotation = null;
+	
+	public WebsocketServer(){
+		curRotation = new HashMap<String, Object>();
+		curRotation.put("incX", 1);
+		curRotation.put("incY", 1);
 	}
 
-	Map<String, Map<String, Object>> tickets = new HashMap<String, Map<String, Object>>();
+	@Listener("/url/")
+	public void processClientHello(ServerSession session, ServerMessage message) {
+		System.out.println("url:" + message.getData());
+	}
+
+	@Listener("/qube/incAngle")
+	public void processAngle(ServerSession session, ServerMessage message) {		
+		curRotation = (HashMap<String, Object>) message.getData();	
+	}
+
+	@Listener("/qube/hello")
+	public void processHello(ServerSession session, ServerMessage message) {		
+		// Create the channel name using the stock symbol
+		String channelName = "/qube/incAngle";// Initialize the channel, making it persistent and lazy
+		bayeuxServer.createIfAbsent(channelName,
+				new ConfigurableServerChannel.Initializer() {
+					public void configureChannel(
+							ConfigurableServerChannel channel) {
+						channel.setPersistent(true);
+						channel.setLazy(true);
+					}
+				});
+
+		// Publish to all subscribers
+		ServerChannel channel = bayeuxServer.getChannel(channelName);
+		channel.publish(sender, curRotation, null);
+	}		
 
 	@Listener("/paint/")
-	public void procesClientTicketMove(ServerSession session,
-			ServerMessage message) {
+	public void procesClientTicketMove(ServerSession session, ServerMessage message) {
 		System.out.println(message.getData());
 	}
-
-	// //don't care
-	// @Listener("/handyMotion/")
-	// public void procesClientMotion(ServerSession session,
-	// ServerMessage message) {
-	// System.out.println(message.getData());
-	// }
 
 }
