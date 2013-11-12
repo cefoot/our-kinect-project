@@ -124,6 +124,13 @@ namespace SocketListener
             DoHandshake(webSocket);
         }
 
+        public void send(String qname, object data)
+        {
+            var sendData = new JsonObject();
+            sendData["channel"] = qname;
+            sendData["data"] = data;
+        }
+
         /// <summary>
         /// <para>Beispiel:</para>
         /// <para>{"version":"1.0","minimumVersion":"0.9","channel":"/meta/handshake","supportedConnectionTypes":["websocket","long-polling","callback-polling"],"advice":{"timeout":60000,"interval":0},"id":"1"}</para>
