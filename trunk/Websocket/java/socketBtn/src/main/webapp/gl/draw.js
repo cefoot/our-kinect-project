@@ -121,7 +121,11 @@ window.requestAnimFrame = (function() {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+        mat4.perspective(45, 
+        		gl.viewportWidth / gl.viewportHeight, 
+        		0.1, 
+        		1000.0, //sichtweite
+        		pMatrix);
 
         mat4.lookAt(eyePos, //hier befinde ich mich
         		[position[0].X, position[0].Y, position[0].Z], //da guck ich hin
@@ -129,7 +133,7 @@ window.requestAnimFrame = (function() {
         		mvMatrix);
 //        mat4.identity(mvMatrix); //mit dem gehts nicht
         
-        for (var int = 0; int < position.length; int++) {
+        for (var i = 0; i < position.length; i++) {
             drawSquareOnPosition(gl, position[i].X, position[i].Y, position[i].Z);
 		}        
     }
@@ -140,7 +144,13 @@ window.requestAnimFrame = (function() {
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
         setMatrixUniforms(gl);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+        mat4.rotateY(mvMatrix, Math.PI/2);//90grad rotieren und nochmal zeichen damit auch von der seite sichtbar
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        setMatrixUniforms(gl);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
         mat4.translate(mvMatrix, [-x, -y, -z]);
+        mat4.rotateY(mvMatrix, Math.PI/-2);
     }
 
     function handleKeyEvent(event) {
