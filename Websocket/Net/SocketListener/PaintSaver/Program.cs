@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using SimpleJson;
 using SocketListener;
 using Microsoft.Kinect;
@@ -25,11 +27,17 @@ namespace PaintSaver
 
         static void Main(string[] args)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             using (Program pro = new Program())
             {
                 pro.start();
                 Console.ReadLine();
             }
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine(e);
         }
 
         public Program()
@@ -101,9 +109,12 @@ namespace PaintSaver
                             //saveToFile(skeleton.Joints[JointType.HandRight].Position);
                             //send hand position to webserver
                             var currentHandPosition=skeleton.Joints[JointType.HandRight].Position;
+                            currentHandPosition.X *= 100f;
+                            currentHandPosition.Y *= 100f;
+                            currentHandPosition.Z *= 100f;
                             if (PointDiffSquared(currentHandPosition,lastPosition)>this.minDiff)
                             {
-                                this.sendHandPosition(skeleton.Joints[JointType.HandRight].Position);
+                                this.sendHandPosition(currentHandPosition);
                                 lastPosition = currentHandPosition;
                                 Console.Write(".");
                             }
@@ -113,7 +124,7 @@ namespace PaintSaver
                         }
                         else
                         {
-                            Console.WriteLine("want to record but no skeleton...");
+                            //Console.WriteLine("want to record but no skeleton..." + DateTime.Now.Ticks);
                         }
                     }
                     else
@@ -134,7 +145,14 @@ namespace PaintSaver
             handPosition["X"] = skeletonPoint.X;
             handPosition["Y"] = skeletonPoint.Y;
             handPosition["Z"] = skeletonPoint.Z;
-            socket.send(this.handPositionChannel, handPosition);
+            try
+            {
+                socket.Send(this.handPositionChannel, handPosition);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
  
         }
 
