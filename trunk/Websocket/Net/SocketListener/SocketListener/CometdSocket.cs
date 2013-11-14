@@ -82,9 +82,13 @@ namespace SocketListener
         }
 
         private void HandleCometdMsg(WebSocket socket, JsonArray cometdMsg)
-        {
+        {//[{"error":"400::channel missing","successful":false}]
             var dictionary = cometdMsg[0] as JsonObject;
-
+            if(dictionary.ContainsKey("error"))
+            {
+                HandleErrorMsg(socket, dictionary);
+                return;
+            }
             var channel = dictionary["channel"] as String;
             switch (channel)
             {
@@ -118,17 +122,28 @@ namespace SocketListener
             }
         }
 
+        private void HandleErrorMsg(WebSocket socket, JsonObject dictionary)
+        {
+            Console.WriteLine(dictionary.ToString());
+        }
+
         void SocketOpened(object sender, EventArgs e)
         {
             var webSocket = (WebSocket)sender;
             DoHandshake(webSocket);
         }
 
-        public void send(String qname, object data)
-        {
-            var sendData = new JsonObject();
-            sendData["channel"] = qname;
-            sendData["data"] = data;
+        public void Send(String qname, object sendData)
+        {//{"channel":"/paint/","data":"stop","id":"163","clientId":"2g8i5sahsqas3xf6n7zykgu1t"
+            var data = new JsonObject();
+            data["channel"] = qname;
+            data["data"] = sendData;
+            data["id"] = MsgId;
+            data["clientId"] = ClienId;
+            _socket.Send(new JsonArray
+                {
+                    data
+                }.ToString());
         }
 
         /// <summary>
