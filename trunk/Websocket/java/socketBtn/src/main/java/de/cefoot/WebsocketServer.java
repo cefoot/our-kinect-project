@@ -29,6 +29,11 @@ public class WebsocketServer {
 		curRotation.put("incY", 1);
 	}
 
+	@Listener("/datachannel/handPosition")
+	public void processHandPos(ServerSession session, ServerMessage message) {
+		System.out.println("handPos:" + message.getData());
+	}
+
 	@Listener("/url/")
 	public void processClientHello(ServerSession session, ServerMessage message) {
 		System.out.println("url:" + message.getData());

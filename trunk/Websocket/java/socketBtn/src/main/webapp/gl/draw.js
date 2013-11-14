@@ -184,9 +184,9 @@ window.requestAnimFrame = (function() {
 		
 		register('/datachannel/handPosition', function(msg){
 			position[position.length] = {
-					X:msg.X,
-					Y:msg.Y,
-					Z:msg.Z
+					X:Math.round(msg.X),
+					Y:Math.round(msg.Y),
+					Z:Math.round(msg.Z)
 			};
 		});
 
