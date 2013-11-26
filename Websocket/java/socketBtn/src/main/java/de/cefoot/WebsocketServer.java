@@ -1,6 +1,8 @@
 package de.cefoot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -23,14 +25,36 @@ public class WebsocketServer {
 	
 	HashMap<String, Object> curRotation = null;
 	
+	List<Object> drawingPositions = new ArrayList<>();
+	
 	public WebsocketServer(){
 		curRotation = new HashMap<String, Object>();
 		curRotation.put("incX", 1);
 		curRotation.put("incY", 1);
 	}
 
+	@Listener("/drawing/hello")
+	public void processDrawingHello(ServerSession session, ServerMessage message) {
+		String channelName = "/datachannel/handPosition";// Initialize the channel, making it persistent and lazy
+		bayeuxServer.createIfAbsent(channelName,
+				new ConfigurableServerChannel.Initializer() {
+					public void configureChannel(
+							ConfigurableServerChannel channel) {
+						channel.setPersistent(true);
+						channel.setLazy(true);
+					}
+				});
+
+		// Publish to all subscribers
+		ServerChannel channel = bayeuxServer.getChannel(channelName);
+		for (Object curPos : drawingPositions) {
+			channel.publish(sender, curPos, null);
+		}
+	}
+
 	@Listener("/datachannel/handPosition")
 	public void processHandPos(ServerSession session, ServerMessage message) {
+		drawingPositions.add(message.getData());
 		System.out.println("handPos:" + message.getData());
 	}
 
