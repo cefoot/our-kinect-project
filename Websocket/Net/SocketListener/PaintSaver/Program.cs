@@ -20,11 +20,10 @@ namespace PaintSaver
         ColorImageFrame imageFrame;
         DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
-        double minDiff = 0.5;
+        double minDiff = 50;
         SkeletonPoint lastPosition = new SkeletonPoint();
         String handPositionChannel = "/datachannel/handPosition";
         String headPositionChannel = "/datachannel/headPosition";
-
 
 
         static void Main(string[] args)
@@ -51,7 +50,7 @@ namespace PaintSaver
 
         private void start()
         {
-            socket = new CometdSocket("ws://ws201736:8080/socketBtn");
+            socket = new CometdSocket("ws://localhost:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             //explizite initialisierung, vielleicht unnötig
             lastPosition.X = 0;
@@ -72,7 +71,7 @@ namespace PaintSaver
         {
             this.kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(Sensor_SkeletonFrameReady);
             this.kinect.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(Sensor_ColorFrameReady);
-            this.kinect.DepthFrameReady +=new EventHandler<DepthImageFrameReadyEventArgs>(Sensor_DepthFrameReady);
+            this.kinect.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(Sensor_DepthFrameReady);
             this.kinect.SkeletonStream.Enable();
             this.kinect.Start();
         }
@@ -100,62 +99,42 @@ namespace PaintSaver
                     Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
 
                     frame.CopySkeletonDataTo(skeletons);
-                    
+
 
                     var skeleton = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).FirstOrDefault();
-                    
-                    if (isRecording)
+
+                    if (skeleton != null)
                     {
-                        if (skeleton != null)
+                        if (isRecording)
                         {
                             //saveToFile(skeleton.Joints[JointType.HandRight].Position);
                             //send hand position to webserver
-                            var currentHandPosition=skeleton.Joints[JointType.HandRight].Position;
+                            var currentHandPosition = skeleton.Joints[JointType.HandRight].Position;
+                            currentHandPosition.X *= 100f;
+                            currentHandPosition.Y *= 100f;
+                            currentHandPosition.Z *= 100f;
                             if (PointDiffSquared(currentHandPosition, lastPosition) > this.minDiff)
                             {
-                                this.sendHandPosition(currentHandPosition);
+                                this.SendPositionToChannel(currentHandPosition, this.handPositionChannel);
                                 lastPosition = currentHandPosition;
                                 Console.Write(".");
                             }
-                            else
-                            {
-                                Console.Write("-");
-                            }
-
-
                             //send correct image+depthmapping to webserver
                             //this.SendDepthImage();
-                            
+
                         }
                         else
                         {
-                            Console.WriteLine("want to record HAND but no skeleton...");
+                            var currentHandPosition = skeleton.Joints[JointType.Head].Position;
+                            currentHandPosition.X *= 100f;
+                            currentHandPosition.Y *= 100f;
+                            currentHandPosition.Z *= 100f;
+                            SendPositionToChannel(currentHandPosition, headPositionChannel);
+                            Console.Write(".");
                         }
-                    }
-                    else
-                    {
-                        if (skeleton != null)
-                        {
-                            var currentHeadPosition = skeleton.Joints[JointType.Head].Position;
-                            this.sendHeadPosition(skeleton.Joints[JointType.HandRight].Position);
-                        }
-                        else
-                        {
-                            Console.WriteLine("want to record HEAD but no skeleton...");
-                        }
-                        
                     }
                 }
             }
-        }
-
-        private void sendHeadPosition(SkeletonPoint skeletonPoint)
-        {
-            JsonObject headPosition = new JsonObject();
-            headPosition["X"] = (int) skeletonPoint.X;
-            headPosition["Y"] = (int) skeletonPoint.Y;
-            headPosition["Z"] = (int) skeletonPoint.Z;
-            socket.send(this.headPositionChannel, headPosition);
         }
 
         private static double PointDiffSquared(SkeletonPoint a, SkeletonPoint b)
@@ -163,21 +142,21 @@ namespace PaintSaver
             return (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y) + (a.Z - b.Z) * (a.Z - b.Z);
         }
 
-        private void sendHandPosition(SkeletonPoint skeletonPoint)
+        private void SendPositionToChannel(SkeletonPoint skeletonPoint, string channelName)
         {
-            JsonObject handPosition = new JsonObject();
-            handPosition["X"] = (int) skeletonPoint.X;
-            handPosition["Y"] = (int) skeletonPoint.Y;
-            handPosition["Z"] = (int) skeletonPoint.Z;
+            var handPosition = new JsonObject();
+            handPosition["X"] = (int)skeletonPoint.X;
+            handPosition["Y"] = (int)skeletonPoint.Y;
+            handPosition["Z"] = (int)skeletonPoint.Z;
             try
             {
-                socket.Send(this.handPositionChannel, handPosition);
+                socket.Send(channelName, handPosition);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
- 
+
         }
 
         private void saveToFile(SkeletonPoint skeletonPoint)
@@ -189,18 +168,18 @@ namespace PaintSaver
         {
             if (this.depthFrame != null && this.imageFrame != null)
             {
-               DepthImagePoint[] depthPointData = new DepthImagePoint[depthFrame.Height*depthFrame.Width];
-               kinect.CoordinateMapper.MapColorFrameToDepthFrame(imageFrame.Format, depthFrame.Format, depthFrame.GetRawPixelData(), depthPointData);
-               ColorImagePoint[] imagePointData = new ColorImagePoint[imageFrame.Height * imageFrame.Width];
-               kinect.CoordinateMapper.MapDepthFrameToColorFrame(depthFrame.Format, depthFrame.GetRawPixelData(), imageFrame.Format, imagePointData);
+                DepthImagePoint[] depthPointData = new DepthImagePoint[depthFrame.Height * depthFrame.Width];
+                kinect.CoordinateMapper.MapColorFrameToDepthFrame(imageFrame.Format, depthFrame.Format, depthFrame.GetRawPixelData(), depthPointData);
+                ColorImagePoint[] imagePointData = new ColorImagePoint[imageFrame.Height * imageFrame.Width];
+                kinect.CoordinateMapper.MapDepthFrameToColorFrame(depthFrame.Format, depthFrame.GetRawPixelData(), imageFrame.Format, imagePointData);
             }
         }
 
         JsonObject ParseDepthImagePointArrayToJsonObject(DepthImagePoint[] depthPointArray, ColorImageFrame colorImageFrame)
         {
             JsonObject simpleObject = new JsonObject();
-            
-            foreach(DepthImagePoint singlePoint in depthPointArray)
+
+            foreach (DepthImagePoint singlePoint in depthPointArray)
             {
 
             }
@@ -210,7 +189,7 @@ namespace PaintSaver
 
         private void PaintHandler(JsonObject msg)
         {
-            Console.WriteLine(msg);
+
             switch (msg["data"].ToString())
             {
                 case "start":

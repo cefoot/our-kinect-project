@@ -182,6 +182,12 @@ window.requestAnimFrame = (function() {
 
 		window.addEventListener("keyup", handleKeyEvent, true);
 		
+		register('/datachannel/headPosition', function(msg){
+			eyePos[0]=msg.X;
+			eyePos[1]=msg.Y;
+			eyePos[2]=msg.Z;
+		});
+		
 		register('/datachannel/handPosition', function(msg){
 			position[position.length] = {
 					X:Math.round(msg.X),
