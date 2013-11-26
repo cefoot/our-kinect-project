@@ -20,9 +20,11 @@ namespace PaintSaver
         ColorImageFrame imageFrame;
         DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
-        double minDiff = 50;
+        double minDiff = 0.5;
         SkeletonPoint lastPosition = new SkeletonPoint();
         String handPositionChannel = "/datachannel/handPosition";
+        String headPositionChannel = "/datachannel/headPosition";
+
 
 
         static void Main(string[] args)
@@ -49,7 +51,7 @@ namespace PaintSaver
 
         private void start()
         {
-            socket = new CometdSocket("ws://localhost:8080/socketBtn");
+            socket = new CometdSocket("ws://ws201736:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             //explizite initialisierung, vielleicht unnötig
             lastPosition.X = 0;
@@ -109,29 +111,51 @@ namespace PaintSaver
                             //saveToFile(skeleton.Joints[JointType.HandRight].Position);
                             //send hand position to webserver
                             var currentHandPosition=skeleton.Joints[JointType.HandRight].Position;
-                            currentHandPosition.X *= 100f;
-                            currentHandPosition.Y *= 100f;
-                            currentHandPosition.Z *= 100f;
-                            if (PointDiffSquared(currentHandPosition,lastPosition)>this.minDiff)
+                            if (PointDiffSquared(currentHandPosition, lastPosition) > this.minDiff)
                             {
                                 this.sendHandPosition(currentHandPosition);
                                 lastPosition = currentHandPosition;
                                 Console.Write(".");
                             }
+                            else
+                            {
+                                Console.Write("-");
+                            }
+
+
                             //send correct image+depthmapping to webserver
                             //this.SendDepthImage();
                             
                         }
                         else
                         {
-                            //Console.WriteLine("want to record but no skeleton..." + DateTime.Now.Ticks);
+                            Console.WriteLine("want to record HAND but no skeleton...");
                         }
                     }
                     else
                     {
+                        if (skeleton != null)
+                        {
+                            var currentHeadPosition = skeleton.Joints[JointType.Head].Position;
+                            this.sendHeadPosition(skeleton.Joints[JointType.HandRight].Position);
+                        }
+                        else
+                        {
+                            Console.WriteLine("want to record HEAD but no skeleton...");
+                        }
+                        
                     }
                 }
             }
+        }
+
+        private void sendHeadPosition(SkeletonPoint skeletonPoint)
+        {
+            JsonObject headPosition = new JsonObject();
+            headPosition["X"] = (int) skeletonPoint.X;
+            headPosition["Y"] = (int) skeletonPoint.Y;
+            headPosition["Z"] = (int) skeletonPoint.Z;
+            socket.send(this.headPositionChannel, headPosition);
         }
 
         private static double PointDiffSquared(SkeletonPoint a, SkeletonPoint b)
@@ -142,9 +166,9 @@ namespace PaintSaver
         private void sendHandPosition(SkeletonPoint skeletonPoint)
         {
             JsonObject handPosition = new JsonObject();
-            handPosition["X"] = skeletonPoint.X;
-            handPosition["Y"] = skeletonPoint.Y;
-            handPosition["Z"] = skeletonPoint.Z;
+            handPosition["X"] = (int) skeletonPoint.X;
+            handPosition["Y"] = (int) skeletonPoint.Y;
+            handPosition["Z"] = (int) skeletonPoint.Z;
             try
             {
                 socket.Send(this.handPositionChannel, handPosition);
@@ -186,7 +210,7 @@ namespace PaintSaver
 
         private void PaintHandler(JsonObject msg)
         {
-
+            Console.WriteLine(msg);
             switch (msg["data"].ToString())
             {
                 case "start":
