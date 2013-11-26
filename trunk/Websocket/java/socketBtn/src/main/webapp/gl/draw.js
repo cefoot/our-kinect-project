@@ -90,6 +90,8 @@ window.requestAnimFrame = (function() {
     }
 
 
+	var position = [];
+
     var mvMatrix = mat4.create();
     var pMatrix = mat4.create();
 
@@ -149,8 +151,8 @@ window.requestAnimFrame = (function() {
         gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
         setMatrixUniforms(gl);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
-        mat4.translate(mvMatrix, [-x, -y, -z]);
         mat4.rotateY(mvMatrix, Math.PI/-2);
+        mat4.translate(mvMatrix, [-x, -y, -z]);
     }
 
     function handleKeyEvent(event) {
@@ -168,8 +170,6 @@ window.requestAnimFrame = (function() {
     		eyePos[0] -= 1;
     	}
 	};
-
-	var position = [];
 	
     function webGLStart() {
         var canvas = document.getElementById("drawArea");
@@ -189,7 +189,8 @@ window.requestAnimFrame = (function() {
 					Z:Math.round(msg.Z)
 			};
 		});
-
+		//server begrüßen->sorgt dafür, dass der server alle bisher bekannten positionen sendet
+		send('/drawing/hello', 'Hallo Server');
         var mainFunc = function() {
         	//wird regelmäßig vom browser afgerufen
             window.requestAnimFrame(mainFunc, canvas);
