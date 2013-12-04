@@ -23,7 +23,9 @@ namespace PaintSaver
         double minDiff = 50;
         SkeletonPoint lastPosition = new SkeletonPoint();
         String handPositionChannel = "/datachannel/handPosition";
-        String headPositionChannel = "/datachannel/headPosition";
+        //String headPositionChannel = "/datachannel/headPosition";
+        String eyePositionChannel = "/datachannel/eyePosition";
+        String lookAtChannel = "/datachannel/lookAt";
 
 
         static void Main(string[] args)
@@ -50,7 +52,7 @@ namespace PaintSaver
 
         private void start()
         {
-            socket = new CometdSocket("ws://localhost:8080/socketBtn");
+            socket = new CometdSocket("ws://ws201736:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             //explizite initialisierung, vielleicht unnötig
             lastPosition.X = 0;
@@ -125,11 +127,18 @@ namespace PaintSaver
                         }
                         else
                         {
-                            var currentHandPosition = skeleton.Joints[JointType.Head].Position;
+                            var currentHandPosition = skeleton.Joints[JointType.HandRight].Position;
+                            var lookAt = skeleton.Joints[JointType.Head].Position;
+
+                            lookAt.X = (2*currentHandPosition.X - lookAt.X)*100f;
+                            lookAt.Y = (2*currentHandPosition.Y - lookAt.Y)*100f;
+                            lookAt.Z = (2*currentHandPosition.Z - lookAt.Z)*100f;
+
                             currentHandPosition.X *= 100f;
                             currentHandPosition.Y *= 100f;
                             currentHandPosition.Z *= 100f;
-                            SendPositionToChannel(currentHandPosition, headPositionChannel);
+                            SendPositionToChannel(currentHandPosition, eyePositionChannel);
+                            SendPositionToChannel(lookAt, lookAtChannel);
                             Console.Write(".");
                         }
                     }
