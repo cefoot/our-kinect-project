@@ -116,8 +116,8 @@ namespace SocketListener
                         handler(dictionary);
                         break;
                     }
-                    Console.WriteLine("ERROR MSG:");
-                    Console.WriteLine(cometdMsg);
+                    //Console.WriteLine("ERROR MSG:");
+                    //Console.WriteLine(cometdMsg);
                     break;
             }
         }
