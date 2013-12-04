@@ -55,7 +55,6 @@ public class WebsocketServer {
 	@Listener("/datachannel/handPosition")
 	public void processHandPos(ServerSession session, ServerMessage message) {
 		drawingPositions.add(message.getData());
-		System.out.println("handPos:" + message.getData());
 	}
 
 	@Listener("/url/")

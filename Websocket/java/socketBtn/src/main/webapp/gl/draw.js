@@ -118,6 +118,7 @@ window.requestAnimFrame = (function() {
     }
 
     var eyePos = [0, 0, 10];
+    var lookAt = [0, 0, 0];
 
     function drawScene(gl) {
         gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
@@ -130,7 +131,7 @@ window.requestAnimFrame = (function() {
         		pMatrix);
 
         mat4.lookAt(eyePos, //hier befinde ich mich
-        		[position[0].X, position[0].Y, position[0].Z], //da guck ich hin
+        		[lookAt[0], lookAt[1], lookAt[2]], //da guck ich hin
         		[0, 1, 0], //das ist oben
         		mvMatrix);
 //        mat4.identity(mvMatrix); //mit dem gehts nicht
@@ -182,10 +183,16 @@ window.requestAnimFrame = (function() {
 
 		window.addEventListener("keyup", handleKeyEvent, true);
 		
-		register('/datachannel/headPosition', function(msg){
+		register('/datachannel/eyePosition', function(msg){
 			eyePos[0]=msg.X;
 			eyePos[1]=msg.Y;
 			eyePos[2]=msg.Z;
+		});
+		
+		register('/datachannel/lookAt', function(msg){
+			lookAt[0]=msg.X;
+			lookAt[1]=msg.Y;
+			lookAt[2]=msg.Z;
 		});
 		
 		register('/datachannel/handPosition', function(msg){
