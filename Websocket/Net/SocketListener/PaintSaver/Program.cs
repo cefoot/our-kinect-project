@@ -27,6 +27,12 @@ namespace PaintSaver
         String eyePositionChannel = "/datachannel/eyePosition";
         String lookAtChannel = "/datachannel/lookAt";
 
+        PointBuffer handPositionBuffer = new PointBuffer(4,"handPositionBuffer");
+        PointBuffer eyePositionBuffer = new PointBuffer(8, "eyePositionBuffer");
+        PointBuffer lookAtBuffer = new PointBuffer(8, "lookAtBuffer");
+
+
+
 
         static void Main(string[] args)
         {
@@ -111,36 +117,38 @@ namespace PaintSaver
                         {
                             //saveToFile(skeleton.Joints[JointType.HandRight].Position);
                             //send hand position to webserver
+
                             var currentHandPosition = skeleton.Joints[JointType.HandRight].Position;
-                            currentHandPosition.X *= 100f;
-                            currentHandPosition.Y *= 100f;
-                            currentHandPosition.Z *= 100f;
-                            if (PointDiffSquared(currentHandPosition, lastPosition) > this.minDiff)
+                            handPositionBuffer.add(currentHandPosition, 100f);
+                            if(handPositionBuffer.isBufferReady())
                             {
-                                this.SendPositionToChannel(currentHandPosition, this.handPositionChannel);
-                                lastPosition = currentHandPosition;
+                                this.SendPositionToChannel(handPositionBuffer.getCurrentPoint(100f), this.handPositionChannel);
                                 Console.Write(".");
                             }
-                            //send correct image+depthmapping to webserver
-                            //this.SendDepthImage();
+                            
+
 
                         }
                         else
                         {
-                            var currentHandPosition = skeleton.Joints[JointType.HandLeft].Position;
-                            var lookAt = skeleton.Joints[JointType.Head].Position;
-
-                            lookAt.X = (2*currentHandPosition.X - lookAt.X)*100f;
-                            lookAt.Y = (2*currentHandPosition.Y - lookAt.Y)*100f;
-                            lookAt.Z = (2*currentHandPosition.Z - lookAt.Z)*100f;
-
-                            currentHandPosition.X *= 100f;
-                            currentHandPosition.Y *= 100f;
-                            currentHandPosition.Z *= 100f;
-                            SendPositionToChannel(currentHandPosition, eyePositionChannel);
-                            SendPositionToChannel(lookAt, lookAtChannel);
-                            Console.Write(".");
+                            handPositionBuffer.resetBuffer();
                         }
+                        SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position,100f);
+                        SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
+                        var lookAt = lookAtBuffer.add(skeleton.Joints[JointType.Head].Position,100f);
+
+                        lookAt.X = (2 * currentHandLeftPosition.X - lookAt.X);
+                        lookAt.Y = (2 * currentHandLeftPosition.Y - lookAt.Y);
+                        lookAt.Z = (2 * currentHandLeftPosition.Z - lookAt.Z);
+                        
+                        /*
+                        currentHandLeftPosition.X *= 100f;
+                        currentHandLeftPosition.Y *= 100f;
+                        currentHandLeftPosition.Z *= 100f;
+                        SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
+                         * */
+                        SendPositionToChannel(lookAt, lookAtChannel);
+                        Console.Write(",");
                     }
                 }
             }
