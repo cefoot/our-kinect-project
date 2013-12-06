@@ -20,7 +20,7 @@ namespace PaintSaver
         ColorImageFrame imageFrame;
         DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
-        double minDiff = 50;
+        double minDiff = 10;
         SkeletonPoint lastPosition = new SkeletonPoint();
         String handPositionChannel = "/datachannel/handPosition";
         //String headPositionChannel = "/datachannel/headPosition";
@@ -127,7 +127,7 @@ namespace PaintSaver
                         }
                         else
                         {
-                            var currentHandPosition = skeleton.Joints[JointType.HandRight].Position;
+                            var currentHandPosition = skeleton.Joints[JointType.HandLeft].Position;
                             var lookAt = skeleton.Joints[JointType.Head].Position;
 
                             lookAt.X = (2*currentHandPosition.X - lookAt.X)*100f;
