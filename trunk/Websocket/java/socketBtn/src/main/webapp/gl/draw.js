@@ -2,16 +2,14 @@
  * Provides requestAnimationFrame in a cross browser way.
  */
 window.requestAnimFrame = (function() {
-	return window.requestAnimationFrame
-			|| window.webkitRequestAnimationFrame
-			|| window.mozRequestAnimationFrame
-			|| window.oRequestAnimationFrame
+	return window.requestAnimationFrame || window.webkitRequestAnimationFrame
+			|| window.mozRequestAnimationFrame || window.oRequestAnimationFrame
 			|| window.msRequestAnimationFrame
 			|| function(/* function FrameRequestCallback */callback, /*
 																		 * DOMElement
 																		 * Element
 																		 */
-					element) {
+			element) {
 				window.setTimeout(callback, 1000 / 60);
 			};
 })();
@@ -94,8 +92,6 @@ function initShaders(gl) {
 			"uMVMatrix");
 }
 
-var position = [];
-
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 
@@ -132,8 +128,24 @@ function drawScene(gl) {
 	mvMatrix);
 	// mat4.identity(mvMatrix); //mit dem gehts nicht
 
-	for (var i = 0; i < position.length; i++) {
-		drawSquareOnPosition(gl, position[i].X, position[i].Y, position[i].Z);
+	for (var drawIdx = 0; drawIdx < drawings.length; drawIdx++) {
+		var colorLocation = gl.getUniformLocation(shaderProgram, "u_color");
+		var curDraw = drawings[drawIdx];
+		gl.uniform4f(colorLocation, // 
+		curDraw.color.r, // red
+		curDraw.color.g, // green
+		curDraw.color.b, // blue
+		1);
+		drawDrawing(gl, curDraw);
+	}
+}
+
+function drawDrawing(gl, curDraw) {
+	for (var posIdx = 0; posIdx < curDraw.positions.length; posIdx++) {
+		drawSquareOnPosition(gl, //
+		curDraw.positions[posIdx].X, // X
+		curDraw.positions[posIdx].Y, // Y
+		curDraw.positions[posIdx].Z); // Z
 	}
 }
 
@@ -145,7 +157,7 @@ function drawSquareOnPosition(gl, x, y, z) {
 	setMatrixUniforms(gl);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
 	mat4.rotateY(mvMatrix, Math.PI / 2);// 90grad rotieren und nochmal zeichen
-										// damit auch von der seite sichtbar
+	// damit auch von der seite sichtbar
 	gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
 	gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute,
 			squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -177,32 +189,33 @@ function gotSources(sourceInfos) {
 		var sourceInfo = sourceInfos[i];
 		var option = document.createElement("option");
 		option.value = sourceInfo.id;
-		if (sourceInfo.kind == 'video'){
-			alert(sourceInfo.id);
-		}
 		if (sourceInfo.kind == 'video') {
-			vId=sourceInfo.id;
+			vId = sourceInfo.id;
 		}
 	}
-	if(!vId){
+	if (!vId) {
 		alert('no cam!');
 		return;
 	}
 	// Grab elements, create settings, etc.
-	var video = document.getElementById("video"),
-		videoObj = { "video": {optional: [{sourceId: vId}]}},
-		errBack = function(error) {
-			console.log("Video capture error: ", error.code); 
-		};
+	var video = document.getElementById("video"), videoObj = {
+		"video" : {
+			optional : [ {
+				sourceId : vId
+			} ]
+		}
+	}, errBack = function(error) {
+		console.log("Video capture error: ", error.code);
+	};
 
 	// Put video listeners into place
-	if(navigator.getUserMedia) { // Standard
+	if (navigator.getUserMedia) { // Standard
 		navigator.getUserMedia(videoObj, function(stream) {
 			video.src = stream;
 			video.play();
 		}, errBack);
-	} else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
-		navigator.webkitGetUserMedia(videoObj, function(stream){
+	} else if (navigator.webkitGetUserMedia) { // WebKit-prefixed
+		navigator.webkitGetUserMedia(videoObj, function(stream) {
 			video.src = window.webkitURL.createObjectURL(stream);
 			video.play();
 		}, errBack);
@@ -217,6 +230,34 @@ function initCam() {
 	}
 }
 
+var drawClr = {
+	r : Math.random(),
+	g : Math.random(),
+	b : Math.random()
+};
+var drawIdx = 0;
+var drawings = [];
+var newDrawing = true;
+
+function addPosition(x, y, z) {
+	if (!drawings[drawIdx]) {
+		drawings[drawIdx] = {
+			color : drawClr,
+			positions : []
+		};
+	}
+	var curDraw = drawings[drawIdx];
+	if (newDrawing) {
+		drawIdx++;
+		newDrawing = false;
+	}
+	curDraw.positions[curDraw.positions.length] = {
+		X : x,
+		Y : y,
+		Z : z
+	};
+}
+
 function webGLStart() {
 	var canvas = document.getElementById("drawArea");
 	var gl = initGL(canvas);
@@ -227,6 +268,28 @@ function webGLStart() {
 	gl.enable(gl.DEPTH_TEST);
 
 	window.addEventListener("keyup", handleKeyEvent, true);
+
+	register('/paint/', function(msg) {
+		if (msg == 'start') {
+			newDrawing = true;
+			drawClr = {
+				r : Math.random(),
+				g : Math.random(),
+				b : Math.random()
+			};
+		}
+		var btn = document.getElementById('btnPaint');
+		btn.innerText = msg == 'start' ? 'stop' : 'start';
+	});
+	
+	register('/datachannel/clear', function(msg) {
+		drawings = [];
+		drawIdx = 0;
+	});
+
+	register('/datachannel/positionData', function(msg) {
+		drawings[drawings.length] = msg;
+	});
 
 	register('/datachannel/eyePosition', function(msg) {
 		eyePos[0] = msg.X;
@@ -241,11 +304,7 @@ function webGLStart() {
 	});
 
 	register('/datachannel/handPosition', function(msg) {
-		position[position.length] = {
-			X : Math.round(msg.X),
-			Y : Math.round(msg.Y),
-			Z : Math.round(msg.Z)
-		};
+		addPosition(msg.X, msg.Y, msg.Z);
 	});
 	// server begrüßen->sorgt dafür, dass der server alle bisher bekannten
 	// positionen sendet
