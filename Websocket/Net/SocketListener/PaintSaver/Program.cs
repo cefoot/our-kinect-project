@@ -20,19 +20,17 @@ namespace PaintSaver
         ColorImageFrame imageFrame;
         DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
-        double minDiff = 10;
-        SkeletonPoint lastPosition = new SkeletonPoint();
+        
         String handPositionChannel = "/datachannel/handPosition";
-        //String headPositionChannel = "/datachannel/headPosition";
         String eyePositionChannel = "/datachannel/eyePosition";
         String lookAtChannel = "/datachannel/lookAt";
-
+        String touchChannel = "/datachannel/touch";
         PointBuffer handPositionBuffer = new PointBuffer(4,"handPositionBuffer");
         PointBuffer eyePositionBuffer = new PointBuffer(8, "eyePositionBuffer");
         PointBuffer lookAtBuffer = new PointBuffer(8, "lookAtBuffer");
 
 
-
+        List<SkeletonPoint> allPoints = new List<SkeletonPoint>();
 
         static void Main(string[] args)
         {
@@ -60,12 +58,8 @@ namespace PaintSaver
         {
             socket = new CometdSocket("ws://ws201736:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
-            //explizite initialisierung, vielleicht unnötig
-            lastPosition.X = 0;
-            lastPosition.Y = 0;
-            lastPosition.Z = 0;
-
-
+            socket.Subscribe("/clear/", ClearHandler);
+                       
             initKinectSensor();
             registerEventListener();
         }
@@ -113,25 +107,28 @@ namespace PaintSaver
 
                     if (skeleton != null)
                     {
+                        var currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position,100f);
                         if (isRecording)
                         {
-                            //saveToFile(skeleton.Joints[JointType.HandRight].Position);
-                            //send hand position to webserver
-
-                            var currentHandPosition = skeleton.Joints[JointType.HandRight].Position;
-                            handPositionBuffer.add(currentHandPosition, 100f);
+                                                        
                             if(handPositionBuffer.isBufferReady())
                             {
-                                this.SendPositionToChannel(handPositionBuffer.getCurrentPoint(100f), this.handPositionChannel);
+                                this.SendPositionToChannel(currentHandPosition, this.handPositionChannel);
                                 Console.Write(".");
+                                allPoints.Add(currentHandPosition);
                             }
                             
-
-
                         }
                         else
                         {
-                            handPositionBuffer.resetBuffer();
+                            SkeletonPoint result = new SkeletonPoint();
+                            if(getClosePoint(currentHandPosition,out result))
+                            {
+                                SendPositionToChannel(result, touchChannel);
+                                Console.Write("´");
+                            }
+                            
+
                         }
                         SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position,100f);
                         SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
@@ -141,17 +138,31 @@ namespace PaintSaver
                         lookAt.Y = (2 * currentHandLeftPosition.Y - lookAt.Y);
                         lookAt.Z = (2 * currentHandLeftPosition.Z - lookAt.Z);
                         
-                        /*
-                        currentHandLeftPosition.X *= 100f;
-                        currentHandLeftPosition.Y *= 100f;
-                        currentHandLeftPosition.Z *= 100f;
-                        SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
-                         * */
                         SendPositionToChannel(lookAt, lookAtChannel);
                         Console.Write(",");
                     }
                 }
             }
+        }
+
+        private bool getClosePoint(SkeletonPoint currentHandPosition, out SkeletonPoint result)
+        {
+            double maxDistance = 100;
+            bool found = false;
+            result = new SkeletonPoint();
+            foreach (SkeletonPoint point in allPoints)
+            {
+                var distance = PointDiffSquared(point, currentHandPosition);
+                if(distance<maxDistance)
+                {
+                    result.X = point.X;
+                    result.Y = point.Y;
+                    result.Z = point.Z;
+                    maxDistance=distance;
+                    found = true;
+                }
+            }
+            return found;
         }
 
         private static double PointDiffSquared(SkeletonPoint a, SkeletonPoint b)
@@ -211,6 +222,20 @@ namespace PaintSaver
             {
                 case "start":
                     StartRecognize();
+                    break;
+                case "stop":
+                    StopRecognize();
+                    break;
+            }
+        }
+
+        private void ClearHandler(JsonObject msg)
+        {
+
+            switch (msg["data"].ToString())
+            {
+                case "clear":
+                    allPoints.Clear();
                     break;
                 case "stop":
                     StopRecognize();
