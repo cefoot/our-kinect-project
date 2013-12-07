@@ -138,6 +138,20 @@ function drawScene(gl) {
 		1);
 		drawDrawing(gl, curDraw);
 	}
+	drawTouch(gl);
+}
+
+function drawTouch(gl){
+	if(!touchPoint){
+		return;
+	}
+	var colorLocation = gl.getUniformLocation(shaderProgram, "u_color");
+	gl.uniform4f(colorLocation, // 
+	1, // red
+	0, // green
+	0, // blue
+	1);
+	drawSquareOnPosition(gl, touchPoint.X, touchPoint.Y, touchPoint.Z);
 }
 
 function drawDrawing(gl, curDraw) {
@@ -167,21 +181,6 @@ function drawSquareOnPosition(gl, x, y, z) {
 	mat4.translate(mvMatrix, [ -x, -y, -z ]);
 }
 
-function handleKeyEvent(event) {
-	if (event.keyCode == 39) {
-		// pfeilRechts
-		eyePos[0] += 1;
-	} else if (event.keyCode == 38) {
-		// pfeilHoch
-		eyePos[2] -= 1;
-	} else if (event.keyCode == 40) {
-		// pfeilRunter
-		eyePos[2] += 1;
-	} else if (event.keyCode == 37) {
-		// pfeilLinks
-		eyePos[0] -= 1;
-	}
-};
 
 function gotSources(sourceInfos) {
 	var vId;
@@ -238,6 +237,8 @@ var drawClr = {
 var drawIdx = 0;
 var drawings = [];
 var newDrawing = true;
+var isScreenWindow = false;
+var touchPoint;
 
 function addPosition(x, y, z) {
 	if (!drawings[drawIdx]) {
@@ -258,7 +259,8 @@ function addPosition(x, y, z) {
 	};
 }
 
-function webGLStart() {
+function webGLStart(isScreen) {
+	isScreenWindow = isScreen;
 	var canvas = document.getElementById("drawArea");
 	var gl = initGL(canvas);
 	initShaders(gl);
@@ -266,9 +268,26 @@ function webGLStart() {
 
 	gl.clearColor(0.0, 0.0, 0.0, 0.0);
 	gl.enable(gl.DEPTH_TEST);
+	initBasicListener();
 
-	window.addEventListener("keyup", handleKeyEvent, true);
+	if (!isScreen) {
+		initCameraListener();
+	}
+	// server begrüßen->sorgt dafür, dass der server alle bisher bekannten
+	// positionen sendet
+	send('/drawing/hello', 'Hallo Server');
+	var mainFunc = function() {
+		// wird regelmäßig vom browser afgerufen
+		window.requestAnimFrame(mainFunc, canvas);
+		drawScene(gl);
+	};
+	mainFunc();
+	if (!isScreen) {
+		initCam();
+	}
+}
 
+function initBasicListener() {
 	register('/paint/', function(msg) {
 		if (msg == 'start') {
 			newDrawing = true;
@@ -278,10 +297,13 @@ function webGLStart() {
 				b : Math.random()
 			};
 		}
+		if (isScreenWindow) {
+			return;
+		}
 		var btn = document.getElementById('btnPaint');
 		btn.innerText = msg == 'start' ? 'stop' : 'start';
 	});
-	
+
 	register('/datachannel/clear', function(msg) {
 		drawings = [];
 		drawIdx = 0;
@@ -291,6 +313,17 @@ function webGLStart() {
 		drawings[drawings.length] = msg;
 	});
 
+	register('/datachannel/handPosition', function(msg) {
+		addPosition(msg.X, msg.Y, msg.Z);
+	});
+	
+	register('/datachannel/touch', function(msg){
+		touchPoint = msg;
+		//TODO timer einbauen und dann deaktivieren
+	});
+}
+
+function initCameraListener() {
 	register('/datachannel/eyePosition', function(msg) {
 		eyePos[0] = msg.X;
 		eyePos[1] = msg.Y;
@@ -302,18 +335,4 @@ function webGLStart() {
 		lookAt[1] = msg.Y;
 		lookAt[2] = msg.Z;
 	});
-
-	register('/datachannel/handPosition', function(msg) {
-		addPosition(msg.X, msg.Y, msg.Z);
-	});
-	// server begrüßen->sorgt dafür, dass der server alle bisher bekannten
-	// positionen sendet
-	send('/drawing/hello', 'Hallo Server');
-	var mainFunc = function() {
-		// wird regelmäßig vom browser afgerufen
-		window.requestAnimFrame(mainFunc, canvas);
-		drawScene(gl);
-	};
-	mainFunc();
-	initCam();
 }
