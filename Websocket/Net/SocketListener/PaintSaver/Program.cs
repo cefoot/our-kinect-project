@@ -125,7 +125,7 @@ namespace PaintSaver
                             if(getClosePoint(currentHandPosition,out result))
                             {
                                 SendPositionToChannel(result, touchChannel);
-                                Console.Write("´");
+                                Console.Write(":");
                             }
                             
 
@@ -147,7 +147,7 @@ namespace PaintSaver
 
         private bool getClosePoint(SkeletonPoint currentHandPosition, out SkeletonPoint result)
         {
-            double maxDistance = 100;
+            double maxDistance = 200;
             bool found = false;
             result = new SkeletonPoint();
             foreach (SkeletonPoint point in allPoints)
