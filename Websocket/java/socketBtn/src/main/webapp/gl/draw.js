@@ -138,7 +138,18 @@ function drawScene(gl) {
 		1);
 		drawDrawing(gl, curDraw);
 	}
+	drawCurHandPos(gl);
 	drawTouch(gl);
+}
+
+function drawCurHandPos(gl){
+	var colorLocation = gl.getUniformLocation(shaderProgram, "u_color");
+	gl.uniform4f(colorLocation, // 
+	1, // red
+	0, // green
+	0, // blue
+	1);
+	drawSquareOnPosition(gl, curHandPos.X, curHandPos.Y, curHandPos.Z);
 }
 
 function drawTouch(gl){
@@ -239,6 +250,7 @@ var drawings = [];
 var newDrawing = true;
 var isScreenWindow = false;
 var touchPoint;
+var curHandPos={X:0,Y:0,Z:0};
 
 function addPosition(x, y, z) {
 	if (!drawings[drawIdx]) {
@@ -313,8 +325,12 @@ function initBasicListener() {
 		drawings[drawings.length] = msg;
 	});
 
-	register('/datachannel/handPosition', function(msg) {
+	register('/datachannel/drawPosition', function(msg) {
 		addPosition(msg.X, msg.Y, msg.Z);
+	});
+
+	register('/datachannel/handPosition', function(msg) {
+		curHandPos = {X:msg.X, Y: msg.Y, Z:msg.Z};
 	});
 	
 	register('/datachannel/touch', function(msg){
@@ -334,5 +350,7 @@ function initCameraListener() {
 		lookAt[0] = msg.X;
 		lookAt[1] = msg.Y;
 		lookAt[2] = msg.Z;
+		lookAt[2] = (lookAt[2] - eyePos[2]) * Math.cos(-0.035) - (lookAt[0] - eyePos[0]) * Math.sin(-0.035) + eyePos[2];
+        lookAt[0] = (lookAt[2] - eyePos[2]) * Math.sin(-0.035) + (lookAt[0] - eyePos[0]) * Math.cos(-0.035) + eyePos[0];
 	});
 }

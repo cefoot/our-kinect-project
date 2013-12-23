@@ -22,6 +22,7 @@ namespace PaintSaver
         //minimal change in mm to send a new hand position
         
         String handPositionChannel = "/datachannel/handPosition";
+        String drawPositionChannel = "/datachannel/drawPosition";
         String eyePositionChannel = "/datachannel/eyePosition";
         String lookAtChannel = "/datachannel/lookAt";
         String touchChannel = "/datachannel/touch";
@@ -56,6 +57,7 @@ namespace PaintSaver
 
         private void start()
         {
+            //socket = new CometdSocket("ws://cefoot.dyndns-at-home.com/socketBtn");
             socket = new CometdSocket("ws://ws201736:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             socket.Subscribe("/clear/", ClearHandler);
@@ -113,7 +115,7 @@ namespace PaintSaver
                                                         
                             if(handPositionBuffer.isBufferReady())
                             {
-                                this.SendPositionToChannel(currentHandPosition, this.handPositionChannel);
+                                this.SendPositionToChannel(currentHandPosition, this.drawPositionChannel);
                                 Console.Write(".");
                                 allPoints.Add(currentHandPosition);
                             }
@@ -127,7 +129,11 @@ namespace PaintSaver
                                 SendPositionToChannel(result, touchChannel);
                                 Console.Write(":");
                             }
-                            
+                            SkeletonPoint currentPoint = new SkeletonPoint();
+                            currentPoint.X = skeleton.Joints[JointType.HandRight].Position.X * 100;
+                            currentPoint.Y = skeleton.Joints[JointType.HandRight].Position.Y * 100;
+                            currentPoint.Z = skeleton.Joints[JointType.HandRight].Position.Z * 100;
+                            this.SendPositionToChannel(currentPoint, this.handPositionChannel);
 
                         }
                         SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position,100f);
