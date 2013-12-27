@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
+using PaintSaver;
 
 namespace SocketListener
 {
@@ -72,26 +73,22 @@ namespace SocketListener
                 lastY.Dequeue();
                 lastZ.Dequeue();
             }
-            calcNewPoint(newPoint);
+            CalcNewPoint();
 
             return getCurrentPoint(scale);
         }
 
-        private void calcNewPoint(SkeletonPoint newPoint)
+        private void CalcNewPoint()
         {
-
-            
-            for (int i = 0; i < lastX.Count; i++)
+            for (var i = 0; i < lastX.Count; i++)
             {
                 curX = lastX.Average();
                 curY = lastY.Average();
                 curZ = lastZ.Average();
             }
-             
-
         }
 
-        public void resetBuffer()
+        public void ResetBuffer()
         {
             lastX.Clear();
             lastY.Clear();
@@ -101,12 +98,12 @@ namespace SocketListener
             curY = 1;
             curZ = 1;
 
-            this.ready = false;
+            ready = false;
 
             count = 0;
         }
 
-        public bool isBufferReady()
+        public bool IsBufferReady()
         {
             return ready;
         }

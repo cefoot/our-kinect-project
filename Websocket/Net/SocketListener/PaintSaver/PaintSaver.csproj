@@ -55,6 +55,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="QueueExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SocketListener\SocketListener.csproj">
