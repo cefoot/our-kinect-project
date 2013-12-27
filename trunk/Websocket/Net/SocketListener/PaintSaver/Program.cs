@@ -105,7 +105,7 @@ namespace PaintSaver
                     frame.CopySkeletonDataTo(skeletons);
 
 
-                    var skeleton = skeletons.Where(s => s.TrackingState == SkeletonTrackingState.Tracked).FirstOrDefault();
+                    var skeleton = skeletons.Where(SkeletTracked).FirstOrDefault();
 
                     if (skeleton != null)
                     {
@@ -113,7 +113,7 @@ namespace PaintSaver
                         if (isRecording)
                         {
                                                         
-                            if(handPositionBuffer.isBufferReady())
+                            if(handPositionBuffer.IsBufferReady())
                             {
                                 this.SendPositionToChannel(currentHandPosition, this.drawPositionChannel);
                                 Console.Write(".");
@@ -149,6 +149,15 @@ namespace PaintSaver
                     }
                 }
             }
+        }
+
+        private bool SkeletTracked(Skeleton skelet)
+        {
+            var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
+            tracked &= skelet.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked;
+            tracked &= skelet.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked;
+            tracked &= skelet.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked;
+            return tracked;
         }
 
         private bool getClosePoint(SkeletonPoint currentHandPosition, out SkeletonPoint result)

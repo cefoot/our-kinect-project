@@ -53,21 +53,6 @@ function lockMouse() {
 	elem.addEventListener("mousemove", mouseMove);
 
 }
-function getDirection(position, lookat) {
-	var direction = [];
-	direction[0] = (lookat[0] - position[0]);
-	direction[1] = (lookat[1] - position[1]);
-	direction[2] = (lookat[2] - position[2]);
-
-	length = Math.sqrt(direction[0] * direction[0] + direction[1]
-			* direction[1] + direction[2] * direction[2]);
-	direction[0] /= length;
-	direction[1] /= length;
-	direction[2] /= length;
-
-	return direction;
-
-}
 
 function handleKeyEvent(event) {
 	var direction = getDirection(eyePos, lookAt);

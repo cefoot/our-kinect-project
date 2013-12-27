@@ -299,6 +299,22 @@ function webGLStart(isScreen) {
 	}
 }
 
+function getDirection(position, lookat) {
+	var direction = [];
+	direction[0] = (lookat[0] - position[0]);
+	direction[1] = (lookat[1] - position[1]);
+	direction[2] = (lookat[2] - position[2]);
+
+	length = Math.sqrt(direction[0] * direction[0] + direction[1]
+			* direction[1] + direction[2] * direction[2]);
+	direction[0] /= length;
+	direction[1] /= length;
+	direction[2] /= length;
+
+	return direction;
+
+}
+
 function initBasicListener() {
 	register('/paint/', function(msg) {
 		if (msg == 'start') {
@@ -344,13 +360,16 @@ function initCameraListener() {
 		eyePos[0] = msg.X;
 		eyePos[1] = msg.Y;
 		eyePos[2] = msg.Z;
+		// ein stück zurück
+		var direction = getDirection(eyePos, lookAt);
+		eyePos[0] -= direction[0] * 1;
+		eyePos[1] -= direction[1] * 1;
+		eyePos[2] -= direction[2] * 1;
 	});
 
 	register('/datachannel/lookAt', function(msg) {
 		lookAt[0] = msg.X;
 		lookAt[1] = msg.Y;
 		lookAt[2] = msg.Z;
-		lookAt[2] = (lookAt[2] - eyePos[2]) * Math.cos(-0.035) - (lookAt[0] - eyePos[0]) * Math.sin(-0.035) + eyePos[2];
-        lookAt[0] = (lookAt[2] - eyePos[2]) * Math.sin(-0.035) + (lookAt[0] - eyePos[0]) * Math.cos(-0.035) + eyePos[0];
 	});
 }
