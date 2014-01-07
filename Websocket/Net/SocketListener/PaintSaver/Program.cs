@@ -57,7 +57,7 @@ namespace PaintSaver
 
         private void start()
         {
-            //socket = new CometdSocket("ws://cefoot.dyndns-at-home.com/socketBtn");
+            //socket = new CometdSocket("ws://cefoot.de/socketBtn");
             socket = new CometdSocket("ws://ws201736:8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             socket.Subscribe("/clear/", ClearHandler);
@@ -109,11 +109,18 @@ namespace PaintSaver
 
                     if (skeleton != null)
                     {
-                        var currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position,100f);
+                        bool rightHandTracked = skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Inferred;
+                        SkeletonPoint currentHandPosition = new SkeletonPoint();
+                        if (rightHandTracked)
+                        {
+                            currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position, 100f);
+                        }
+                        
+
                         if (isRecording)
                         {
-                                                        
-                            if(handPositionBuffer.IsBufferReady())
+
+                            if (handPositionBuffer.IsBufferReady() && rightHandTracked)
                             {
                                 this.SendPositionToChannel(currentHandPosition, this.drawPositionChannel);
                                 Console.Write(".");
@@ -124,28 +131,36 @@ namespace PaintSaver
                         else
                         {
                             SkeletonPoint result = new SkeletonPoint();
-                            if(getClosePoint(currentHandPosition,out result))
+                            if(getClosePoint(currentHandPosition,out result) && rightHandTracked)
                             {
                                 SendPositionToChannel(result, touchChannel);
                                 Console.Write(":");
                             }
-                            SkeletonPoint currentPoint = new SkeletonPoint();
-                            currentPoint.X = skeleton.Joints[JointType.HandRight].Position.X * 100;
-                            currentPoint.Y = skeleton.Joints[JointType.HandRight].Position.Y * 100;
-                            currentPoint.Z = skeleton.Joints[JointType.HandRight].Position.Z * 100;
-                            this.SendPositionToChannel(currentPoint, this.handPositionChannel);
+                            if (rightHandTracked)
+                            {
+                                SkeletonPoint currentPoint = new SkeletonPoint();
+                                currentPoint.X = skeleton.Joints[JointType.HandRight].Position.X * 100;
+                                currentPoint.Y = skeleton.Joints[JointType.HandRight].Position.Y * 100;
+                                currentPoint.Z = skeleton.Joints[JointType.HandRight].Position.Z * 100;
+                                this.SendPositionToChannel(currentPoint, this.handPositionChannel);
+                            }
 
                         }
-                        SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position,100f);
-                        SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
-                        var lookAt = lookAtBuffer.add(skeleton.Joints[JointType.Head].Position,100f);
+                        bool viewTracked = skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred;
+                        viewTracked &= skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Inferred;
+                        if (viewTracked)
+                        {
+                            SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position, 100f);
+                            SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
+                            var lookAt = lookAtBuffer.add(skeleton.Joints[JointType.Head].Position, 100f);
 
-                        lookAt.X = (2 * currentHandLeftPosition.X - lookAt.X);
-                        lookAt.Y = (2 * currentHandLeftPosition.Y - lookAt.Y);
-                        lookAt.Z = (2 * currentHandLeftPosition.Z - lookAt.Z);
-                        
-                        SendPositionToChannel(lookAt, lookAtChannel);
-                        Console.Write(",");
+                            lookAt.X = (2 * currentHandLeftPosition.X - lookAt.X);
+                            lookAt.Y = (2 * currentHandLeftPosition.Y - lookAt.Y);
+                            lookAt.Z = (2 * currentHandLeftPosition.Z - lookAt.Z);
+
+                            SendPositionToChannel(lookAt, lookAtChannel);
+                            Console.Write(",");
+                        }
                     }
                 }
             }
@@ -154,9 +169,6 @@ namespace PaintSaver
         private bool SkeletTracked(Skeleton skelet)
         {
             var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
-            tracked &= skelet.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked;
-            tracked &= skelet.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked;
-            tracked &= skelet.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked;
             return tracked;
         }
 
