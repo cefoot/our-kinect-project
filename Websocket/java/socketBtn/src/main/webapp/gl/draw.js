@@ -316,14 +316,12 @@ function getDirection(position, lookat) {
 }
 
 function initBasicListener() {
+	register('/paint/clr', function(msg){
+		drawClr = msg;
+	});
 	register('/paint/', function(msg) {
 		if (msg == 'start') {
 			newDrawing = true;
-			drawClr = {
-				r : Math.random(),
-				g : Math.random(),
-				b : Math.random()
-			};
 		}
 		if (isScreenWindow) {
 			return;
