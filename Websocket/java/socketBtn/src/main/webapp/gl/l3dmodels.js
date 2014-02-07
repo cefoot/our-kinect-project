@@ -408,7 +408,7 @@ function createAxisYZ(size) {
 
 
 
-function createVector(from, to, radius, material) {
+function createVector(from, to, radius, material, withoutCone) {
 
     var r = 0.03;
     if (radius != undefined)
@@ -444,7 +444,12 @@ function createVector(from, to, radius, material) {
     var fromV = vec3.create(); fromV.set(from);
     mat4.translate(m1, fromV);
     mat4.multiply(m1,m);
-    var scaleV = vec3.create(); scaleV.set([r * 0.5, l, r * 0.5]);
+    var scaleV = vec3.create(); 
+    if(!withoutCone){
+    	scaleV.set([r * 0.5, l, r * 0.5]);
+    }else{
+        scaleV.set([r * 0.5, 1, r * 0.5]);
+    }
     mat4.scale(m1,scaleV);
     
     var cy = createCylinder(8);
@@ -459,15 +464,20 @@ function createVector(from, to, radius, material) {
     var t = vec3.create(); t.set([0, -2, 0]);
     mat4.translate(m1, t);
 
-    var co = createCone(8);
-    co.setLocalTrans(m1);
+    var vec = new Models();
+    if(!withoutCone){
+        var co = createCone(8);
+        co.setLocalTrans(m1);
+        if (material != undefined) {
+            co.setMaterial(material);
+        }
+        vec.add(co);
+    }
 
     if (material != undefined) {
-        co.setMaterial(material);
         cy.setMaterial(material);
-    }
-    var vec = new Models();
-    vec.add(co); vec.add(cy);
+    } 
+    vec.add(cy);
     return vec;
 }
 
