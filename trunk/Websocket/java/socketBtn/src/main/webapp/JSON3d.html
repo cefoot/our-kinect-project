@@ -471,11 +471,69 @@ function main()
 </script>
 </head>
 <body>
-	<canvas id="canvas" width="600" height="400" onload="main()">Your browser does not support the canvas tag.</canvas><br>
-	<input type="file" id="file" name="file" onchange="handleFileSelect(this)" /><br>
-    <a href="json/cube2.json">qube download</a><br>
+	<canvas id="canvas" width="600" height="400" onload="main()">Your browser does not support the canvas tag.</canvas>
+	<table>
+		<tr>
+			<td>
+				<input type="file" id="file" name="file" onchange="handleFileSelect(this)" />
+			</td>
+			<td colspan="2">
+    			<a href="json/cube2.json">qube download</a>
+    		</td>
+    	</tr>
+    	<tr style="border: thin;">
+    		<td>
+    			<label>From</label>
+    		</td>
+    		<td>
+    			<label>To</label>
+    		</td>
+    	</tr>
+    	<tr>
+    		<td>
+    			<label>X:</label>
+    			<input type="number" id="fromX" name="X" style="width: 50px;" value="0"/>
+    			<label>Y:</label>
+    			<input type="number" id="fromY" name="Y" style="width: 50px;" value="0"/>
+    			<label>Z:</label>
+    			<input type="number" id="fromZ" name="Z" style="width: 50px;" value="0"/>
+    		</td>
+    		<td>
+    			<label>X:</label>
+    			<input type="number" id="toX" name="X" style="width: 50px;" value="1"/>
+    			<label>Y:</label>
+    			<input type="number" id="toY" name="Y" style="width: 50px;" value="0"/>
+    			<label>Z:</label>
+    			<input type="number" id="toZ" name="Z" style="width: 50px;" value="0"/>
+    		</td>
+    		<td>
+    			<input type="button" id="cylinder" name="cylinder" value="cylinder" onclick="makeCylinder()"/>
+    		</td>
+    	</tr>
+    	<tr>
+    		<td colspan="3" style="height: 150px;">
+    			<label style="width: 100%; height: 150px;" id="txt" ></label>
+    		</td>
+    	</tr>
+    </table>
 	<script>
 	main();
+	function makeCylinder() {
+		var clr = new Material();
+    	//red.diffuse[0] = 1.0;//r 
+    	clr.diffuse[1] = 0.0;//g 
+    	clr.diffuse[2] = 0.0;//b
+    	clr.ambient = 0.5;
+		var mdl = createVector([document.getElementById("fromX").valueAsNumber,
+						document.getElementById("fromY").valueAsNumber,
+						document.getElementById("fromZ").valueAsNumber],
+					[document.getElementById("toX").valueAsNumber,
+						document.getElementById("toY").valueAsNumber,
+						document.getElementById("toZ").valueAsNumber], 
+					1, clr, true);
+		//document.getElementById("txt").innerHTML = JSON.stringify(mdl);//useless shit
+		myModel.add(mdl);
+	}
   function handleFileSelect(evt) {
     var files = evt.files; // FileList object
 

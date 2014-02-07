@@ -31,7 +31,7 @@
 				0,1, 0,0, 1,0, 1,1, 0,1, 0,0, 
 				1,0, 1,1, 0,1, 0,0, 1,0, 1,1],
 			"material" : 
-				{"texture" : "http://www.lighthouse3d.com/wp-content/uploads/2013/07/crate1.jpg" ,
+				{"texture" : "json/text.jpg" ,
 				 "diffuse" : [0.827451,0.792157,0.772549,1],
 				 "specular" : [0,0,0,1]},
 			"boundingBox" : 
