@@ -416,8 +416,12 @@ function createVector(from, to, radius, material, withoutCone) {
     var x = vec3.create(); x.set([1,0,0]);
     var y = vec3.create(); y.set([to[0]-from[0], to[1]-from[1], to[2]-from[2]]);
     var z = vec3.create(); z.set([0, 0, 1]);
-
     var l = vec3.length(y) - 6 * r; // 0.45 is the tip's size
+    
+    if(withoutCone){
+        l = vec3.length(y);
+    }
+
 
     var d1 = vec3.dot(y, z);
     var d2 = vec3.dot(y, x);
@@ -445,11 +449,7 @@ function createVector(from, to, radius, material, withoutCone) {
     mat4.translate(m1, fromV);
     mat4.multiply(m1,m);
     var scaleV = vec3.create(); 
-    if(!withoutCone){
-    	scaleV.set([r * 0.5, l, r * 0.5]);
-    }else{
-        scaleV.set([r * 0.5, 1, r * 0.5]);
-    }
+	scaleV.set([r * 0.5, l, r * 0.5]);
     mat4.scale(m1,scaleV);
     
     var cy = createCylinder(8);
