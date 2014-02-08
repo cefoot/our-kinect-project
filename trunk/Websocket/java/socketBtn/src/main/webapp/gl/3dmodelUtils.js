@@ -21,11 +21,19 @@ var beta = 0.44, prevBeta;
 var radius = 5, prevRadius;
 var camX, camY, camZ;
 
-function spherical2Cartesian() {
+function setValue(uiElem, value){
+	if(uiElem != undefined && uiElem.hasOwnProperty("valueAsNumber")){
+		uiElem.valueAsNumber = value;
+	}
+}
 
+function spherical2Cartesian() {
     camX = radius * Math.cos(beta) * Math.sin(alpha);
     camZ = radius * Math.cos(beta) * Math.cos(alpha);
-    camY = radius * Math.sin(beta)
+    camY = radius * Math.sin(beta);
+    setValue(document.getElementById("alpha"), alpha);
+    setValue(document.getElementById("beta"), beta);
+    setValue(document.getElementById("radius"), radius);
 }
 
 
@@ -173,16 +181,19 @@ function checkError()
 var mouseTracking = -1, startX, startY;
 
 function handleKeyDown(event) {
-
+	var valChanged = false;
     switch (String.fromCharCode(event.keyCode)) {
-        case "A": alpha -= 0.05; break;
-        case "D": alpha += 0.05; break;
-        case "W": beta += 0.05; if (beta > 1.5) beta = 1.5; break;
-        case "S": beta -= 0.05; if (beta < -1.5) beta = -1.5; break;
-        case "R": radius += 0.05; break;
-        case "F": radius -= 0.05; if (radius < 0.5) radius = 0.5; break;
+        case "A": alpha -= 0.05; valChanged = true; break;
+        case "D": alpha += 0.05; valChanged = true; break;
+        case "W": beta += 0.05; if (beta > 1.5) beta = 1.5; valChanged = true; break;
+        case "S": beta -= 0.05; if (beta < -1.5) beta = -1.5; valChanged = true; break;
+        case "R": radius += 0.05; valChanged = true; break;
+        case "F": radius -= 0.05; if (radius < 0.5) radius = 0.5; valChanged = true; break;
     }
-    spherical2Cartesian();
+    //only set if changed
+    if(valChanged){
+    	spherical2Cartesian();
+    }
 }
 
 
@@ -243,7 +254,7 @@ function init() {
 
     // projection matrix. 
     var ratio = canvas.clientWidth / canvas.clientHeight;
-    mat4.perspective(60, ratio, 0.1, 50, Matrices.proj);
+    mat4.perspective(60, ratio, 0.1, 1000, Matrices.proj);
 
 
     // Set the background clear color to gray.
