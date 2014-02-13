@@ -21,19 +21,19 @@ Matrices.init = function() {
     Matrices.vm = mat4.create();
     Matrices.pvm = mat4.create();
     Matrices.stack = new Array();
-}
+};
 
 Matrices.compDerived = function () {
     mat4.multiply(Matrices.view,Matrices.model, Matrices.vm);
     mat4.multiply(Matrices.proj, Matrices.vm, Matrices.pvm);
     mat4.toInverseMat3(Matrices.vm, Matrices.normal);
     mat3.transpose(Matrices.normal);
-}
+};
 
 Matrices.getN = function () {
    
     return Matrices.normal;
-}
+};
 
 Matrices.getVM = function () {
 
@@ -103,10 +103,10 @@ Material.loadTexture = function(src) {
     var i = new Image();
 
     var tex = gl.createTexture();
-    i.onload = function () { Material.textureLoader(tex,i); }
+    i.onload = function () { Material.textureLoader(tex,i); };
     i.src = src;
     Material.textures[src] = tex;
-}
+};
 
 // --------------------------------------------------------------------------------------
 //  Models - basically an array of Model
@@ -121,7 +121,7 @@ function Models() {
     this.add = add;
     function add(model) {
         if (Object.prototype.toString.call(model) === '[object Array]')
-            this.set = this.set.concat(model)
+            this.set = this.set.concat(model);
         else
             this.set.push(model);
     }
