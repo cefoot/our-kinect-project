@@ -19,7 +19,7 @@ var deltaBeta = 0;
 var alpha = 0.44, prevAlpha;
 var beta = 0.44, prevBeta;
 var radius = 5, prevRadius;
-var camX, camY, camZ, lookAtX, lookAtY, lookAtZ;
+var camX, camY, camZ;
 
 function setValue(uiElem, value){
 	if(uiElem != undefined && uiElem.hasOwnProperty("valueAsNumber")){
@@ -28,9 +28,12 @@ function setValue(uiElem, value){
 }
 
 function spherical2Cartesian() {
-    camX = radius * Math.cos(beta) * Math.sin(alpha) + lookAtX;
-    camZ = radius * Math.cos(beta) * Math.cos(alpha) + lookAtY;
-    camY = radius * Math.sin(beta) + lookAtZ;
+    camX = radius * Math.cos(beta) * Math.sin(alpha);
+    camZ = radius * Math.cos(beta) * Math.cos(alpha);
+    camY = radius * Math.sin(beta);
+    setValue(document.getElementById("alpha"), alpha);
+    setValue(document.getElementById("beta"), beta);
+    setValue(document.getElementById("radius"), radius);
 }
 
 
@@ -102,7 +105,7 @@ function render(time)
 	
     // Place Camera
     mat4.identity(Matrices.view);
-    mat4.lookAt(vec3.create([camX, camY, camZ]), vec3.create([lookAtX, lookAtY, lookAtZ]), vec3.create([0, 1, 0]), Matrices.view);
+    mat4.lookAt(vec3.create([camX, camY, camZ]), vec3.create([0, 0, 0]), vec3.create([0, 1, 0]), Matrices.view);
 
     // Clear model matrix 
     mat4.identity(Matrices.model);
@@ -180,10 +183,10 @@ var mouseTracking = -1, startX, startY;
 function handleKeyDown(event) {
 	var valChanged = false;
     switch (String.fromCharCode(event.keyCode)) {
-        case "A": lookAtZ -= 1; valChanged = true; break;
-        case "D": lookAtZ += 1; valChanged = true; break;
-        case "W": lookAtX += 1; valChanged = true; break;
-        case "S": lookAtX -= 1; valChanged = true; break;
+        case "A": alpha -= 0.05; valChanged = true; break;
+        case "D": alpha += 0.05; valChanged = true; break;
+        case "W": beta += 0.05; if (beta > 1.5) beta = 1.5; valChanged = true; break;
+        case "S": beta -= 0.05; if (beta < -1.5) beta = -1.5; valChanged = true; break;
         case "R": radius += 0.05; valChanged = true; break;
         case "F": radius -= 0.05; if (radius < 0.5) radius = 0.5; valChanged = true; break;
     }
@@ -247,10 +250,11 @@ function init() {
     spherical2Cartesian();
 
     // set the viewport to be the whole canvas
-    gl.viewport(0, 0, gl.desiredWidth, gl.desiredHeight);
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     // projection matrix. 
-    mat4.perspective(45, gl.desiredWidth / gl.desiredHeight, 0.1, 1000, Matrices.proj);
+    var ratio = canvas.clientWidth / canvas.clientHeight;
+    mat4.perspective(60, ratio, 0.1, 1000, Matrices.proj);
 
 
     // Set the background clear color to gray.
@@ -293,9 +297,6 @@ function init() {
 
 function main()
 {		
-	lookAtX = 0;
-	lookAtY = 0;
-	lookAtZ = 0;
     // Try to get a WebGL context    
     canvas = document.getElementById("canvas");    
     
@@ -303,8 +304,6 @@ function main()
             
     if (gl != null)
     {
-		gl.desiredWidth = 640;
-		gl.desiredHeight = 480;
         // init gl stuff
         init();
 
