@@ -223,6 +223,16 @@ void main()
     			<input type="submit" id="cylinder" name="cylinder" value="cylinder"/>
     		</td>
     	</tr>
+			<tr>
+				<td>
+    			<label>R:</label>
+    			<input type="number" step="0.05" min="0" max="1" id="r" name="r" style="width: 50px;" value="1"/>
+    			<label>G:</label>
+    			<input type="number" step="0.05" min="0" max="1" id="g" name="g" style="width: 50px;" value="0"/>
+    			<label>B:</label>
+    			<input type="number" step="0.05" min="0" max="1" id="b" name="b" style="width: 50px;" value="0"/>
+    		</td>
+			</tr>
     	<tr>
     		<td colspan="3" style="height: 150px;">
     			<label style="width: 100%; height: 150px;" id="txt" ></label>
@@ -233,9 +243,9 @@ void main()
 	<script>
 	function makeCylinder() {
 		var clr = new Material();
-	   	clr.diffuse[0] = 1;//r 
-	   	clr.diffuse[1] = 0;//g 
-	   	clr.diffuse[2] = 0;//b
+	   	clr.diffuse[0] = document.getElementById("r").valueAsNumber;//r 
+	   	clr.diffuse[1] = document.getElementById("g").valueAsNumber;//g 
+	   	clr.diffuse[2] = document.getElementById("b").valueAsNumber;//b
 	   	//clr.ambient = 0.0;
 	   	//clr.shininess = 255;
 	   	//clr.specular = [0,0,0,1];
