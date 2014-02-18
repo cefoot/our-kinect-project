@@ -29,8 +29,8 @@ function setValue(uiElem, value){
 
 function spherical2Cartesian() {
     camX = radius * Math.cos(beta) * Math.sin(alpha) + lookAtX;
-    camZ = radius * Math.cos(beta) * Math.cos(alpha) + lookAtY;
-    camY = radius * Math.sin(beta) + lookAtZ;
+    camZ = radius * Math.cos(beta) * Math.cos(alpha) + lookAtZ;
+    camY = radius * Math.sin(beta) + lookAtY;
 }
 
 
@@ -303,8 +303,8 @@ function main()
             
     if (gl != null)
     {
-		gl.desiredWidth = 640;
-		gl.desiredHeight = 480;
+		gl.desiredWidth = canvas.width;
+		gl.desiredHeight = canvas.height;
         // init gl stuff
         init();
 
