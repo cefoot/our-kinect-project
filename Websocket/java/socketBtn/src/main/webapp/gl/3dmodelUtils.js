@@ -297,14 +297,16 @@ function main()
 	lookAtY = 0;
 	lookAtZ = 0;
     // Try to get a WebGL context    
-    canvas = document.getElementById("canvas");    
+    canvas = document.getElementById("canvas");  
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     
     gl = WebGLUtils.setupWebGL(canvas, { depth: true });
             
     if (gl != null)
     {
-		gl.desiredWidth = canvas.width;
-		gl.desiredHeight = canvas.height;
+		gl.desiredWidth = canvas.clientWidth;
+		gl.desiredHeight = canvas.clientHeight;
         // init gl stuff
         init();
 
