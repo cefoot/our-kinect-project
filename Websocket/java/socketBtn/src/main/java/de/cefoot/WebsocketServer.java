@@ -1,6 +1,5 @@
 package de.cefoot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class WebsocketServer {
 	private BayeuxServer bayeuxServer;
 	@Session
 	private LocalSession sender;
-
+	
 	HashMap<String, Object> curRotation = null;
 
 	public WebsocketServer() {
@@ -49,18 +48,6 @@ public class WebsocketServer {
 	public void processClear(ServerSession session, ServerMessage message) {
 		drawings.clear();
 		newDrawing = true;
-	}
-
-	@Listener("/datachannel/drawPosition")
-	public void processHandPos(ServerSession session, ServerMessage message) {
-		try {
-			long x = (long) message.getDataAsMap().get("X");
-			long y = (long) message.getDataAsMap().get("Y");
-			long z = (long) message.getDataAsMap().get("Z");
-			addPosition(x, y, z);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Listener("/url/")
@@ -99,6 +86,18 @@ public class WebsocketServer {
 	Map<String, Double> drawClr = new HashMap<>();
 	Stack<Map<String, Object>> drawings = new Stack<>();
 	boolean newDrawing = true;
+
+	@Listener("/datachannel/drawPosition")
+	public void processHandPos(ServerSession session, ServerMessage message) {
+		try {
+			long x = (long) message.getDataAsMap().get("X");
+			long y = (long) message.getDataAsMap().get("Y");
+			long z = (long) message.getDataAsMap().get("Z");
+			addPosition(x, y, z);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	private void addPosition(long x, long y, long z) {
 		if (newDrawing) {
