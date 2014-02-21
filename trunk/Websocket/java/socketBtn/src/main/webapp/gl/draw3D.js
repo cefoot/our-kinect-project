@@ -18,18 +18,16 @@ window.requestAnimFrame = (function() {
 var lastPos;
 var painting=false;
 
-function addPosition(x, y, z) {
+function addPosition(x, y, z, r, g, b) {
 	if (lastPos != undefined){
 		var clr = new Material();
-	   	clr.diffuse[0] = 1;//r 
-	   	clr.diffuse[1] = 0.0;//g 
-	   	clr.diffuse[2] = 0.0;//b
-	   	clr.ambient = 0.0;
-	   	clr.shininess = 255;
+	   	clr.diffuse[0] = r;//r 
+	   	clr.diffuse[1] = g;//g 
+	   	clr.diffuse[2] = b;//b
 		var mdl = createVector([lastPos.X, lastPos.Y, lastPos.Z],
 					[x, y, z], 
 					1, clr, true);
-		myModel.add(mdl);
+		pipes.add(mdl);
 	}
 	lastPos={
 			X : x,
@@ -55,17 +53,13 @@ function getDirection(position, lookat) {
 }
 
 function initBasicListener() {
-	register('/paint/', function(msg) {
-		painting = (msg == 'start');
-	});
 
 	register('/datachannel/clear', function(msg) {
-		console.debug('notyetimplemented');
+		pipes = new Models();
 	});
 
-	register('/datachannel/drawPosition', function(msg) {
-		addPosition(msg.X, msg.Y, msg.Z);
-		console.debug('X:'+msg.X+' Y:'+ msg.Y+' Z:'+ msg.Z);
+	register('/drawing/newPos', function(msg) {
+		addPosition(msg.x, msg.y, msg.z, msg.r, msg.g, msg.b);
 	});
 
 }

@@ -9,7 +9,7 @@
     </init-param>
     <init-param>
       <param-name>services</param-name>
-      <param-value>de.cefoot.WebsocketServer</param-value>
+      <param-value>de.cefoot.PaintSupply</param-value>
     </init-param>
     <init-param>
       <param-name>maxLazyTimeout</param-name>

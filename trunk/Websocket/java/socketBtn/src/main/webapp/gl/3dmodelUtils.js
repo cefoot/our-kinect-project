@@ -39,7 +39,7 @@ function spherical2Cartesian() {
 // Models is defined in l3dmodels.js
 // --------------------------------------------------------------------------
 
-var myModel = new Models(), myGrid = new Model(), myAxis = new Models();
+var myModel = new Models(), pipes = new Models(), myGrid = new Model(), myAxis = new Models();
 
 
 // --------------------------------------------------------------------------
@@ -150,6 +150,7 @@ function render(time)
 
     // render the grid
     myGrid.render();
+    pipes.render();
 
     // just checking
     checkError();
