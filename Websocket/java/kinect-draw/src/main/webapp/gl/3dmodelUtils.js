@@ -178,15 +178,63 @@ function checkError()
 
 var mouseTracking = -1, startX, startY;
 
+var speed = 1;
+
+function getDirection(position, lookat) {
+	var direction = [];
+	direction[0] = (lookat[0] - position[0]);
+	direction[1] = (lookat[1] - position[1]);
+	direction[2] = (lookat[2] - position[2]);
+
+	length = Math.sqrt(direction[0] * direction[0] + direction[1]
+			* direction[1] + direction[2] * direction[2]);
+	direction[0] /= length;
+	direction[1] /= length;
+	direction[2] /= length;
+
+	return direction;
+
+}
+
 function handleKeyDown(event) {
+	var direction = getDirection([camX, camY, camZ], [lookAtX,lookAtY,lookAtZ]);
+	// rotate around y
+	// z' = z*cos q - x*sin q
+	// x' = z*sin q + x*cos q
+	var strafeDir = [];
+	var rAngle = Math.PI / 2;
+	strafeDir[2] = direction[2] * Math.cos(rAngle) - direction[0]
+			* Math.sin(rAngle);
+	strafeDir[0] = direction[2] * Math.sin(rAngle) + direction[0]
+			* Math.cos(rAngle);
 	var valChanged = false;
     switch (String.fromCharCode(event.keyCode)) {
-        case "A": lookAtZ -= 1; valChanged = true; break;
-        case "D": lookAtZ += 1; valChanged = true; break;
-        case "W": lookAtX += 1; valChanged = true; break;
-        case "S": lookAtX -= 1; valChanged = true; break;
+        case "A": 
+    		lookAtX += strafeDir[0] * speed;
+    		lookAtZ += strafeDir[2] * speed;
+        	valChanged = true; 
+        	break;
+        case "D": 
+    		lookAtX -= strafeDir[0] * speed;
+    		lookAtZ -= strafeDir[2] * speed;
+        	valChanged = true; 
+        	break;
+        case "W":
+        	lookAtX += direction[0] * speed;
+        	lookAtY += direction[1] * speed;
+        	lookAtZ += direction[2] * speed; 
+        	valChanged = true; 
+        	break;
+        case "S": 
+    		lookAtX -= direction[0] * speed;
+    		lookAtY -= direction[1] * speed;
+    		lookAtZ -= direction[2] * speed;
+        	valChanged = true; 
+        	break;
         case "R": radius += 0.05; valChanged = true; break;
         case "F": radius -= 0.05; if (radius < 0.5) radius = 0.5; valChanged = true; break;
+        case "E": speed++; break;
+        case "Q": speed--; break;
     }
     //only set if changed
     if(valChanged){
