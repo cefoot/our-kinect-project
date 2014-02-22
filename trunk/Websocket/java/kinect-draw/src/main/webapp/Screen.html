@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title>3d JSON Model</title>
+    <!-- WebGL utils originally from here: https://cvs.khronos.org/svn/repos/registry/trunk/public/webgl/sdk/demos/common/webgl-utils.js -->
+	<script type="text/javascript" src="gl/webgl-utils.js"></script>
+	<!-- glMatrix utils originally from here: http://code.google.com/p/glmatrix/source/browse/glMatrix.js -->
+	<script type="text/javascript" src="gl/glMatrix-0.9.5.min.js"></script>
+	<!-- lib to ease model and material managment -->
+	<script type="text/javascript" src="gl/l3dmodels.js"></script>
+	<script type="text/javascript" src="gl/3dmodelUtils.js"></script>
+	<script data-dojo-config="async: true, tlmSiblingOfDojo: true, deps: ['cometd-util.js']" src="dojo/dojo.js"></script>
+
+	<script type="text/javascript" src="gl/draw3D.js"></script>
+	<!-- Shader programs -->
+
+	<!-- simple shader displaying a constant color -->
+	<script id="color_vs" type="x-shader/x-vertex">
+
+uniform mat4 uMat4PVM;  
+
+attribute vec4 aVec4Position;  
+        
+void main()                 
+{
+	gl_Position = uMat4PVM * aVec4Position;
+}
+
+	</script>
+	<script id="color_fs" type="x-shader/x-fragment">
+precision mediump float;      
+							   
+uniform vec4 uVec4Diffuse;         
+		  					  
+void main()                   
+{
+    gl_FragColor = uVec4Diffuse;
+}
+	</script>
+
+	<!-- Phong shader -->
+	<script id="phong_vs" type="x-shader/x-vertex">
+
+uniform mat4 uMat4PVM;   
+uniform mat3 uMat3Normal;
+uniform mat4 uMat4ViewModel;
+
+attribute vec4 aVec4Position;  
+attribute vec3 aVec3Normal;
+        
+varying vec3 normal;
+varying vec3 eyeCoord;
+
+void main()                 
+{
+
+    normal = normalize(uMat3Normal * aVec3Normal);
+    eyeCoord = -vec3(uMat4ViewModel * aVec4Position);
+
+	gl_Position = uMat4PVM * aVec4Position;
+}
+
+	</script>
+	<script id="phong_fs" type="x-shader/x-fragment">
+precision mediump float;      
+							  
+uniform vec3 uVec3LightDir; 
+uniform vec4 uVec4Diffuse;         
+uniform vec4 uVec4Specular;
+uniform float uFloatShininess;
+uniform float uFloatAmbient;
+		  					  
+varying vec3 normal;
+varying vec3 eyeCoord;
+            
+void main()                   
+{
+    vec4 spec = vec4(0.0);
+
+    vec3 n = normalize(normal);
+    vec3 e = normalize(eyeCoord);
+    
+
+    float intensity = max(dot(n,uVec3LightDir), 0.0);
+
+    if (intensity > 0.0) {
+    
+        vec3 h = normalize(uVec3LightDir + e);
+        float intSpec = max(dot(h,n), 0.0);
+        spec = uVec4Specular * pow(intSpec, uFloatShininess);
+    }
+ // gl_FragColor = vec4(1.0,1.0,0.0,1.0);
+//  gl_FragColor = vec4(uVec3LightDir,1.0);
+    gl_FragColor = max(vec4(intensity, intensity, intensity, 1.0) * uVec4Diffuse + spec , uVec4Diffuse * vec4(uFloatAmbient, uFloatAmbient, uFloatAmbient, 1.0));  
+}
+	</script>
+
+
+	<!-- Phong shader with texturing -->
+	<script id="phong_texture_vs" type="x-shader/x-vertex">
+
+uniform mat4 uMat4PVM;   
+uniform mat3 uMat3Normal;
+uniform mat4 uMat4ViewModel;
+
+attribute vec4 aVec4Position;  
+attribute vec3 aVec3Normal;
+attribute vec2 aVec2TexCoord;
+
+        
+varying vec3 normal;
+varying vec3 eyeCoord;
+varying vec2 tc;
+
+void main()                 
+{
+    tc = aVec2TexCoord;
+    normal = normalize(uMat3Normal * aVec3Normal);
+    eyeCoord = -vec3(uMat4ViewModel * aVec4Position);
+
+	gl_Position = uMat4PVM * aVec4Position;
+}
+
+	</script>
+	<script id="phong_texture_fs" type="x-shader/x-fragment">
+precision mediump float;      
+							  
+uniform vec3 uVec3LightDir; 
+uniform vec4 uVec4Diffuse;         
+uniform vec4 uVec4Specular;
+uniform float uFloatShininess;
+uniform float uFloatAmbient;
+		  				
+uniform sampler2D uSamp2DTexID;
+        	  
+varying vec3 normal;
+varying vec3 eyeCoord;
+varying vec2 tc;
+            
+void main()                   
+{
+    vec4 spec = vec4(0.0);
+
+    vec3 n = normalize(normal);
+    vec3 e = normalize(eyeCoord);
+    
+
+    float intensity = max(dot(n,uVec3LightDir), 0.0);
+
+    if (intensity > 0.0) {
+    
+        vec3 h = normalize(uVec3LightDir + e);
+        float intSpec = max(dot(h,n), 0.0);
+        spec = uVec4Specular * pow(intSpec, uFloatShininess);
+    }
+    vec4 dif = uVec4Diffuse * texture2D(uSamp2DTexID, tc);
+    gl_FragColor = max(vec4(intensity, intensity, intensity, 1.0) * dif + spec , uVec4Diffuse * vec4(uFloatAmbient, uFloatAmbient, uFloatAmbient, 1.0));  
+}
+	</script>
+</head>
+<body onload="initBasicListener();">
+	<canvas id="canvas" style="position: absolute; left: 0; top: 0; min-height: 100%; height: 100%; min-width: 100%; width: 100%" onload="main()">Your browser does not support the canvas tag.</canvas>
+	
+	<script>
+		main();
+	</script>
+</body>
+</html>
