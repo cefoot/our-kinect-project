@@ -7,7 +7,7 @@
 var isPainting = false;
 
 function handleTouchStart(event) {
-	if (register == undefined){
+	if (register == undefined) {
 		return;
 	}
 	if (isPainting) {
@@ -17,14 +17,25 @@ function handleTouchStart(event) {
 	}
 }
 
-function onPaint(msg){
-	if(msg == 'start'){
+function onPaint(msg) {
+	if (msg == 'start') {
 		isPainting = true;
 		document.getElementById('recording').style.background = 'red';
 	} else {
 		isPainting = false;
 		document.getElementById('recording').style.background = 'transparent';
 	}
+}
+
+var isLiveView = false;
+
+function imgRecieved(msg){
+	if (isLiveView){
+		return;
+	}
+    var image = document.getElementById('videoImgTarget');
+    image.style.display = 'inline';
+    image.src = msg;
 }
 
 function gotSources(sourceInfos) {
@@ -38,7 +49,8 @@ function gotSources(sourceInfos) {
 		}
 	}
 	if (!vId) {
-		alert('no cam!');
+		isLiveView = false;
+		console.debug('no cam!');
 		return;
 	}
 	// Grab elements, create settings, etc.
@@ -58,26 +70,32 @@ function gotSources(sourceInfos) {
 			video.src = stream;
 			video.play();
 		}, errBack);
-	} else if (navigator.webkitGetUserMedia) { // WebKit-prefixed
+	} else if (navigator.webkitGetUserMedia) { // WebKit-prefixed -> chrome
+		isLiveView = true;
 		navigator.webkitGetUserMedia(videoObj, function(stream) {
 			video.src = window.webkitURL.createObjectURL(stream);
 			video.play();
 		}, errBack);
 	}
+	time = setInterval(function() {
+		var videoCanvas = document.getElementById('videoImg');
+		var ctx = videoCanvas.getContext('2d');
+		ctx.drawImage(video, 0, 0, 320, 240);
+		var data = videoCanvas.toDataURL('image/jpeg', 1.0);
+		send('/cam/img', data);
+	}, 250);
 }
 
-// --------------------------------------------------------------------------
-// functions
-// --------------------------------------------------------------------------
-
-function initScreenListener(){
+function initScreenListener() {
+	register('/cam/img', imgRecieved);
 	register('/paint/', onPaint);
 	register('/datachannel/eyePosition', function(msg) {
 		camX = msg.X;
 		camY = msg.Y;
 		camZ = msg.Z;
 		// ein stück zurück
-		var direction = getDirection([ camX, camY, camZ ], [ lookAtX, lookAtY, lookAtZ ]);
+		var direction = getDirection([ camX, camY, camZ ], [ lookAtX, lookAtY,
+				lookAtZ ]);
 		camX -= direction[0] * 1;
 		camY -= direction[1] * 1;
 		camZ -= direction[2] * 1;
@@ -88,6 +106,8 @@ function initScreenListener(){
 		lookAtY = msg.Y;
 		lookAtZ = msg.Z;
 	});
+	
+	send('/client/hello', 'Hello i am a screen');
 }
 
 function initCam() {
@@ -120,8 +140,9 @@ function main() {
 		gl.desiredHeight = canvas.clientHeight;
 		// init gl stuff
 		init();
-		
-		gl.clearColor(0.0, 0.0, 0.0, 0.0);//transarent damit das video gesehen wird
+
+		gl.clearColor(0.0, 0.0, 0.0, 0.0);// transarent damit das video
+											// gesehen wird
 
 		// rendering callback
 		window.requestAnimFrame(render, canvas);

@@ -160,7 +160,7 @@ void main()
 }
 	</script>
 </head>
-<body onload="initBasicListener();">
+<body onload="initBasicListener();send('/client/hello', 'Hello i am a monitor');">
 	<canvas id="canvas" style="position: absolute; left: 0; top: 0; min-height: 100%; height: 100%; min-width: 100%; width: 100%" onload="main()">Your browser does not support the canvas tag.</canvas>
 	
 	<script>

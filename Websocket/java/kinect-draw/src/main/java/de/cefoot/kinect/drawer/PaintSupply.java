@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -53,6 +54,30 @@ public class PaintSupply {
 			curColor = Color.getRandomColor();
 		}
 	}
+	
+	private static boolean sendingClear = false;
+	
+	@Listener("/datachannel/clear")
+	public void clear(ServerSession session, ServerMessage message) {
+		if (!sendingClear){
+			positions.clear();
+			positions.put(curColor, new ArrayList<Position>());
+		}
+	}
+
+	@Listener("/client/hello")
+	public void clienHello(ServerSession session, ServerMessage message) {
+		//momentan wird an alle gesendet, daher vorher clear
+		sendingClear = true;
+		getChannel("/datachannel/clear").publish(sender, "clear!", null);
+		sendingClear = false;
+		for (Entry<Color, List<Position>> entry : positions.entrySet()) {
+			for (Position pos : entry.getValue()) {
+				getChannel("/drawing/newPos").publish(sender,
+						curPositionData(pos), null);
+			}
+		}
+	}
 
 	Color curColor = Color.getRandomColor();
 
@@ -74,7 +99,8 @@ public class PaintSupply {
 					(long) message.getDataAsMap().get("Y"),// Y
 					(long) message.getDataAsMap().get("Z"));// Z
 			positions.get(curColor).add(pos);
-			getChannel("/drawing/newPos").publish(sender, curPositionData(pos),null);
+			getChannel("/drawing/newPos").publish(sender, curPositionData(pos),
+					null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
