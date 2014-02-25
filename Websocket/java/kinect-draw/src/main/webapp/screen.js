@@ -111,6 +111,10 @@ function initScreenListener() {
 }
 
 function initCam() {
+	if (!confirm('Would you like to see your live img?')){
+		//dann eben nicht-> keine kamera hier
+		return;
+	}
 	if (typeof MediaStreamTrack === 'undefined') {
 		alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
 	} else {
