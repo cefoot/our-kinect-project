@@ -61,7 +61,6 @@ public class PaintSupply {
 	public void clear(ServerSession session, ServerMessage message) {
 		if (!sendingClear){
 			positions.clear();
-			positions.put(curColor, new ArrayList<Position>());
 		}
 	}
 
@@ -74,7 +73,7 @@ public class PaintSupply {
 		for (Entry<Color, List<Position>> entry : positions.entrySet()) {
 			for (Position pos : entry.getValue()) {
 				getChannel("/drawing/newPos").publish(sender,
-						curPositionData(pos), null);
+						curPositionData(entry.getKey() ,pos), null);
 			}
 		}
 	}
@@ -99,17 +98,17 @@ public class PaintSupply {
 					(long) message.getDataAsMap().get("Y"),// Y
 					(long) message.getDataAsMap().get("Z"));// Z
 			positions.get(curColor).add(pos);
-			getChannel("/drawing/newPos").publish(sender, curPositionData(pos),
+			getChannel("/drawing/newPos").publish(sender, curPositionData(curColor, pos),
 					null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private Object curPositionData(Position pos) {
+	private Object curPositionData(Color color, Position pos) {
 		Map<String, Object> data = new HashMap<>();
 		data.putAll(pos);
-		data.putAll(curColor);
+		data.putAll(color);
 		return data;
 	}
 
