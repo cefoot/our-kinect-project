@@ -35,7 +35,7 @@ namespace ViewFromAbove
         Rectangle tracedSize;
         UInt32[] blackWhiteImage;
         UInt32[] circle;
-        List<List<Point>> clusters;
+        List<List<Point>> clusters=new List<List<Point>>();
 
         List<Point> points = new List<Point>();
         private Texture2D clusterTexture;
@@ -62,7 +62,9 @@ namespace ViewFromAbove
                     }
 
                 }
-                filter(1000, 2000);
+
+                filter(1000, 1100);
+                
             }
 
         }
@@ -169,8 +171,8 @@ namespace ViewFromAbove
                 this.Exit();
 
             // TODO: Add your update logic here
-
-            clusters = DBSCAN.GetClusters(points, 10, 8);
+            clusters = DBSCAN.GetClusters(points, 3, 8);
+            
 
             base.Update(gameTime);
         }
@@ -193,7 +195,9 @@ namespace ViewFromAbove
             spriteBatch.Draw(backgroundText, new Rectangle(0, 0, imageWidth, imageHeight), Color.White);
             int count = 0;
 
-            Debug.WriteLine("elapsedtime:" + gameTime.ElapsedGameTime);
+            Debug.WriteLine("points:" + points.Count);
+            Debug.WriteLine("clusters:"+clusters.Count);
+            
             foreach (List<Point> cluster in clusters)
             {
                 count++;
@@ -249,12 +253,6 @@ namespace ViewFromAbove
 
 
         }
-
-
-
-
-
-
 
     }
 }
