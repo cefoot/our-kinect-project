@@ -1,6 +1,0 @@
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\bin\x86\Debug\ViewFromAbove.exe
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\bin\x86\Debug\ViewFromAbove.pdb
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\obj\x86\Debug\ResolveAssemblyReference.cache
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\obj\x86\Debug\ViewFromAbove.exe
-F:\Kinect_Projects\ViewFromAbove\ViewFromAbove\ViewFromAbove\obj\x86\Debug\ViewFromAbove.pdb
