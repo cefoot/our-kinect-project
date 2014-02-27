@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Diagnostics;
 using Microsoft.Kinect;
+using Color = Microsoft.Xna.Framework.Color;
 
 
 namespace ViewFromAbove
@@ -25,19 +26,20 @@ namespace ViewFromAbove
         KinectSensor kinect;
         DepthImageFrame depthFrame;
         GraphicsDeviceManager graphics;
+        private KinectSensor sensor;
         SpriteBatch spriteBatch;
         public Array colorPixels { get; set; }
         static int imageWidth = 640;
         static int imageHeight = 480;
         //public int[,] blackWhiteImage = new int[imageWidth,imageHeight];
-        Texture2D canvas;
-        Texture2D circleCanvas;
         Rectangle tracedSize;
         UInt32[] blackWhiteImage;
         UInt32[] circle;
         List<List<Point>> clusters;
 
         List<Point> points = new List<Point>();
+        private Texture2D clusterTexture;
+        private Texture2D backgroundText;
 
         private void initKinectSensor()
         {
@@ -49,16 +51,33 @@ namespace ViewFromAbove
 
         void Sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
         {
-            depthFrame = e.OpenDepthImageFrame();
+            using (depthFrame = e.OpenDepthImageFrame())
+            {
+                if (this.depthFrame != null)
+                {
+                    DepthImagePixel[] array = depthFrame.GetRawPixelData();
+                    for (int i = 0; i < array.Length; i++)
+                    {
+                        blackWhiteImage[i] = (uint)array[i].Depth;
+                    }
+
+                }
+                filter(1000, 2000);
+            }
 
         }
 
         //init testimage
-        
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+        }
+
+        public void InitKinect()
+        {
+            sensor = KinectSensor.KinectSensors.First(kinect => kinect.Status == KinectStatus.Connected);
         }
 
         public void initRandomImage(int numberOfPoints, int pointRadius)
@@ -77,14 +96,14 @@ namespace ViewFromAbove
             Random r1 = new Random();
             for (int k = 0; k < numberOfPoints; k++)
             {
-                Vector2 pointOrigin = new Vector2(r1.Next(pointRadius,imageWidth-pointRadius),r1.Next(pointRadius,imageHeight-pointRadius)); 
-                
+                Vector2 pointOrigin = new Vector2(r1.Next(pointRadius, imageWidth - pointRadius), r1.Next(pointRadius, imageHeight - pointRadius));
+
                 Random r = new Random();
                 for (int i = -pointRadius; i < pointRadius; i++)
                 {
                     for (int j = -pointRadius; j < pointRadius; j++)
                     {
-                        blackWhiteImage[(int)pointOrigin.X + i + ((int)pointOrigin.Y + j) * imageWidth] = (uint)Math.Pow(r.Next(15),2);
+                        blackWhiteImage[(int)pointOrigin.X + i + ((int)pointOrigin.Y + j) * imageWidth] = (uint)Math.Pow(r.Next(15), 2);
                     }
                 }
             }
@@ -101,16 +120,14 @@ namespace ViewFromAbove
         {
             // TODO: Add your initialization logic here
             tracedSize = GraphicsDevice.PresentationParameters.Bounds;
-            canvas = new Texture2D(GraphicsDevice, imageWidth, imageHeight, false, SurfaceFormat.Color);
-            circleCanvas = new Texture2D(GraphicsDevice, 10, 10, false, SurfaceFormat.Color);
             blackWhiteImage = new UInt32[imageWidth * imageHeight];
-            circle = new UInt32[10*10];
+            circle = new UInt32[10 * 10];
             initCircle();
-            this.initRandomImage(10,10);
-            
+            this.initRandomImage(10, 10);
+
             this.initKinectSensor();
 
-            
+
             base.Initialize();
 
         }
@@ -124,6 +141,10 @@ namespace ViewFromAbove
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            clusterTexture = new Texture2D(GraphicsDevice, 1, 1);
+            clusterTexture.SetData(new[] { Color.White });
+            backgroundText = new Texture2D(GraphicsDevice, imageWidth, imageHeight);
+            //backgroundText.SetData(new[] { Color.White });
             // TODO: use this.Content to load your game content here
         }
 
@@ -148,17 +169,9 @@ namespace ViewFromAbove
                 this.Exit();
 
             // TODO: Add your update logic here
-            if (this.depthFrame != null)
-            {
-                DepthImagePixel[] array = depthFrame.GetRawPixelData();
-                for (int i = 0; i < array.Length; i++)
-                {
-                    blackWhiteImage[i] = (uint) array[i].Depth;
-                }
-                
-            }
-            this.filter(1000,1001);
-            
+
+            clusters = DBSCAN.GetClusters(points, 10, 8);
+
             base.Update(gameTime);
         }
 
@@ -168,29 +181,27 @@ namespace ViewFromAbove
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
-            
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-                       
-            GraphicsDevice.Textures[0] = null;
-            
-            canvas.SetData<UInt32>(blackWhiteImage, 0, imageWidth * imageHeight);
-                        
-            spriteBatch.Draw(canvas, new Rectangle(0, 0, imageWidth, imageHeight), Microsoft.Xna.Framework.Color.White);
-            int count=0;
 
-            clusters = DBSCAN.GetClusters(points, 10, 8);
+            GraphicsDevice.Textures[0] = null;
+
+            backgroundText.SetData<UInt32>(blackWhiteImage, 0, imageWidth * imageHeight);
+
+            spriteBatch.Draw(backgroundText, new Rectangle(0, 0, imageWidth, imageHeight), Color.White);
+            int count = 0;
+
             Debug.WriteLine("elapsedtime:" + gameTime.ElapsedGameTime);
-            foreach(List<Point> cluster in clusters)
+            foreach (List<Point> cluster in clusters)
             {
                 count++;
-                circleCanvas.SetData<UInt32>(circle, 0, 10 * 10);
                 Point center = getCenter(cluster);
-                spriteBatch.Draw(circleCanvas, new Rectangle(center.X-5, center.Y-5, 12, 12), Microsoft.Xna.Framework.Color.Red);
-                
+                spriteBatch.Draw(clusterTexture, new Rectangle(center.X - 5, center.Y - 5, 12, 12), Color.Green);
+
             }
-            
+
             spriteBatch.End();
 
             base.Draw(gameTime);
@@ -198,34 +209,34 @@ namespace ViewFromAbove
 
         void initCircle()
         {
-            for (int i = 0; i < circle.Length;i++ )
+            for (int i = 0; i < circle.Length; i++)
             {
                 circle[i] = (uint)200;
             }
         }
 
 
-        public void filter(uint thresholdLow,uint thresholdHigh)
+        public void filter(uint thresholdLow, uint thresholdHigh)
         {
-            
+            var tmpPoints = new List<Point>();
             for (int i = 0; i < imageWidth; i++)
             {
                 for (int j = 0; j < imageHeight; j++)
                 {
-                    if (blackWhiteImage[i + j * imageWidth] > thresholdLow && blackWhiteImage[i + j * imageWidth]<thresholdHigh)
+                    if (blackWhiteImage[i + j * imageWidth] > thresholdLow && blackWhiteImage[i + j * imageWidth] < thresholdHigh)
                     {
-                        points.Add(new Point(i, j));   
+                        tmpPoints.Add(new Point(i, j));
                     }
 
                 }
             }
-            
+            points = tmpPoints;
         }
 
         public Point getCenter(List<Point> cluster)
         {
-            Point center = new Point(0,0);
-            foreach(Point point in cluster)
+            Point center = new Point(0, 0);
+            foreach (Point point in cluster)
             {
                 center.X += point.X;
                 center.Y += point.Y;
@@ -235,15 +246,15 @@ namespace ViewFromAbove
             center.Y /= cluster.Count;
 
             return center;
-                
+
 
         }
 
-        
 
 
 
 
-        
+
+
     }
 }
