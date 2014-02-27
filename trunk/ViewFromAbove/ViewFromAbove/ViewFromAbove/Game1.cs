@@ -201,8 +201,7 @@ namespace ViewFromAbove
             foreach (List<Point> cluster in clusters)
             {
                 count++;
-                Point center = getCenter(cluster);
-                spriteBatch.Draw(clusterTexture, new Rectangle(center.X - 5, center.Y - 5, 12, 12), Color.Green);
+                spriteBatch.Draw(clusterTexture, GetRectangle(cluster), Color.Green);
 
             }
 
@@ -235,6 +234,34 @@ namespace ViewFromAbove
                 }
             }
             points = tmpPoints;
+        }
+
+        public Rectangle GetRectangle(List<Point> cluster)
+        {
+            var minX = int.MaxValue;
+            var minY = int.MaxValue;
+            var maxX = int.MinValue;
+            var maxY = int.MinValue;
+            foreach (var point in cluster)
+            {
+                if(minX > point.X)
+                {
+                    minX = point.X;
+                }
+                if (minY > point.Y)
+                {
+                    minY = point.Y;
+                }
+                if (maxX < point.X)
+                {
+                    maxX = point.X;
+                }
+                if (maxY < point.Y)
+                {
+                    maxY = point.Y;
+                }
+            }
+            return new Rectangle(minX, minY, maxX - minX, maxY - minY);
         }
 
         public Point getCenter(List<Point> cluster)
