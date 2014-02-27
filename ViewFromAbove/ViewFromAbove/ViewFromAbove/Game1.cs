@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows;
 using System.Diagnostics;
+using Microsoft.Kinect;
+
 
 namespace ViewFromAbove
 {
@@ -20,6 +22,8 @@ namespace ViewFromAbove
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        KinectSensor kinect;
+        DepthImageFrame depthFrame;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         public Array colorPixels { get; set; }
@@ -35,7 +39,19 @@ namespace ViewFromAbove
 
         List<Point> points = new List<Point>();
 
+        private void initKinectSensor()
+        {
+            this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
+            this.kinect.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(Sensor_DepthFrameReady);
+            this.kinect.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+            this.kinect.Start();
+        }
 
+        void Sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
+        {
+            depthFrame = e.OpenDepthImageFrame();
+
+        }
 
         //init testimage
         
@@ -91,8 +107,8 @@ namespace ViewFromAbove
             circle = new UInt32[10*10];
             initCircle();
             this.initRandomImage(10,10);
-            this.filter(150);
             
+            this.initKinectSensor();
 
             
             base.Initialize();
@@ -132,7 +148,17 @@ namespace ViewFromAbove
                 this.Exit();
 
             // TODO: Add your update logic here
-
+            if (this.depthFrame != null)
+            {
+                DepthImagePixel[] array = depthFrame.GetRawPixelData();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    blackWhiteImage[i] = (uint) array[i].Depth;
+                }
+                
+            }
+            this.filter(1000,1001);
+            
             base.Update(gameTime);
         }
 
@@ -153,6 +179,7 @@ namespace ViewFromAbove
                         
             spriteBatch.Draw(canvas, new Rectangle(0, 0, imageWidth, imageHeight), Microsoft.Xna.Framework.Color.White);
             int count=0;
+
             clusters = DBSCAN.GetClusters(points, 10, 8);
             Debug.WriteLine("elapsedtime:" + gameTime.ElapsedGameTime);
             foreach(List<Point> cluster in clusters)
@@ -178,13 +205,14 @@ namespace ViewFromAbove
         }
 
 
-        public void filter(uint threshold)
+        public void filter(uint thresholdLow,uint thresholdHigh)
         {
+            
             for (int i = 0; i < imageWidth; i++)
             {
                 for (int j = 0; j < imageHeight; j++)
                 {
-                    if (blackWhiteImage[i + j * imageWidth] > threshold)
+                    if (blackWhiteImage[i + j * imageWidth] > thresholdLow && blackWhiteImage[i + j * imageWidth]<thresholdHigh)
                     {
                         points.Add(new Point(i, j));   
                     }

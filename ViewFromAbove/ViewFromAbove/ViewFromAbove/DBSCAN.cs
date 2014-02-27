@@ -44,6 +44,10 @@ namespace ViewFromAbove
                 }
             }
             // sort out points into their clusters, if any
+            if (points.Count == 0)
+            {
+                return clusters;
+            }
             int maxClusterId = points.OrderBy(p => p.ClusterId).Last().ClusterId;
             if (maxClusterId < 1) return clusters; // no clusters, so list is empty
             for (int i = 0; i < maxClusterId; i++) clusters.Add(new List<Point>());
