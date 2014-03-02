@@ -77,13 +77,14 @@ function gotSources(sourceInfos) {
 			video.play();
 		}, errBack);
 	}
-	time = setInterval(function() {
-		var videoCanvas = document.getElementById('videoImg');
-		var ctx = videoCanvas.getContext('2d');
-		ctx.drawImage(video, 0, 0, 320, 240);
-		var data = videoCanvas.toDataURL('image/jpeg', 1.0);
-		send('/cam/img', data);
-	}, 250);
+	//timer der alle x millisekunden das hintergrund bild per websocket sendet ---> flaschenhals...
+	//time = setInterval(function() {
+	//	var videoCanvas = document.getElementById('videoImg');
+	//	var ctx = videoCanvas.getContext('2d');
+	//	ctx.drawImage(video, 0, 0, 320, 240);
+	//	var data = videoCanvas.toDataURL('image/jpeg', 1.0);
+	//	send('/cam/img', data);
+	//}, 250);
 }
 
 function initScreenListener() {
