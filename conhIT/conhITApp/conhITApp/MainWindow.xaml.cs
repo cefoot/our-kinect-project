@@ -24,7 +24,6 @@ namespace conhITApp
     {
         KinectSensor kinect;
         private List<SkeletData> _skeletData = new List<SkeletData>();
-        BitmapSource heartGIF;
 
         public MainWindow()
         {
@@ -55,17 +54,6 @@ namespace conhITApp
                 image.CopyPixelDataTo(data);
                 var myDrawingGroup = new DrawingGroup();
                 myDrawingGroup.Children.Add(new ImageDrawing(data.ToBitmapSource(image.Width, image.Height), new Rect(new Size(image.Width, image.Height))));
-                var skeletDatas = _skeletData.ToArray();
-                foreach (var skeletData in skeletDatas)
-                {
-                    var calcWidth = 50d / (skeletData.HeartDistance / 3d);
-                    var calcHeight = 52.5d / (skeletData.HeartDistance / 3d);
-
-                    myDrawingGroup.Children.Add(new ImageDrawing(heartGIF, new Rect(skeletData.HeartPosition.X - ((int)calcWidth / 2), skeletData.HeartPosition.Y - ((int)calcHeight / 2), calcWidth, calcHeight)));
-
-                    tblHeight.Margin = new Thickness(skeletData.HeartPosition.X, skeletData.HeartPosition.Y, 0, 0);
-                    
-                }
                 image1.Source = new DrawingImage(myDrawingGroup);
             }
 
@@ -95,6 +83,7 @@ namespace conhITApp
                                 var heartPosition = middlePoint(spine.Position, shoulderLeft.Position);
                                 skeletDataObject.HeartPosition = this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(heartPosition, ColorImageFormat.RgbResolution640x480Fps30);
                                 skeletDataObject.HeartDistance = heartPosition.Z;
+                                CreateHeart(heartPosition.X,heartPosition.Y,50,50);
                                 this._skeletData.Add(skeletDataObject);
 
                             }
@@ -125,22 +114,24 @@ namespace conhITApp
             var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
             return tracked;
         }
-        private void CreateHeart(int x, int y, int height, int width)
+        Image heartImg;
+        private void CreateHeart(float x, float y, float height, float width)
         {
-            var img = new Image();
-            
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
-            image.EndInit();
-            ImageBehavior.SetAnimatedSource(img,image);
-            img.Width = width;
-            img.Height = height;
-            img.Margin = new Thickness(x, y, 0, 0);
-            container.Children.Add(img);
-            
+            if (heartImg == null)
+            {
+                heartImg = new Image();
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
+                image.EndInit();
+                ImageBehavior.SetAnimatedSource(heartImg, image);
+                heartImg.Width = width;
+                heartImg.Height = height;
+                container.Children.Add(heartImg);
+            }
+            heartImg.Margin = new Thickness(x, y, 0, 0);
         }
 
-        
+
     }
 }
