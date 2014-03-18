@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Kinect;
+using WpfAnimatedGif;
 
 namespace conhITApp
 {
@@ -81,6 +82,22 @@ namespace conhITApp
         {
             var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
             return tracked;
+        }
+
+        private void CreateHeart(int x, int y, int height, int width)
+        {
+            var img = new Image();
+            
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
+            image.EndInit();
+            ImageBehavior.SetAnimatedSource(img,image);
+            img.Width = width;
+            img.Height = height;
+            img.Margin = new Thickness(x, y, 0, 0);
+            container.Children.Add(img);
+            
         }
 
         
