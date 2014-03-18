@@ -1,8 +1,9 @@
 ﻿<Window x:Class="conhITApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
+        xmlns:gif="http://wpfanimatedgif.codeplex.com"
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
+    <Grid Name="container">
         <Image Margin="0,0,0,0" Name="image1" Stretch="Fill"/>
         <TextBlock Name="tblHeight" Text="" FontSize="22" Foreground="White"  Margin="34,37,0,0" Height="25" VerticalAlignment="Top" HorizontalAlignment="Left" Width="40" />
     </Grid>
