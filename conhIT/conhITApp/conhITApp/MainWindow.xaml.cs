@@ -127,6 +127,8 @@ namespace conhITApp
                 ImageBehavior.SetAnimatedSource(heartImg, image);
                 heartImg.Width = width;
                 heartImg.Height = height;
+                heartImg.VerticalAlignment = VerticalAlignment.Top;
+                heartImg.HorizontalAlignment = HorizontalAlignment.Left;
                 container.Children.Add(heartImg);
             }
             heartImg.Margin = new Thickness(x, y, 0, 0);
