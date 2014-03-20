@@ -22,6 +22,7 @@ namespace conhITApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        ColorImageFormat imageFormat=ColorImageFormat.RgbResolution640x480Fps30;
         KinectSensor kinect;
         private List<SkeletData> _skeletData = new List<SkeletData>();
 
@@ -40,7 +41,7 @@ namespace conhITApp
             this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
             this.kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(Sensor_SkeletonFrameReady);
             this.kinect.SkeletonStream.Enable();
-            this.kinect.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            this.kinect.ColorStream.Enable();
             this.kinect.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(Sensor_ColorFrameReady);
             this.kinect.Start();
         }
@@ -80,10 +81,12 @@ namespace conhITApp
                             if (IsTrackedOrInferred(spine) && IsTrackedOrInferred(shoulderLeft))
                             {
                                 //create point in between
-                                var heartPosition = middlePoint(spine.Position, shoulderLeft.Position);
-                                skeletDataObject.HeartPosition = this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(heartPosition, ColorImageFormat.RgbResolution640x480Fps30);
-                                skeletDataObject.HeartDistance = heartPosition.Z;
-                                CreateHeart(heartPosition.X,heartPosition.Y,50,50);
+                                
+                                var spineImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position,imageFormat);
+                                var shoulderImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position,imageFormat);
+                                skeletDataObject.HeartPosition = spineImagePos;
+                                skeletDataObject.HeartDistance = spine.Position.Z;
+                                CreateHeart(skeletDataObject.HeartPosition.X, skeletDataObject.HeartPosition.Y, 50, 50);
                                 this._skeletData.Add(skeletDataObject);
 
                             }
