@@ -12,5 +12,9 @@ namespace conhITApp
         public ColorImagePoint HeartPosition { get; set; }
         public float HeartDistance { get; set; }
         public float heartWidth { get; set; }
+
+        public ColorImagePoint HeadPosition { get; set; }
+
+        public double HeadDistance { get; set; }
     }
 }
