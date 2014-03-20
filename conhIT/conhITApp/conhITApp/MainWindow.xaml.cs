@@ -80,10 +80,8 @@ namespace conhITApp
                             var spine = skeleton.Joints[JointType.Spine];
                             var shoulderLeft = skeleton.Joints[JointType.ShoulderLeft];
                             var shoulderRight = skeleton.Joints[JointType.ShoulderRight];
-                            if (IsTrackedOrInferred(spine) && IsTrackedOrInferred(shoulderLeft))
+                            if (IsTrackedOrInferred(spine) && IsTrackedOrInferred(shoulderLeft) && IsTrackedOrInferred(shoulderRight))
                             {
-                                //create point in between
-
                                 var spineImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position, imageFormat);
                                 var shoulderRightImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderRight.Position, imageFormat);
                                 var shoulderLeftImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position, imageFormat);
@@ -110,15 +108,6 @@ namespace conhITApp
 
             }
 
-        }
-
-        private SkeletonPoint middlePoint(SkeletonPoint a, SkeletonPoint b)
-        {
-            SkeletonPoint result = new SkeletonPoint();
-            result.X = a.X + 0.5f * (b.X - a.X);
-            result.Y = a.Y + 0.5f * (b.Y - a.Y);
-            result.Z = a.Z + 0.5f * (b.Z - a.Z);
-            return result;
         }
 
         private bool IsTrackedOrInferred(Joint joint)
