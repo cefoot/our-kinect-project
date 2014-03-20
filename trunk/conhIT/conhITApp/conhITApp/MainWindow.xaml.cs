@@ -23,7 +23,7 @@ namespace conhITApp
     /// </summary>
     public partial class MainWindow : Window
     {
-        ColorImageFormat imageFormat=ColorImageFormat.RgbResolution640x480Fps30;
+        ColorImageFormat imageFormat = ColorImageFormat.RgbResolution640x480Fps30;
         KinectSensor kinect;
         private List<SkeletData> _skeletData = new List<SkeletData>();
 
@@ -74,27 +74,34 @@ namespace conhITApp
                     this._skeletData = new List<SkeletData>();
                     foreach (Skeleton skeleton in skeletons.Where(SkeletTracked))
                     {
-                        SkeletData skeletDataObject = new SkeletData();
+                        var skeletDataObject = new SkeletData();
                         if (skeleton != null)
                         {
                             var spine = skeleton.Joints[JointType.Spine];
                             var shoulderLeft = skeleton.Joints[JointType.ShoulderLeft];
+                            var shoulderRight = skeleton.Joints[JointType.ShoulderRight];
                             if (IsTrackedOrInferred(spine) && IsTrackedOrInferred(shoulderLeft))
                             {
                                 //create point in between
-                                
-                                var spineImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position,imageFormat);
-                                var shoulderImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position,imageFormat);
-                                ColorImagePoint heartPos = new ColorImagePoint();
-                                heartPos.X = (spineImagePos.X + shoulderImagePos.X)/2;
-                                heartPos.Y = (spineImagePos.Y + shoulderImagePos.Y)/2;
+
+                                var spineImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position, imageFormat);
+                                var shoulderRightImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderRight.Position, imageFormat);
+                                var shoulderLeftImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position, imageFormat);
+                                var heartPos = new ColorImagePoint
+                                                   {
+                                                       X = (spineImagePos.X + shoulderLeftImagePos.X) / 2,
+                                                       Y = (spineImagePos.Y + shoulderLeftImagePos.Y) / 2
+                                                   };
                                 skeletDataObject.HeartPosition = heartPos;
                                 skeletDataObject.HeartDistance = spine.Position.Z;
-                                var calcWidth = 50d / (skeletDataObject.HeartDistance / 3d);
-                                var calcHeight = 52.5d / (skeletDataObject.HeartDistance / 3d);
-                                Debug.WriteLine(calcHeight);
+                                skeletDataObject.heartWidth = Math.Abs(shoulderRightImagePos.X - shoulderLeftImagePos.X) * 0.6f;
+                                //Debug.WriteLine(skeletDataObject.heartWidth);
+                                var calcWidth = container.ActualWidth * (skeletDataObject.heartWidth / kinect.ColorStream.FrameWidth);
+                                calcWidth = Math.Max(calcWidth, 34);
+                                var calcHeight = calcWidth;//bild ist genauso hoch wie breit
+                                //Debug.WriteLine(calcHeight);
                                 CreateHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight);
-                                this._skeletData.Add(skeletDataObject);
+                                _skeletData.Add(skeletDataObject);
 
                             }
                         }
@@ -107,7 +114,7 @@ namespace conhITApp
 
         private SkeletonPoint middlePoint(SkeletonPoint a, SkeletonPoint b)
         {
-            SkeletonPoint result=new SkeletonPoint();
+            SkeletonPoint result = new SkeletonPoint();
             result.X = a.X + 0.5f * (b.X - a.X);
             result.Y = a.Y + 0.5f * (b.Y - a.Y);
             result.Z = a.Z + 0.5f * (b.Z - a.Z);
@@ -135,12 +142,12 @@ namespace conhITApp
                 image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
                 image.EndInit();
                 ImageBehavior.SetAnimatedSource(heartImg, image);
-                heartImg.Width = width;
-                heartImg.Height = height;
                 heartImg.VerticalAlignment = VerticalAlignment.Top;
                 heartImg.HorizontalAlignment = HorizontalAlignment.Left;
                 container.Children.Add(heartImg);
             }
+            heartImg.Width = width;
+            heartImg.Height = height;
             heartImg.Margin = new Thickness(x, y, 0, 0);
         }
 
