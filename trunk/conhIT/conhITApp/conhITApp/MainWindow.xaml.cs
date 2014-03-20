@@ -25,7 +25,8 @@ namespace conhITApp
     {
         ColorImageFormat imageFormat = ColorImageFormat.RgbResolution640x480Fps30;
         KinectSensor kinect;
-        private List<SkeletData> _skeletData = new List<SkeletData>();
+        private readonly Dictionary<int,SkeletData> _skeletData = new Dictionary<int, SkeletData>();
+        private Dictionary<int,Image> _imgs = new Dictionary<int, Image>();
 
         public MainWindow()
         {
@@ -68,15 +69,16 @@ namespace conhITApp
             {
                 if (frame != null)
                 {
-                    Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
+                    var skeletons = new Skeleton[frame.SkeletonArrayLength];
 
                     frame.CopySkeletonDataTo(skeletons);
-                    this._skeletData = new List<SkeletData>();
-                    foreach (Skeleton skeleton in skeletons.Where(SkeletTracked))
+                    _skeletData.Clear();
+                    foreach (var skeleton in skeletons.Where(SkeletTracked))
                     {
                         var skeletDataObject = new SkeletData();
                         if (skeleton != null)
                         {
+                            Debug.WriteLine(skeleton.TrackingId);
                             var spine = skeleton.Joints[JointType.Spine];
                             var shoulderLeft = skeleton.Joints[JointType.ShoulderLeft];
                             var shoulderRight = skeleton.Joints[JointType.ShoulderRight];
@@ -93,21 +95,87 @@ namespace conhITApp
                                 skeletDataObject.HeartPosition = heartPos;
                                 skeletDataObject.HeartDistance = spine.Position.Z;
                                 skeletDataObject.heartWidth = Math.Abs(shoulderRightImagePos.X - shoulderLeftImagePos.X) * 0.6f;
-                                //Debug.WriteLine(skeletDataObject.heartWidth);
-                                var calcWidth = container.ActualWidth * (skeletDataObject.heartWidth / kinect.ColorStream.FrameWidth);
-                                calcWidth = Math.Max(calcWidth, 34);
-                                var calcHeight = calcWidth;//bild ist genauso hoch wie breit
-                                //Debug.WriteLine(calcHeight);
-                                CreateHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight);
-                                _skeletData.Add(skeletDataObject);
+                                
+                                _skeletData[skeleton.TrackingId]=skeletDataObject;
 
                             }
                         }
                     }
+                    CreateHearts();
                 }
 
             }
 
+        }
+
+        private void CreateHearts()
+        {
+            var oldIDs = new List<int>(_imgs.Keys);
+            var newIDs = new List<int>(_skeletData.Keys);
+            foreach (var newID in newIDs)
+            {
+                if(!_imgs.ContainsKey(newID))
+                {
+                    CreateNewHeart(newIDs, newID);
+                }
+            }
+            foreach (var heartKey in _imgs.Keys)
+            {
+                if(!newIDs.Contains(heartKey))
+                {
+                    _imgs[heartKey].Visibility = Visibility.Hidden;
+                }else
+                {
+                    _imgs[heartKey].Visibility = Visibility.Visible;
+                    var skeletDataObject = _skeletData[heartKey];
+                    var calcWidth = container.ActualWidth * (skeletDataObject.heartWidth / kinect.ColorStream.FrameWidth);
+                    calcWidth = Math.Max(calcWidth, 34);
+                    var calcHeight = calcWidth;//bild ist genauso hoch wie breit
+                    //Debug.WriteLine(calcHeight);
+                    MoveHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight, _imgs[heartKey]);
+            
+                }
+            }
+                                
+        }
+
+        private void CreateNewHeart(ICollection<int> newIDs, int newID)
+        {
+            var curKey = -1;
+            foreach (var heartKey in _imgs.Keys.Where(heartKey => !newIDs.Contains(heartKey)))
+            {
+                curKey = heartKey;
+                break;
+            }
+            if(curKey>= 0)
+            {
+                _imgs[newID] = _imgs[curKey];
+                _imgs.Remove(curKey);
+            }else
+            {
+                _imgs[newID] = CreateHeart();
+            }
+        }
+
+        private Image CreateHeart()
+        {
+            var heartImg = new Image();
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
+            image.EndInit();
+            ImageBehavior.SetAnimatedSource(heartImg, image);
+            heartImg.VerticalAlignment = VerticalAlignment.Top;
+            heartImg.HorizontalAlignment = HorizontalAlignment.Left;
+            container.Children.Add(heartImg);
+            return heartImg;
+        }
+
+        private void MoveHeart(float x, float y, float height, float width, Image heartImg)
+        {
+            heartImg.Width = width;
+            heartImg.Height = height;
+            heartImg.Margin = new Thickness(x, y, 0, 0);
         }
 
         private bool IsTrackedOrInferred(Joint joint)
@@ -119,25 +187,6 @@ namespace conhITApp
         {
             var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
             return tracked;
-        }
-        Image heartImg;
-        private void CreateHeart(float x, float y, float height, float width)
-        {
-            if (heartImg == null)
-            {
-                heartImg = new Image();
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.UriSource = new Uri(@"pack://application:,,,/Resources/giphy.gif", UriKind.RelativeOrAbsolute);
-                image.EndInit();
-                ImageBehavior.SetAnimatedSource(heartImg, image);
-                heartImg.VerticalAlignment = VerticalAlignment.Top;
-                heartImg.HorizontalAlignment = HorizontalAlignment.Left;
-                container.Children.Add(heartImg);
-            }
-            heartImg.Width = width;
-            heartImg.Height = height;
-            heartImg.Margin = new Thickness(x, y, 0, 0);
         }
 
 
