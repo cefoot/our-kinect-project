@@ -84,7 +84,10 @@ namespace conhITApp
                                 
                                 var spineImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position,imageFormat);
                                 var shoulderImagePos=this.kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position,imageFormat);
-                                skeletDataObject.HeartPosition = spineImagePos;
+                                ColorImagePoint heartPos = new ColorImagePoint();
+                                heartPos.X = (spineImagePos.X + shoulderImagePos.X)/2;
+                                heartPos.Y = (spineImagePos.Y + shoulderImagePos.Y)/2;
+                                skeletDataObject.HeartPosition = heartPos;
                                 skeletDataObject.HeartDistance = spine.Position.Z;
                                 CreateHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight), 50, 50);
                                 this._skeletData.Add(skeletDataObject);
