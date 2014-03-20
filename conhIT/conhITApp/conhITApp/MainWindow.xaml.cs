@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -89,7 +90,10 @@ namespace conhITApp
                                 heartPos.Y = (spineImagePos.Y + shoulderImagePos.Y)/2;
                                 skeletDataObject.HeartPosition = heartPos;
                                 skeletDataObject.HeartDistance = spine.Position.Z;
-                                CreateHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight), 50, 50);
+                                var calcWidth = 50d / (skeletDataObject.HeartDistance / 3d);
+                                var calcHeight = 52.5d / (skeletDataObject.HeartDistance / 3d);
+                                Debug.WriteLine(calcHeight);
+                                CreateHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight);
                                 this._skeletData.Add(skeletDataObject);
 
                             }
