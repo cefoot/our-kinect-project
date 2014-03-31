@@ -66,7 +66,7 @@ namespace conhITApp
                 var myDrawingGroup = new DrawingGroup();
                 myDrawingGroup.Children.Add(new ImageDrawing(data.ToBitmapSource(image.Width, image.Height), new Rect(new Size(image.Width, image.Height))));
 
-                DrawFaces(myDrawingGroup);
+                //DrawFaces(myDrawingGroup);//draw smilies
 
                 image1.Source = new DrawingImage(myDrawingGroup);
             }
@@ -222,7 +222,8 @@ namespace conhITApp
             var heartImg = new Image();
             var image = new BitmapImage();
             image.BeginInit();
-            image.UriSource = new Uri(@"pack://application:,,,/Resources/giphyBright.gif", UriKind.RelativeOrAbsolute);
+            //http://media.photobucket.com/user/Snaazzy/media/gif.gif.html?filters[term]=heart%20gif&filters[primary]=images&filters[secondary]=videos&sort=1&o=0
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/heart.gif", UriKind.RelativeOrAbsolute);
             image.EndInit();
             ImageBehavior.SetAnimatedSource(heartImg, image);
             heartImg.VerticalAlignment = VerticalAlignment.Top;
