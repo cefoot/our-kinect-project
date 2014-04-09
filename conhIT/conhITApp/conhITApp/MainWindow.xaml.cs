@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using conhITApp.Properties;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using WpfAnimatedGif;
@@ -29,8 +30,8 @@ namespace conhITApp
     {
         ColorImageFormat imageFormat = ColorImageFormat.RgbResolution640x480Fps30;
         KinectSensor kinect;
-        private readonly Dictionary<int,SkeletData> _skeletData = new Dictionary<int, SkeletData>();
-        private Dictionary<int,Image> _imgs = new Dictionary<int, Image>();
+        private readonly Dictionary<int, SkeletData> _skeletData = new Dictionary<int, SkeletData>();
+        private Dictionary<int, Image> _imgs = new Dictionary<int, Image>();
         private BitmapSource _face;
 
         public MainWindow()
@@ -49,6 +50,7 @@ namespace conhITApp
         private void InitKinectSensor()
         {
             this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
+            if (this.kinect == null) return;
             this.kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(Sensor_SkeletonFrameReady);
             this.kinect.SkeletonStream.Enable();
             this.kinect.ColorStream.Enable();
@@ -82,7 +84,6 @@ namespace conhITApp
 
                 myDrawingGroup.Children.Add(new ImageDrawing(_face, new Rect(skeletData.HeadPosition.X - ((int)calcWidth / 2), skeletData.HeadPosition.Y - ((int)calcHeight / 2), calcWidth, calcHeight)));
 
-                tblHeight.Margin = new Thickness(skeletData.HeadPosition.X, skeletData.HeadPosition.Y, 0, 0);
                 //myDrawingGroup.Children.Add(new ImageDrawing(c. Properties.Resources.face, new Rect(40, 0, 45, 130)));
             }
         }
@@ -123,8 +124,8 @@ namespace conhITApp
                                 skeletDataObject.heartWidth = Math.Abs(shoulderRightImagePos.X - shoulderLeftImagePos.X) * 0.6f;
                                 skeletDataObject.HeadPosition = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(head.Position, imageFormat);
                                 skeletDataObject.HeadDistance = head.Position.Z;
-                                
-                                _skeletData[skeleton.TrackingId]=skeletDataObject;
+
+                                _skeletData[skeleton.TrackingId] = skeletDataObject;
 
                             }
                         }
@@ -142,17 +143,18 @@ namespace conhITApp
             var newIDs = new List<int>(_skeletData.Keys);
             foreach (var newID in newIDs)
             {
-                if(!_imgs.ContainsKey(newID))
+                if (!_imgs.ContainsKey(newID))
                 {
                     CreateNewHeart(newIDs, newID);
                 }
             }
             foreach (var heartKey in _imgs.Keys)
             {
-                if(!newIDs.Contains(heartKey))
+                if (!newIDs.Contains(heartKey))
                 {
                     _imgs[heartKey].Visibility = Visibility.Hidden;
-                }else
+                }
+                else
                 {
                     _imgs[heartKey].Visibility = Visibility.Visible;
                     var skeletDataObject = _skeletData[heartKey];
@@ -161,10 +163,10 @@ namespace conhITApp
                     var calcHeight = calcWidth;//bild ist genauso hoch wie breit
                     //Debug.WriteLine(calcHeight);
                     MoveHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight, _imgs[heartKey]);
-            
+
                 }
             }
-                                
+
         }
 
         private void CreateNewHeart(ICollection<int> newIDs, int newID)
@@ -175,11 +177,12 @@ namespace conhITApp
                 curKey = heartKey;
                 break;
             }
-            if(curKey>= 0)
+            if (curKey >= 0)
             {
                 _imgs[newID] = _imgs[curKey];
                 _imgs.Remove(curKey);
-            }else
+            }
+            else
             {
                 _imgs[newID] = CreateHeart();
             }
@@ -223,7 +226,7 @@ namespace conhITApp
             var image = new BitmapImage();
             image.BeginInit();
             //http://media.photobucket.com/user/Snaazzy/media/gif.gif.html?filters[term]=heart%20gif&filters[primary]=images&filters[secondary]=videos&sort=1&o=0
-            image.UriSource = new Uri(@"pack://application:,,,/Resources/heart.gif", UriKind.RelativeOrAbsolute);
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/heartCustom.agif", UriKind.RelativeOrAbsolute);
             image.EndInit();
             ImageBehavior.SetAnimatedSource(heartImg, image);
             heartImg.VerticalAlignment = VerticalAlignment.Top;
@@ -248,6 +251,26 @@ namespace conhITApp
         {
             var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
             return tracked;
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch(e.Key)
+            {
+                case Key.H:
+                    MessageBox.Show("Folgende Hotkeys sind hinterlegt:\n\tF\tVollbild\n\tH\tHilfe\n\tESC\tSchließen", "Hilfe");
+                    break;
+                case Key.X:
+                    MoveHeart(50f, 50f, 50f, 50f, CreateHeart());
+                    break;
+                case Key.F:
+                    WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+                    break;
+                case Key.Escape:
+                    Application.Current.Shutdown();
+                    break;
+
+            }
         }
 
 
