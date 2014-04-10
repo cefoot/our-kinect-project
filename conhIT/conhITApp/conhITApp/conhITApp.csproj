@@ -101,7 +101,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Resource Include="Resources\heartCustom.agif" />
+    <Resource Include="Resources\heartCustom.gif" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\giphy.gif" />

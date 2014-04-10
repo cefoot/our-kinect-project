@@ -20,6 +20,7 @@ using WpfAnimatedGif;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Size = System.Windows.Size;
+using System.Windows.Controls;
 
 namespace conhITApp
 {
@@ -162,7 +163,12 @@ namespace conhITApp
                     calcWidth = Math.Max(calcWidth, 34);
                     var calcHeight = calcWidth;//bild ist genauso hoch wie breit
                     //Debug.WriteLine(calcHeight);
-                    MoveHeart((float)(container.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2), (float)(container.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2), (float)calcWidth, (float)calcHeight, _imgs[heartKey]);
+                    MoveHeart(
+                        (float)(image1.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2f + image1.Margin.Left),
+                        (float)(image1.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2f + image1.Margin.Top),
+                        (float)calcWidth,
+                        (float)calcHeight,
+                        _imgs[heartKey]);
 
                 }
             }
@@ -226,7 +232,7 @@ namespace conhITApp
             var image = new BitmapImage();
             image.BeginInit();
             //http://media.photobucket.com/user/Snaazzy/media/gif.gif.html?filters[term]=heart%20gif&filters[primary]=images&filters[secondary]=videos&sort=1&o=0
-            image.UriSource = new Uri(@"pack://application:,,,/Resources/heartCustom.agif", UriKind.RelativeOrAbsolute);
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/heartCustom.gif", UriKind.RelativeOrAbsolute);
             image.EndInit();
             ImageBehavior.SetAnimatedSource(heartImg, image);
             heartImg.VerticalAlignment = VerticalAlignment.Top;
@@ -255,13 +261,13 @@ namespace conhITApp
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            switch(e.Key)
+            switch (e.Key)
             {
                 case Key.H:
                     MessageBox.Show("Folgende Hotkeys sind hinterlegt:\n\tF\tVollbild\n\tH\tHilfe\n\tESC\tSchließen", "Hilfe");
                     break;
                 case Key.X:
-                    MoveHeart(50f, 50f, 50f, 50f, CreateHeart());
+                    MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
                     break;
                 case Key.F:
                     WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
