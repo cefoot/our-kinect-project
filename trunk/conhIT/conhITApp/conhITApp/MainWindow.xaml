@@ -4,21 +4,21 @@
         xmlns:local="clr-namespace:conhITApp"       
         xmlns:properties="clr-namespace:conhITApp.Properties"
         Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded" KeyUp="Window_KeyUp" WindowStyle="None">
-    <Grid Name="container">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="60px"/>
+            <ColumnDefinition Width="150px"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Row="0" BorderBrush="#FF00695B" BorderThickness="0 0 2 4">
             <StackPanel Orientation="Horizontal" x:Name="stack" Height="35px">
                 <StackPanel.Resources>
                     <local:NegatingConverter x:Key="NegatingConverter" />
                     <Storyboard x:Key="slide">
-                        <DoubleAnimation From="0" To="{Binding Width, ElementName=canvas, Converter={StaticResource NegatingConverter}}" Duration="00:00:05"
+                        <DoubleAnimation From="0" To="{Binding Width, ElementName=canvas, Converter={StaticResource NegatingConverter}}" Duration="00:00:30"
                           Storyboard.TargetProperty="X"
                           Storyboard.TargetName="transferCurreny"
                           RepeatBehavior="Forever"/>
@@ -44,6 +44,8 @@
         <Border Grid.Row="0" Grid.Column="1" BorderBrush="#FF00695B" BorderThickness="0 0 0 4">
             <Image Name="logo" Stretch="Uniform" Source="/conhITApp;component/Images/data_experts_4c_ohneTextzeile200x104.jpg" />
         </Border>
-        <Image Grid.Row="1" Grid.ColumnSpan="2" Margin="0,0,0,0" Name="image1" Stretch="Uniform" />
+        <Grid Grid.Row="1" Grid.ColumnSpan="2"  Name="container">
+            <Image Margin="0,0,0,0" Name="image1" Stretch="Fill" />
+        </Grid>
     </Grid>
 </Window>
