@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using AForge.Imaging;
 using Microsoft.Kinect;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -94,8 +93,20 @@ namespace Sphernecto
         }
 
         Skeleton _curSkelet = null;
+        private bool _IsCustomFloor = false;
 
-        protected Tuple<float, float, float, float> Floor { get; set; }
+        private Tuple<float, float, float, float> _floor;
+        protected Tuple<float, float, float, float> Floor
+        {
+            get { return _floor; }
+            set
+            {
+                if (!_IsCustomFloor)
+                {
+                    _floor = value;
+                }
+            }
+        }
 
         private void AnalyzeSkeletFrame(SkeletonFrame frame)
         {
@@ -109,12 +120,19 @@ namespace Sphernecto
             Floor = frame.FloorClipPlane;
         }
 
+        private DepthImagePixel[] depthImage = null;
+
+        private DepthImagePixel[] DepthImage { get { return depthImage; } }
+
         private void AnalyzeDepthFrame(DepthImageFrame frame)
         {
-            var pixels = new DepthImagePixel[frame.PixelDataLength];
-            frame.CopyDepthImagePixelDataTo(pixels);
+            if (DepthImage == null)
+            {
+                depthImage = new DepthImagePixel[frame.PixelDataLength];
+            }
+            frame.CopyDepthImagePixelDataTo(DepthImage);
 
-            Worker.RunWorkerAsync(pixels);
+            Worker.RunWorkerAsync(DepthImage);
         }
 
         private void worker_DoWork(object sender, DoWorkEventArgs e)
@@ -135,7 +153,7 @@ namespace Sphernecto
                 var abs = Math.Abs(px.X * curFloorPxl.Item1 + px.Y * curFloorPxl.Item2 + px.Z * curFloorPxl.Item3 + curFloorPxl.Item4);
                 var drawIdx = i * 4;
                 Joint leftFoot;
-                if (_curSkelet != null && 
+                if (_curSkelet != null &&
                     (leftFoot = _curSkelet.Joints[JointType.FootLeft]).TrackingState == JointTrackingState.Tracked
                     && px.X.IsInRange(leftFoot.Position.X, FootRange)
                     && px.Y.IsInRange(leftFoot.Position.Y, FootRange)
@@ -199,5 +217,45 @@ namespace Sphernecto
         }
 
         protected KinectSensor Sensor { get; set; }
+
+        List<SkeletonPoint> ClickedPxl = new List<SkeletonPoint>();
+
+        private void image1_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(image1);
+            var pxl = new DepthImagePoint
+                          {
+                              X = (int)(pos.X / image1.ActualWidth * Sensor.DepthStream.FrameWidth),
+                              Y = (int)(pos.Y / image1.ActualHeight * Sensor.DepthStream.FrameHeight)
+                          };
+            pxl.Depth = DepthImage[pxl.Y * Sensor.DepthStream.FrameWidth + pxl.X].Depth;
+            var pnt = Sensor.CoordinateMapper.MapDepthPointToSkeletonPoint(Sensor.DepthStream.Format, pxl);
+            ClickedPxl.Add(pnt);
+            Debug.WriteLine("X:{0:0.00}Y:{1:0.00}Z:{2:0.00}", pnt.X, pnt.Y, pnt.Z);
+            if (ClickedPxl.Count == 3)
+            {
+                //calc
+                _IsCustomFloor = true;
+                _floor = CalcFloor(ClickedPxl);
+            }
+        }
+
+        private static Tuple<float, float, float, float> CalcFloor(IReadOnlyList<SkeletonPoint> clickedPxl)
+        {
+            var p1 = clickedPxl[0];
+            var p2 = clickedPxl[1];
+            var p3 = clickedPxl[2];
+            var ax = p1.X - p3.X;
+            var ay = p1.Y - p3.Y;
+            var az = p1.Z - p3.Z;
+            var bx = p2.X - p3.X;
+            var by = p2.Y - p3.Y;
+            var bz = p2.Z - p3.Z;
+            var a = ay * bz - az * by;
+            var b = az * bx - ax * bz;
+            var c = ax * by - ay * bx;
+            var d = a * p3.X + b * p3.Y + c * p3.Z;
+            return new Tuple<float, float, float, float>(a, b, c, d);
+        }
     }
 }
