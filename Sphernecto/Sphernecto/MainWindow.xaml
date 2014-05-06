@@ -3,6 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525" Loaded="WindowLoaded">
     <Grid>
-        <Image Margin="0,0,0,0" Name="image1" Stretch="Fill"/>
+        <Image Margin="0,0,0,0" Name="image1" Stretch="Fill" MouseDown="image1_MouseDown"/>
     </Grid>
 </Window>
