@@ -36,22 +36,22 @@ namespace SocketListener
 
 
 
-        public SkeletonPoint getCurrentPoint(float scale)
+        public CameraSpacePoint getCurrentPoint(float scale)
         {
 
-            SkeletonPoint currentPoint = new SkeletonPoint();
+            CameraSpacePoint currentPoint = new CameraSpacePoint();
             currentPoint.X = curX * scale;
             currentPoint.Y = curY * scale;
             currentPoint.Z = curZ * scale;
             return currentPoint;
 
         }
-        public SkeletonPoint add(SkeletonPoint newPoint)
+        public CameraSpacePoint add(CameraSpacePoint newPoint)
         {
             return this.add(newPoint, 1f);
         }
 
-        public SkeletonPoint add(SkeletonPoint newPoint,float scale)
+        public CameraSpacePoint add(CameraSpacePoint newPoint, float scale)
         {
             lastX.Enqueue(newPoint.X);
             lastY.Enqueue(newPoint.Y);
