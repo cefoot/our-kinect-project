@@ -17,8 +17,8 @@ namespace PaintSaver
         Boolean isRecording = false;
         private StreamWriter fileWriter;
         CometdSocket socket;
-        ColorImageFrame imageFrame;
-        DepthImageFrame depthFrame;
+        //ColorImageFrame imageFrame;
+        //DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
         
         String handPositionChannel = "/datachannel/handPosition";
@@ -30,8 +30,10 @@ namespace PaintSaver
         PointBuffer eyePositionBuffer = new PointBuffer(8, "eyePositionBuffer");
         PointBuffer lookAtBuffer = new PointBuffer(8, "lookAtBuffer");
 
+        Body[] skeletons;
 
-        List<SkeletonPoint> allPoints = new List<SkeletonPoint>();
+
+        List<CameraSpacePoint> allPoints = new List<CameraSpacePoint>();
 
         static void Main(string[] args)
         {
@@ -41,6 +43,7 @@ namespace PaintSaver
                 pro.start();
                 Console.ReadLine();
             }
+            
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -58,7 +61,7 @@ namespace PaintSaver
         private void start()
         {
             //socket = new CometdSocket("ws://cefoot.de/socketBtn");
-            socket = new CometdSocket("ws://ws201736:8080/socketBtn");
+            socket = new CometdSocket("ws://"+Properties.Settings.Default.HOST+":8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             socket.Subscribe("/clear/", ClearHandler);
                        
@@ -68,49 +71,48 @@ namespace PaintSaver
 
         private void initKinectSensor()
         {
-            this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
+            this.kinect = KinectSensor.GetDefault();
         }
 
         private void registerEventListener()
         {
-            this.kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(Sensor_SkeletonFrameReady);
-            this.kinect.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(Sensor_ColorFrameReady);
-            this.kinect.DepthFrameReady += new EventHandler<DepthImageFrameReadyEventArgs>(Sensor_DepthFrameReady);
-            this.kinect.SkeletonStream.Enable();
-            this.kinect.Start();
+            this.kinect.BodyFrameSource.OpenReader().FrameArrived+= Sensor_SkeletonFrameReady;
+            //this.kinect.ColorFrameSource.FrameCaptured += Sensor_ColorFrameReady;
+            //this.kinect.DepthFrameSource.FrameCaptured += Sensor_DepthFrameReady;
+
+
+            skeletons = new Body[this.kinect.BodyFrameSource.BodyCount];
+            this.kinect.Open();
         }
 
-        void Sensor_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
-        {
-            imageFrame = e.OpenColorImageFrame();
+        //void Sensor_ColorFrameReady(object sender, ColorFrameArrivedEventArgs e)
+        //{
+        //    imageFrame = e.FrameReference.AcquireFrame();
+        //}
 
-        }
+        //void Sensor_DepthFrameReady(object sender, DepthFrameArrivedEventArgs e)
+        //{
+        //    depthFrame = e.FrameReference.AcquireFrame();
+        //}
 
-        void Sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
-        {
-            depthFrame = e.OpenDepthImageFrame();
-
-        }
-
-        void Sensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        void Sensor_SkeletonFrameReady(object sender, BodyFrameArrivedEventArgs e)
         {
 
-            using (var frame = e.OpenSkeletonFrame())
+            using (var frame = e.FrameReference.AcquireFrame())
             {
                 if (frame != null)
                 {
 
-                    Skeleton[] skeletons = new Skeleton[frame.SkeletonArrayLength];
-
-                    frame.CopySkeletonDataTo(skeletons);
+                    frame.GetAndRefreshBodyData(skeletons);
 
 
                     var skeleton = skeletons.Where(SkeletTracked).FirstOrDefault();
 
                     if (skeleton != null)
                     {
-                        bool rightHandTracked = skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.HandRight].TrackingState == JointTrackingState.Inferred;
-                        SkeletonPoint currentHandPosition = new SkeletonPoint();
+                        var t = skeleton.Joints[JointType.HandRight];
+                        bool rightHandTracked = skeleton.Joints[JointType.HandRight].TrackingState == TrackingState.Tracked || skeleton.Joints[JointType.HandRight].TrackingState == TrackingState.Inferred;
+                        CameraSpacePoint currentHandPosition = new CameraSpacePoint();
                         if (rightHandTracked)
                         {
                             currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position, 100f);
@@ -130,7 +132,7 @@ namespace PaintSaver
                         }
                         else
                         {
-                            SkeletonPoint result = new SkeletonPoint();
+                            var result = new CameraSpacePoint();
                             if(getClosePoint(currentHandPosition,out result) && rightHandTracked)
                             {
                                 SendPositionToChannel(result, touchChannel);
@@ -138,7 +140,7 @@ namespace PaintSaver
                             }
                             if (rightHandTracked)
                             {
-                                SkeletonPoint currentPoint = new SkeletonPoint();
+                                var currentPoint = new CameraSpacePoint();
                                 currentPoint.X = skeleton.Joints[JointType.HandRight].Position.X * 100;
                                 currentPoint.Y = skeleton.Joints[JointType.HandRight].Position.Y * 100;
                                 currentPoint.Z = skeleton.Joints[JointType.HandRight].Position.Z * 100;
@@ -146,11 +148,11 @@ namespace PaintSaver
                             }
 
                         }
-                        bool viewTracked = skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred;
-                        viewTracked &= skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Tracked || skeleton.Joints[JointType.Head].TrackingState == JointTrackingState.Inferred;
+                        bool viewTracked = skeleton.Joints[JointType.HandLeft].TrackingState == TrackingState.Tracked || skeleton.Joints[JointType.HandLeft].TrackingState == TrackingState.Inferred;
+                        viewTracked &= skeleton.Joints[JointType.Head].TrackingState == TrackingState.Tracked || skeleton.Joints[JointType.Head].TrackingState == TrackingState.Inferred;
                         if (viewTracked)
                         {
-                            SkeletonPoint currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position, 100f);
+                            var currentHandLeftPosition = eyePositionBuffer.add(skeleton.Joints[JointType.HandLeft].Position, 100f);
                             SendPositionToChannel(currentHandLeftPosition, eyePositionChannel);
                             var lookAt = lookAtBuffer.add(skeleton.Joints[JointType.Head].Position, 100f);
 
@@ -166,18 +168,18 @@ namespace PaintSaver
             }
         }
 
-        private bool SkeletTracked(Skeleton skelet)
+        private bool SkeletTracked(Body skelet)
         {
-            var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
+            var tracked = skelet.IsTracked;
             return tracked;
         }
 
-        private bool getClosePoint(SkeletonPoint currentHandPosition, out SkeletonPoint result)
+        private bool getClosePoint(CameraSpacePoint currentHandPosition, out CameraSpacePoint result)
         {
             double maxDistance = 200;
             bool found = false;
-            result = new SkeletonPoint();
-            foreach (SkeletonPoint point in allPoints)
+            result = new CameraSpacePoint();
+            foreach (CameraSpacePoint point in allPoints)
             {
                 var distance = PointDiffSquared(point, currentHandPosition);
                 if(distance<maxDistance)
@@ -192,12 +194,12 @@ namespace PaintSaver
             return found;
         }
 
-        private static double PointDiffSquared(SkeletonPoint a, SkeletonPoint b)
+        private static double PointDiffSquared(CameraSpacePoint a, CameraSpacePoint b)
         {
             return (a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y) + (a.Z - b.Z) * (a.Z - b.Z);
         }
 
-        private void SendPositionToChannel(SkeletonPoint skeletonPoint, string channelName)
+        private void SendPositionToChannel(CameraSpacePoint skeletonPoint, string channelName)
         {
             var handPosition = new JsonObject();
             handPosition["X"] = (int)skeletonPoint.X;
@@ -214,33 +216,33 @@ namespace PaintSaver
 
         }
 
-        private void saveToFile(SkeletonPoint skeletonPoint)
+        private void saveToFile(CameraSpacePoint skeletonPoint)
         {
             fileWriter.WriteLine("{0};{1};{2}", skeletonPoint.X, skeletonPoint.Y, skeletonPoint.Z);
         }
 
-        private void SendDepthImage()
-        {
-            if (this.depthFrame != null && this.imageFrame != null)
-            {
-                DepthImagePoint[] depthPointData = new DepthImagePoint[depthFrame.Height * depthFrame.Width];
-                kinect.CoordinateMapper.MapColorFrameToDepthFrame(imageFrame.Format, depthFrame.Format, depthFrame.GetRawPixelData(), depthPointData);
-                ColorImagePoint[] imagePointData = new ColorImagePoint[imageFrame.Height * imageFrame.Width];
-                kinect.CoordinateMapper.MapDepthFrameToColorFrame(depthFrame.Format, depthFrame.GetRawPixelData(), imageFrame.Format, imagePointData);
-            }
-        }
+        //private void SendDepthImage()
+        //{
+        //    if (this.depthFrame != null && this.imageFrame != null)
+        //    {
+        //        DepthImagePoint[] depthPointData = new DepthImagePoint[depthFrame.Height * depthFrame.Width];
+        //        kinect.CoordinateMapper.MapColorFrameToDepthFrame(imageFrame.Format, depthFrame.Format, depthFrame.GetRawPixelData(), depthPointData);
+        //        ColorImagePoint[] imagePointData = new ColorImagePoint[imageFrame.Height * imageFrame.Width];
+        //        kinect.CoordinateMapper.MapDepthFrameToColorFrame(depthFrame.Format, depthFrame.GetRawPixelData(), imageFrame.Format, imagePointData);
+        //    }
+        //}
 
-        JsonObject ParseDepthImagePointArrayToJsonObject(DepthImagePoint[] depthPointArray, ColorImageFrame colorImageFrame)
-        {
-            JsonObject simpleObject = new JsonObject();
+        //JsonObject ParseDepthImagePointArrayToJsonObject(DepthImagePoint[] depthPointArray, ColorImageFrame colorImageFrame)
+        //{
+        //    JsonObject simpleObject = new JsonObject();
 
-            foreach (DepthImagePoint singlePoint in depthPointArray)
-            {
+        //    foreach (DepthImagePoint singlePoint in depthPointArray)
+        //    {
 
-            }
+        //    }
 
-            return simpleObject;
-        }
+        //    return simpleObject;
+        //}
 
         private void PaintHandler(JsonObject msg)
         {
@@ -288,6 +290,10 @@ namespace PaintSaver
         /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
+            if (kinect != null && kinect.IsOpen)
+            {
+                kinect.Close();
+            }
             fileWriter.Dispose();
         }
     }

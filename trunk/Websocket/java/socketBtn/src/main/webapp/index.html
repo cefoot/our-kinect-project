@@ -10,5 +10,22 @@
     <a href="GlDrawing.html">GlDrawing</a><br>
     <a href="GlScreen.html">GlScreen</a><br>
     <a href="JSON3d.html">Json3D</a><br>
+    <a href="javascript:playSound()">Play Sound</a>
+    <a href="javascript:stopSound()">Stop Sound</a>
+    <script type="text/javascript">
+	 var context = new webkitAudioContext(),//webkit browsers only
+	    oscillator;
+     function playSound(){
+ 	    oscillator = context.createOscillator();
+    		oscillator.type = oscillator.SQUARE; 
+    		oscillator.frequency.value = 800;
+    		oscillator.connect(context.destination);
+    		oscillator.noteOn(0);
+
+         }
+     function stopSound(){
+ 		oscillator.noteOff(0);
+         }
+    </script>
 </body>
 </html>

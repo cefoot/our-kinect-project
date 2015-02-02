@@ -18,6 +18,7 @@ import org.cometd.bayeux.server.LocalSession;
 import org.cometd.bayeux.server.ServerChannel;
 import org.cometd.bayeux.server.ServerMessage;
 import org.cometd.bayeux.server.ServerSession;
+import org.cometd.bayeux.server.ServerSession.ServerSessionListener;
 
 import de.cefoot.kinect.drawer.data.Color;
 import de.cefoot.kinect.drawer.data.Position;
