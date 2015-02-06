@@ -1,8 +1,8 @@
-﻿<Window x:Class="conhITApp.MainWindow"
+﻿<Window x:Class="De.DataExperts.conhITApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:conhITApp"       
-        xmlns:properties="clr-namespace:conhITApp.Properties"
+        xmlns:local="clr-namespace:De.DataExperts.conhITApp"       
+        xmlns:properties="clr-namespace:De.DataExperts.conhITApp.Properties"
         Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded" KeyUp="Window_KeyUp" WindowStyle="None">
     <Grid>
         <Grid.RowDefinitions>

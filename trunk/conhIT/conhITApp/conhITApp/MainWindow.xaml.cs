@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using conhITApp.Properties;
+using De.DataExperts.conhITApp.Properties;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using WpfAnimatedGif;
@@ -22,18 +22,19 @@ using Image = System.Windows.Controls.Image;
 using Size = System.Windows.Size;
 using System.Windows.Controls;
 
-namespace conhITApp
+namespace De.DataExperts.conhITApp
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        ColorImageFormat imageFormat = ColorImageFormat.RgbResolution640x480Fps30;
+        FrameDescription imageFormat;
         KinectSensor kinect;
-        private readonly Dictionary<int, SkeletData> _skeletData = new Dictionary<int, SkeletData>();
-        private Dictionary<int, Image> _imgs = new Dictionary<int, Image>();
+        private readonly Dictionary<ulong, SkeletData> _skeletData = new Dictionary<ulong, SkeletData>();
+        private Dictionary<ulong, Image> _imgs = new Dictionary<ulong, Image>();
         private BitmapSource _face;
+        private WriteableBitmap colorBitmap;
 
         public MainWindow()
         {
@@ -50,24 +51,44 @@ namespace conhITApp
 
         private void InitKinectSensor()
         {
-            this.kinect = KinectSensor.KinectSensors.Where(x => x.Status == KinectStatus.Connected).FirstOrDefault();
+            this.kinect = KinectSensor.GetDefault();
             if (this.kinect == null) return;
-            this.kinect.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(Sensor_SkeletonFrameReady);
-            this.kinect.SkeletonStream.Enable();
-            this.kinect.ColorStream.Enable();
-            this.kinect.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(Sensor_ColorFrameReady);
-            this.kinect.Start();
+
+            this.kinect.BodyFrameSource.OpenReader().FrameArrived += Sensor_SkeletonFrameReady;
+            this.kinect.ColorFrameSource.OpenReader().FrameArrived += Sensor_ColorFrameReady;
+            this.kinect.Open();
+            imageFormat = this.kinect.ColorFrameSource.CreateFrameDescription(ColorImageFormat.Bgra);
+            this.colorBitmap = new WriteableBitmap(imageFormat.Width, imageFormat.Height, 96.0, 96.0, PixelFormats.Bgr32, null);
         }
 
-        void Sensor_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
+        void Sensor_ColorFrameReady(object sender, ColorFrameArrivedEventArgs e)
         {
-            using (var image = e.OpenColorImageFrame())
+            using (var image = e.FrameReference.AcquireFrame())
             {
                 if (image == null) return;
-                var data = new byte[image.PixelDataLength];
-                image.CopyPixelDataTo(data);
+
+                FrameDescription colorFrameDescription = image.FrameDescription;
+                using (KinectBuffer colorBuffer = image.LockRawImageBuffer())
+                {
+                    this.colorBitmap.Lock();
+
+                    // verify data and write the new color frame data to the display bitmap
+                    if ((colorFrameDescription.Width == this.colorBitmap.PixelWidth) && (colorFrameDescription.Height == this.colorBitmap.PixelHeight))
+                    {
+                        image.CopyConvertedFrameDataToIntPtr(
+                            this.colorBitmap.BackBuffer,
+                            (uint)(colorFrameDescription.Width * colorFrameDescription.Height * 4),
+                            ColorImageFormat.Bgra);
+
+                        this.colorBitmap.AddDirtyRect(new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight));
+                    }
+
+                    this.colorBitmap.Unlock();
+                }
+                
                 var myDrawingGroup = new DrawingGroup();
-                myDrawingGroup.Children.Add(new ImageDrawing(data.ToBitmapSource(image.Width, image.Height), new Rect(new Size(image.Width, image.Height))));
+                myDrawingGroup.Children.Add(new ImageDrawing(this.colorBitmap, new Rect(new Size(this.colorBitmap.Width, this.colorBitmap.Height))));
+                //myDrawingGroup.Children.Add(new ImageDrawing(data.ToBitmapSource(image.Width, image.Height), new Rect(new Size(image.Width, image.Height))));
 
                 //DrawFaces(myDrawingGroup);//draw smilies
 
@@ -89,33 +110,32 @@ namespace conhITApp
             }
         }
 
-        void Sensor_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        void Sensor_SkeletonFrameReady(object sender, BodyFrameArrivedEventArgs e)
         {
 
-            using (var frame = e.OpenSkeletonFrame())
+            using (var frame = e.FrameReference.AcquireFrame())
             {
                 if (frame != null)
                 {
-                    var skeletons = new Skeleton[frame.SkeletonArrayLength];
+                    var skeletons = new Body[frame.BodyCount];
 
-                    frame.CopySkeletonDataTo(skeletons);
+                    frame.GetAndRefreshBodyData(skeletons);
                     _skeletData.Clear();
                     foreach (var skeleton in skeletons.Where(SkeletTracked))
                     {
                         var skeletDataObject = new SkeletData();
                         if (skeleton != null)
                         {
-                            Debug.WriteLine(skeleton.TrackingId);
-                            var spine = skeleton.Joints[JointType.Spine];
+                            var spine = skeleton.Joints[JointType.SpineMid];
                             var shoulderLeft = skeleton.Joints[JointType.ShoulderLeft];
                             var shoulderRight = skeleton.Joints[JointType.ShoulderRight];
                             var head = skeleton.Joints[JointType.Head];
                             if (IsTrackedOrInferred(spine) && IsTrackedOrInferred(shoulderLeft) && IsTrackedOrInferred(shoulderRight))
                             {
-                                var spineImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(spine.Position, imageFormat);
-                                var shoulderRightImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderRight.Position, imageFormat);
-                                var shoulderLeftImagePos = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(shoulderLeft.Position, imageFormat);
-                                var heartPos = new ColorImagePoint
+                                var spineImagePos = kinect.CoordinateMapper.MapCameraPointToColorSpace(spine.Position);//, imageFormat);
+                                var shoulderRightImagePos = kinect.CoordinateMapper.MapCameraPointToColorSpace(shoulderRight.Position);//, imageFormat);
+                                var shoulderLeftImagePos = kinect.CoordinateMapper.MapCameraPointToColorSpace(shoulderLeft.Position);//, imageFormat);
+                                var heartPos = new ColorSpacePoint
                                                    {
                                                        X = (spineImagePos.X + shoulderLeftImagePos.X) / 2,
                                                        Y = (spineImagePos.Y + shoulderLeftImagePos.Y) / 2
@@ -123,7 +143,7 @@ namespace conhITApp
                                 skeletDataObject.HeartPosition = heartPos;
                                 skeletDataObject.HeartDistance = spine.Position.Z;
                                 skeletDataObject.heartWidth = Math.Abs(shoulderRightImagePos.X - shoulderLeftImagePos.X) * 0.6f;
-                                skeletDataObject.HeadPosition = kinect.CoordinateMapper.MapSkeletonPointToColorPoint(head.Position, imageFormat);
+                                skeletDataObject.HeadPosition = kinect.CoordinateMapper.MapCameraPointToColorSpace(head.Position);//, imageFormat);
                                 skeletDataObject.HeadDistance = head.Position.Z;
 
                                 _skeletData[skeleton.TrackingId] = skeletDataObject;
@@ -140,8 +160,8 @@ namespace conhITApp
 
         private void CreateHearts()
         {
-            var oldIDs = new List<int>(_imgs.Keys);
-            var newIDs = new List<int>(_skeletData.Keys);
+            var oldIDs = new List<ulong>(_imgs.Keys);
+            var newIDs = new List<ulong>(_skeletData.Keys);
             foreach (var newID in newIDs)
             {
                 if (!_imgs.ContainsKey(newID))
@@ -159,13 +179,12 @@ namespace conhITApp
                 {
                     _imgs[heartKey].Visibility = Visibility.Visible;
                     var skeletDataObject = _skeletData[heartKey];
-                    var calcWidth = container.ActualWidth * (skeletDataObject.heartWidth / kinect.ColorStream.FrameWidth);
+                    var calcWidth = container.ActualWidth * (skeletDataObject.heartWidth / kinect.ColorFrameSource.FrameDescription.Width);
                     calcWidth = Math.Max(calcWidth, 34);
                     var calcHeight = calcWidth;//bild ist genauso hoch wie breit
-                    //Debug.WriteLine(calcHeight);
                     MoveHeart(
-                        (float)(image1.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorStream.FrameWidth - calcWidth / 2f + image1.Margin.Left),
-                        (float)(image1.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorStream.FrameHeight - calcHeight / 2f + image1.Margin.Top),
+                        (float)(image1.ActualWidth * skeletDataObject.HeartPosition.X / kinect.ColorFrameSource.FrameDescription.Width - calcWidth / 2f + image1.Margin.Left),
+                        (float)(image1.ActualHeight * skeletDataObject.HeartPosition.Y / kinect.ColorFrameSource.FrameDescription.Height - calcHeight / 2f + image1.Margin.Top),
                         (float)calcWidth,
                         (float)calcHeight,
                         _imgs[heartKey]);
@@ -175,15 +194,15 @@ namespace conhITApp
 
         }
 
-        private void CreateNewHeart(ICollection<int> newIDs, int newID)
+        private void CreateNewHeart(ICollection<ulong> newIDs, ulong newID)
         {
-            var curKey = -1;
+            ulong curKey = ulong.MaxValue;
             foreach (var heartKey in _imgs.Keys.Where(heartKey => !newIDs.Contains(heartKey)))
             {
                 curKey = heartKey;
                 break;
             }
-            if (curKey >= 0)
+            if (curKey < ulong.MaxValue)
             {
                 _imgs[newID] = _imgs[curKey];
                 _imgs.Remove(curKey);
@@ -250,12 +269,12 @@ namespace conhITApp
 
         private bool IsTrackedOrInferred(Joint joint)
         {
-            return joint.TrackingState == JointTrackingState.Tracked || joint.TrackingState == JointTrackingState.Inferred;
+            return joint.TrackingState == TrackingState.Tracked || joint.TrackingState == TrackingState.Inferred;
         }
 
-        private bool SkeletTracked(Skeleton skelet)
+        private bool SkeletTracked(Body skelet)
         {
-            var tracked = skelet.TrackingState == SkeletonTrackingState.Tracked;
+            var tracked = skelet.IsTracked;
             return tracked;
         }
 
