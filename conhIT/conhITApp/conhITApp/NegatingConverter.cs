@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Data;
 
-namespace conhITApp
+namespace De.DataExperts.conhITApp
 {
 
     public class NegatingConverter : IValueConverter
