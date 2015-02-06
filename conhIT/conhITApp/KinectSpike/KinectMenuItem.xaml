@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="De.DataExperts.conhITApp.KinectMenuItem"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:props="clr-namespace:De.DataExperts.conhITApp.Properties"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Label Name="txt" FontSize="{Binding Source={x:Static props:Settings.Default},
+                               Path=MenuFontSize}"  />
+</UserControl>
