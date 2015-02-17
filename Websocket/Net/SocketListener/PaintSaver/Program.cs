@@ -110,12 +110,12 @@ namespace PaintSaver
 
                     if (skeleton != null)
                     {
-                        var t = skeleton.Joints[JointType.HandRight];
-                        bool rightHandTracked = skeleton.Joints[JointType.HandRight].TrackingState == TrackingState.Tracked || skeleton.Joints[JointType.HandRight].TrackingState == TrackingState.Inferred;
+                        
+                        bool rightHandTracked = skeleton.Joints[JointType.HandTipRight].TrackingState == TrackingState.Tracked;
                         CameraSpacePoint currentHandPosition = new CameraSpacePoint();
                         if (rightHandTracked)
                         {
-                            currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position, 100f);
+                            currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandTipRight].Position, 100f);
                         }
 
 
