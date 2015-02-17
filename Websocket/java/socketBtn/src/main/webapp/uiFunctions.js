@@ -3,7 +3,7 @@
  */
 function btnPaint() {
 	var btn = document.getElementById('btnPaint');
-	var val = btn.innerText;
+	var val = btn.innerHTML;
 	console.debug('paint:'+val);
 	send('/paint/', val);
 }
