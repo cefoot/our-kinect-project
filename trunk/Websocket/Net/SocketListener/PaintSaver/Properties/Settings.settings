@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="HOST" Type="System.String" Scope="User">
-      <Value Profile="(Default)">192.168.178.61</Value>
+      <Value Profile="(Default)">localhost</Value>
     </Setting>
   </Settings>
 </SettingsFile>

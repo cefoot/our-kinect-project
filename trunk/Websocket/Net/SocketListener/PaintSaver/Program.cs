@@ -20,13 +20,13 @@ namespace PaintSaver
         //ColorImageFrame imageFrame;
         //DepthImageFrame depthFrame;
         //minimal change in mm to send a new hand position
-        
+
         String handPositionChannel = "/datachannel/handPosition";
         String drawPositionChannel = "/datachannel/drawPosition";
         String eyePositionChannel = "/datachannel/eyePosition";
         String lookAtChannel = "/datachannel/lookAt";
         String touchChannel = "/datachannel/touch";
-        PointBuffer handPositionBuffer = new PointBuffer(4,"handPositionBuffer");
+        PointBuffer handPositionBuffer = new PointBuffer(4, "handPositionBuffer");
         PointBuffer eyePositionBuffer = new PointBuffer(8, "eyePositionBuffer");
         PointBuffer lookAtBuffer = new PointBuffer(8, "lookAtBuffer");
 
@@ -43,7 +43,7 @@ namespace PaintSaver
                 pro.start();
                 Console.ReadLine();
             }
-            
+
         }
 
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -61,10 +61,10 @@ namespace PaintSaver
         private void start()
         {
             //socket = new CometdSocket("ws://cefoot.de/socketBtn");
-            socket = new CometdSocket("ws://"+Properties.Settings.Default.HOST+":8080/socketBtn");
+            socket = new CometdSocket("ws://" + Properties.Settings.Default.HOST + ":8080/socketBtn");
             socket.Subscribe("/paint/", PaintHandler);
             socket.Subscribe("/clear/", ClearHandler);
-                       
+
             initKinectSensor();
             registerEventListener();
         }
@@ -76,7 +76,7 @@ namespace PaintSaver
 
         private void registerEventListener()
         {
-            this.kinect.BodyFrameSource.OpenReader().FrameArrived+= Sensor_SkeletonFrameReady;
+            this.kinect.BodyFrameSource.OpenReader().FrameArrived += Sensor_SkeletonFrameReady;
             //this.kinect.ColorFrameSource.FrameCaptured += Sensor_ColorFrameReady;
             //this.kinect.DepthFrameSource.FrameCaptured += Sensor_DepthFrameReady;
 
@@ -117,7 +117,7 @@ namespace PaintSaver
                         {
                             currentHandPosition = handPositionBuffer.add(skeleton.Joints[JointType.HandRight].Position, 100f);
                         }
-                        
+
 
                         if (isRecording)
                         {
@@ -128,12 +128,12 @@ namespace PaintSaver
                                 Console.Write(".");
                                 allPoints.Add(currentHandPosition);
                             }
-                            
+
                         }
                         else
                         {
                             var result = new CameraSpacePoint();
-                            if(getClosePoint(currentHandPosition,out result) && rightHandTracked)
+                            if (getClosePoint(currentHandPosition, out result) && rightHandTracked)
                             {
                                 SendPositionToChannel(result, touchChannel);
                                 Console.Write(":");
@@ -182,12 +182,12 @@ namespace PaintSaver
             foreach (CameraSpacePoint point in allPoints)
             {
                 var distance = PointDiffSquared(point, currentHandPosition);
-                if(distance<maxDistance)
+                if (distance < maxDistance)
                 {
                     result.X = point.X;
                     result.Y = point.Y;
                     result.Z = point.Z;
-                    maxDistance=distance;
+                    maxDistance = distance;
                     found = true;
                 }
             }
@@ -246,8 +246,12 @@ namespace PaintSaver
 
         private void PaintHandler(JsonObject msg)
         {
-
-            switch (msg["data"].ToString())
+            var data = msg.ToString();
+            if (msg.ContainsKey("data"))
+            {
+                data = msg["data"].ToString();
+            }
+            switch (data)
             {
                 case "start":
                     StartRecognize();
@@ -260,8 +264,12 @@ namespace PaintSaver
 
         private void ClearHandler(JsonObject msg)
         {
-
-            switch (msg["data"].ToString())
+            var data = msg.ToString();
+            if (msg.ContainsKey("data"))
+            {
+                data = msg["data"].ToString();
+            }
+            switch (data)
             {
                 case "clear":
                     allPoints.Clear();
@@ -294,7 +302,10 @@ namespace PaintSaver
             {
                 kinect.Close();
             }
-            fileWriter.Dispose();
+            if (fileWriter != null)
+            {
+                fileWriter.Dispose();
+            }
         }
     }
 }
