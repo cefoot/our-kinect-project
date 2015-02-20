@@ -21,12 +21,24 @@ namespace De.DataExperts.conhITApp
     {
         HashSet<KinectMenuItem> items = new HashSet<KinectMenuItem>();
 
+        const string CSV_HEADER_LINE = "MENU_NAME;MENU_ACTION";
+
         void InitMenuItems()
         {
-            items.Add(new KinectMenuItem { LabelText = "\r\nCorBene\r\n" });
-            items.Add(new KinectMenuItem { LabelText = "\r\nexpert Connect\r\n" });
-            items.Add(new KinectMenuItem { LabelText = "\r\nItem1\r\n" });
-            items.Add(new KinectMenuItem { LabelText = "\r\nItem2\r\n" });
+            using (var fReader = File.OpenRead("MenuItems.txt"))
+            using (var reader = new StreamReader(fReader))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains(CSV_HEADER_LINE))
+                    {
+                        continue;
+                    }
+                    var data = line.Split(";".ToCharArray(), 2);
+                    items.Add(LoadMenuItem(data));
+                }
+            }
             items.ToList().ForEach(itm =>
             {
                 itm.Visibility = System.Windows.Visibility.Hidden;
@@ -36,32 +48,134 @@ namespace De.DataExperts.conhITApp
                 Grid.SetColumnSpan(itm, 3);
                 itm.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
                 itm.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                itm.MouseDoubleClick += itm_MouseDoubleClick;
+                itm.MouseDoubleClick += MenuItm_MouseDoubleClick;
             });
         }
 
-        void itm_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private static KinectMenuItem LoadMenuItem(string[] data)
+        {
+            var newItm = new KinectMenuItem { LabelText = data[0] };
+            try
+            {
+                var img = new BitmapImage(new Uri(data[1]));
+                newItm.Tag = img; 
+            }
+            catch (Exception)
+            {
+                //so it's a video file
+                newItm.Tag = new Uri(data[1]);
+            }
+            return newItm;
+        }
+
+        void MenuItm_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var itm = sender as KinectMenuItem;
-            if (itm.LabelText.Contains("Item1"))
+            if (itm.Tag is Uri)
             {
-                var element = new MediaElement { Source = new Uri(@"p:\telematik\ExpertConnect_v2.mp4") };
-                element.MediaEnded += (send, args) =>
-                {
-                    gridContainer.Children.Remove(element);
-                };
+                StartVideo(itm.Tag as Uri);
+            }
+            else
+            {
+                ShowImage(itm.Tag as BitmapImage);
+            }
+        }
+
+        List<FrameworkElement> imgCtrls = new List<FrameworkElement>();
+
+        private void ShowImage(BitmapImage bitmapImage)
+        {
+            if (imgCtrls.Count == 0)
+            {
+                var element = new Image();
+                element.Stretch = Stretch.Uniform;
+                KinectMenuItem newItm = new KinectMenuItem { LabelText = "Close" };
+                newItm.MouseDoubleClick += (send, args) => HideImage();
                 Grid.SetColumnSpan(element, 3);
                 Grid.SetRowSpan(element, 2);
-                element.Width = gridContainer.ActualWidth;
-                element.Height = gridContainer.ActualHeight;
-                gridContainer.Children.Add(element);
+                element.Margin = new Thickness(0);
+                imgCtrls.Add(element);
+                Grid.SetColumnSpan(newItm, 3);
+                Grid.SetRowSpan(newItm, 2);
+                newItm.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                newItm.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                newItm.Margin = new Thickness(10, 10, 0, 0);
+                imgCtrls.Add(newItm);
+            }
+            if (gridContainer.Children.Contains(imgCtrls[0]))
+            {
+                //image is showing
+                return;
+            }
+            foreach (var ctrl in imgCtrls)
+            {
+                gridContainer.Children.Add(ctrl);
+            }
+            (from ctrls in imgCtrls where ctrls is Image select ctrls as Image).FirstOrDefault().Source = bitmapImage;
+        }
+
+        private void HideImage()
+        {
+            foreach (var ctrl in imgCtrls)
+            {
+                if (ctrl is Image)
+                {
+                    (ctrl as Image).Source = null;
+                }
+                gridContainer.Children.Remove(ctrl);
+            }
+        }
+
+        List<FrameworkElement> vidCtrls = new List<FrameworkElement>();
+
+        private void StartVideo(Uri videoSrc)
+        {
+            if (vidCtrls.Count == 0)
+            {
+                var element = new MediaElement();// { Source = new Uri(@"p:\telematik\ExpertConnect_v2.mp4") };
+                element.LoadedBehavior = MediaState.Manual;
+                element.Loaded += (send, args) => element.Play();
+                KinectMenuItem newItm = new KinectMenuItem { LabelText = "Close" };
+                newItm.MouseDoubleClick += (send, args) => StopVideo();
+                element.MediaEnded += (send, args) => StopVideo();
+                Grid.SetColumnSpan(element, 3);
+                Grid.SetRowSpan(element, 2);
+                element.Margin = new Thickness(0);
+                vidCtrls.Add(element);
+                Grid.SetColumnSpan(newItm, 3);
+                Grid.SetRowSpan(newItm, 2);
+                newItm.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                newItm.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                newItm.Margin = new Thickness(10, 10, 0, 0);
+                vidCtrls.Add(newItm);
+            }
+            if (gridContainer.Children.Contains(vidCtrls[0]))
+            {
+                //video is running
+                return;
+            }
+            foreach (var ctrl in vidCtrls)
+            {
+                gridContainer.Children.Add(ctrl);
+            }
+            (from ctrls in vidCtrls where ctrls is MediaElement select ctrls as MediaElement).FirstOrDefault().Source = videoSrc;
+        }
+
+        private void StopVideo()
+        {
+            foreach (var ctrl in vidCtrls)
+            {
+                if (ctrl is MediaElement)
+                {
+                    (ctrl as MediaElement).Close();
+                }
+                gridContainer.Children.Remove(ctrl);
             }
         }
 
 
         void Sensor_SkeletonFrameReady_UserMenu(object sender, BodyFrameArrivedEventArgs e)
         {
-
             using (var frame = e.FrameReference.AcquireFrame())
             {
                 if (frame != null)

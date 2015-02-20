@@ -3,7 +3,9 @@ using Microsoft.Kinect.Toolkit.Input;
 using Microsoft.Kinect.Wpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,7 +50,12 @@ namespace De.DataExperts.conhITApp
                     MessageBox.Show("Folgende Hotkeys sind hinterlegt:\n\tF\tVollbild\n\tH\tHilfe\n\tESC\tSchließen", "Hilfe");
                     break;
                 case Key.X:
-                    MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
+                    //MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
+                    StartVideo(new Uri(@"p:\telematik\telematik_v3.mp4"));
+                    break;
+                case Key.Y:
+                    //MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
+                    ShowImage(new BitmapImage(new Uri(@"p:\Temp\cpapenfuss\conHIT\xout.GIF")));
                     break;
                 case Key.F:
                     WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
@@ -65,14 +72,22 @@ namespace De.DataExperts.conhITApp
             var bitmap = Properties.Resources.face;
             bitmap.MakeTransparent(System.Drawing.Color.Blue);
             _face = CreateBitmapSourceFromBitmap(bitmap);
-            InitMenuItems();
+            try
+            {
+                InitMenuItems();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(String.Format("Kann die Datei '{0}' kan nicht geladen werden.", new FileInfo("MenuItems.txt").FullName));
+                throw;
+            }
         }
 
         private void kinectRegion_Loaded(object sender, RoutedEventArgs e)
         {
             kinectRegion.SetKinectOnePersonManualEngagement(this);
-            
-            
+
+
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

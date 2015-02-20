@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "conhITApp", "conhITApp\conhITApp.csproj", "{7EA25FE0-3D27-49C7-BCB2-1525B7592C1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "conhITApp-old", "conhITApp\conhITApp-old.csproj", "{7EA25FE0-3D27-49C7-BCB2-1525B7592C1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectSpike", "KinectSpike\KinectSpike.csproj", "{81B9B96D-A635-448C-92D6-72832BA76F85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "conhITApp-new", "KinectSpike\conhITApp-new.csproj", "{81B9B96D-A635-448C-92D6-72832BA76F85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
