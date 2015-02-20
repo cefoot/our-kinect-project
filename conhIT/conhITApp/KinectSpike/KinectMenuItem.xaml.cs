@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace De.DataExperts.conhITApp
 {
@@ -59,6 +60,32 @@ namespace De.DataExperts.conhITApp
         {
             get { return false; }
         }
+
+        private bool ChangingSize { get; set; }
+
+        private void Ctrl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {//controls should always be square
+            if (ChangingSize)
+            {//guard
+                ChangingSize = false;
+                return;
+            }
+            if (e.NewSize.IsEmpty)
+            {
+                return;
+            }
+            if (e.NewSize.Height > e.NewSize.Width)
+            {
+                ChangingSize = true;
+                Width = e.NewSize.Height;
+            }
+            else if (e.NewSize.Width > e.NewSize.Height)
+            {
+                ChangingSize = true;
+                Height = e.NewSize.Width;
+            }
+        }
+        private static Action EmptyDelegate = delegate() { };
 
     }
 }

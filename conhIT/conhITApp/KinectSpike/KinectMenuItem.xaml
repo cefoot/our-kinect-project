@@ -5,7 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:props="clr-namespace:De.DataExperts.conhITApp.Properties"
              mc:Ignorable="d" 
+             SizeChanged="Ctrl_SizeChanged"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Label Name="txt" FontSize="{Binding Source={x:Static props:Settings.Default},
-                               Path=MenuFontSize}"  />
+    <Grid Name="backGrd">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Ellipse Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="#FF073B4C"   >
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF195D78" Offset="1"/>
+                    <GradientStop Color="#FF03425D" Offset="0.85"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+        <Label  Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="Close" Name="txt" Foreground="White" FontSize="{Binding Source={x:Static props:Settings.Default},
+                               Path=MenuFontSize}" Margin="0,0,0,11"  />
+    </Grid>
 </UserControl>

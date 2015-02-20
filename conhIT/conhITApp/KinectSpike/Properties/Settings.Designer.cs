@@ -58,5 +58,17 @@ namespace De.DataExperts.conhITApp.Properties {
                 this["MenuRadius"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public double HeaderFontSize {
+            get {
+                return ((double)(this["HeaderFontSize"]));
+            }
+            set {
+                this["HeaderFontSize"] = value;
+            }
+        }
     }
 }

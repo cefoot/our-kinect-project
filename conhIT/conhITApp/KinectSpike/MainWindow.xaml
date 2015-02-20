@@ -9,7 +9,7 @@
     <k:KinectRegion x:Name="kinectRegion" Loaded="kinectRegion_Loaded">
         <Grid Name="gridContainer">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50px"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -17,8 +17,10 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="#FF00695B" BorderThickness="0 0 2 4">
-                <StackPanel Orientation="Horizontal" x:Name="stack" Height="35px">
+            <TextBlock FontSize="{Binding Source={x:Static properties:Settings.Default},
+                               Path=HeaderFontSize}"/>
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="#FF00695B" BorderThickness="0 0 2 4">
+                <StackPanel Orientation="Horizontal" x:Name="stack" >
                     <StackPanel.Resources>
                         <loc:NegatingConverter x:Key="NegatingConverter" />
                         <Storyboard x:Key="slide">
@@ -38,21 +40,26 @@
                         <EventTrigger RoutedEvent="StackPanel.SizeChanged">
                             <BeginStoryboard Storyboard="{StaticResource slide}" />
                         </EventTrigger>
-                    </StackPanel.Triggers>
+                </StackPanel.Triggers>
                     <Canvas x:Name="canvas" Width="{Binding ActualWidth, ElementName=stack}">
-                        <TextBlock Text="{Binding Source={x:Static properties:Settings.Default}, Path=Text}" FontSize="25"  x:Name="txtKron" Canvas.Left="0" DataContext="{Binding RelativeSource={RelativeSource Self}}"/>
-                        <TextBlock Text="{Binding Text, ElementName=txtKron}" FontSize="25" Canvas.Left="{Binding Width, ElementName=canvas}"/>
+                        <TextBlock Text="{Binding Source={x:Static properties:Settings.Default}, Path=Text}" FontSize="{Binding Source={x:Static properties:Settings.Default},
+                               Path=HeaderFontSize}"  x:Name="txtKron" Canvas.Left="0" DataContext="{Binding RelativeSource={RelativeSource Self}}"/>
+                        <TextBlock Text="{Binding Text, ElementName=txtKron}" FontSize="{Binding Source={x:Static properties:Settings.Default},
+                               Path=HeaderFontSize}" Canvas.Left="{Binding Width, ElementName=canvas}"/>
                     </Canvas>
                 </StackPanel>
             </Border>
-            <Border Grid.Row="0" Grid.Column="2" BorderBrush="#FF00695B" Background="White" BorderThickness="0 0 0 4">
-                <Image Name="logo" Stretch="Uniform" Source="/KinectSpike;component/Resources/data_experts_4c_ohneTextzeile200x104.jpg" />
+            <Rectangle IsHitTestVisible="False" Fill="White" Grid.Column="2" Grid.Row="0" />
+            <Border Grid.Row="0" Grid.Column="2" BorderBrush="#FF00695B" BorderThickness="0 0 0 4">
+                <Border.Background>
+                    <ImageBrush ImageSource="Resources/data_experts_4c_ohneTextzeile200x104.jpg" Stretch="Uniform"/>
+                </Border.Background>
             </Border>
             <Grid Grid.Row="1" Grid.Column="1" Name="container">
                 <Image Margin="0,0,0,0" Name="image1" Stretch="Fill" />
             </Grid>
-            <Image Grid.Column="0" Grid.Row="1" Stretch="Uniform" Source="/KinectSpike;component/Resources/border.gif" />
-            <Image Grid.Column="2" Grid.Row="1" Stretch="Uniform" Source="/KinectSpike;component/Resources/border.gif" />
+            <Image Grid.Column="0" Grid.Row="1" Stretch="Uniform" Source="Resources/border.gif" />
+            <Image Grid.Column="2" Grid.Row="1" Stretch="Uniform" Source="Resources/border.gif" />
 
 
             <!--loc:KinectMenuItem Grid.ColumnSpan="3" x:Name="btn1" Width="200" Height="200" Margin="75,25,0,0" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" >
