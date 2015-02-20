@@ -7,13 +7,13 @@
         xmlns:k="clr-namespace:Microsoft.Kinect.Wpf.Controls;assembly=Microsoft.Kinect.Wpf.Controls">
     <!-- Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
     <k:KinectRegion x:Name="kinectRegion" Loaded="kinectRegion_Loaded">
-        <Grid Name="gridContainer">
+        <Grid Name="gridContainer" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
