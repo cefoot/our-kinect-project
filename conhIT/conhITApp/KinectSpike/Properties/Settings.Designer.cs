@@ -37,7 +37,7 @@ namespace De.DataExperts.conhITApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        [global::System.Configuration.DefaultSettingValueAttribute("35")]
         public double MenuFontSize {
             get {
                 return ((double)(this["MenuFontSize"]));
@@ -61,7 +61,7 @@ namespace De.DataExperts.conhITApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
         public double HeaderFontSize {
             get {
                 return ((double)(this["HeaderFontSize"]));

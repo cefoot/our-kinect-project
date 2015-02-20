@@ -42,7 +42,7 @@ namespace De.DataExperts.conhITApp
             items.ToList().ForEach(itm =>
             {
                 itm.Visibility = System.Windows.Visibility.Hidden;
-                itm.Background = new SolidColorBrush(Colors.Green) { Opacity = .25d };
+                //itm.Background = new SolidColorBrush(Colors.Green) { Opacity = .25d };
                 gridContainer.Children.Add(itm);
                 Grid.SetRowSpan(itm, 2);
                 Grid.SetColumnSpan(itm, 3);
@@ -190,6 +190,7 @@ namespace De.DataExperts.conhITApp
                     if (user == null)
                     {
                         items.ToList().ForEach(itm => itm.Visibility = System.Windows.Visibility.Hidden);
+                        ShowThinkbubble(skeletons, frame.RelativeTime);
                         return;
                     }
 
@@ -213,6 +214,30 @@ namespace De.DataExperts.conhITApp
 
                 }
 
+            }
+
+        }
+
+        Dictionary<ulong, TimeSpan> visileBdys = new Dictionary<ulong, TimeSpan>();
+
+        private void ShowThinkbubble(Body[] skeletons, TimeSpan time)
+        {
+            var user = from sk in skeletons
+                                where sk.IsTracked
+                                select sk;
+            foreach (var skelet in user)
+            {
+                if (visileBdys.ContainsKey(skelet.TrackingId))
+                {
+                    if ((time - visileBdys[skelet.TrackingId]).TotalMilliseconds > 1000)
+                    {
+                        Console.WriteLine("Lange Da");
+                    }
+                }
+                else
+                {
+                    visileBdys[skelet.TrackingId] = time;
+                }
             }
 
         }
