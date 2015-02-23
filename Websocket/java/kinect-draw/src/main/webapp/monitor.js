@@ -85,6 +85,9 @@ function handleKeyDown(event) {
 			speed = 1;
 		}
 		break;
+	case "C":
+		send('/datachannel/clear');
+		break;
 	}
 	// only set if changed
 	if (valChanged) {
@@ -93,6 +96,7 @@ function handleKeyDown(event) {
 }
 
 function handleMouseDown(event) {
+	hideMenu();
 	if (event.button == 0) // left button
 		mouseTracking = 0;
 	else if (event.button == 1)
@@ -131,6 +135,28 @@ function handleMouseMove(event) {
 
 }
 
+function showHelp(){
+	document.getElementById('tblHlp').style.display = 'block';
+}
+
+function hideMenu(){
+	document.getElementById('divContext').style.display = 'none';
+	document.getElementById('tblHlp').style.display = 'none';
+}
+
+function handleContextmenu(e){
+
+      // get mouse position relative to the canvas
+	  _divContext = document.getElementById("divContext");
+      _divContext.style.left = e.clientX + 'px';
+      _divContext.style.top = e.clientY + 'px';
+      _divContext.style.display = 'block';
+
+      // prevents the usual context from popping up
+      e.preventDefault()
+      return(false); 
+    }
+
 
 // --------------------------------------------------------------------------
 // Main function
@@ -144,6 +170,7 @@ function main() {
 	canvas = document.getElementById("canvas");
 	canvas.width = canvas.clientWidth;
 	canvas.height = canvas.clientHeight;
+	canvas.addEventListener('contextmenu', handleContextmenu, false);  
 
 	gl = WebGLUtils.setupWebGL(canvas, {
 		depth : true
