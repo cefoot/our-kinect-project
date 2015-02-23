@@ -86,7 +86,7 @@ function handleKeyDown(event) {
 		}
 		break;
 	case "C":
-		send('/datachannel/clear');
+		send('/datachannel/clear', '');
 		break;
 	}
 	// only set if changed
