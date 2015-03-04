@@ -54,16 +54,20 @@ namespace De.DataExperts.conhITApp
 
         private static KinectMenuItem LoadMenuItem(string[] data)
         {
-            var newItm = new KinectMenuItem { LabelText = data[0] };
-            try
+            var newItm = new KinectMenuItem { LabelText = data[0].Replace("\\n", Environment.NewLine) };
+            FileInfo file;
+            if ((file = new FileInfo(data[1])).Exists)
             {
-                var img = new BitmapImage(new Uri(data[1]));
-                newItm.Tag = img; 
-            }
-            catch (Exception)
-            {
-                //so it's a video file
-                newItm.Tag = new Uri(data[1]);
+                try
+                {
+                    var img = new BitmapImage(new Uri(file.FullName));
+                    newItm.Tag = img;
+                }
+                catch (Exception)
+                {
+                    //so it's a video file
+                    newItm.Tag = new Uri(file.FullName);
+                }
             }
             return newItm;
         }
@@ -209,7 +213,11 @@ namespace De.DataExperts.conhITApp
                         curAngle += singleAngle;
                         pnt.Offset(pos.X, pos.Y);
                         pnt.Offset(itm.ActualWidth / -2d, itm.ActualHeight / -2d);
-                        itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
+
+                        if (!double.IsNaN(pnt.X) && !double.IsNaN(pnt.Y))
+                        {
+                            itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
+                        }
                     });
 
                 }
