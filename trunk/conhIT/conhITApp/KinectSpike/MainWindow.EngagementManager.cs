@@ -56,20 +56,29 @@ namespace De.DataExperts.conhITApp
 
                     // we want the first body that is tracked and where the 2 joints I'm interested  
                     // in are tracked and where the hand is above the shoulder.  
-                    var first =
-                      this.bodies.FirstOrDefault(
-                        b => b.IsTracked
-                          && (this.trackingId == null 
-                            || b.TrackingId == this.trackingId)//wenn einer Aktiv, dann soll der es auch bleiben
-                          && AreTracked(b, JointType.HandRight, JointType.ShoulderRight)
-                          && VerticalDistance(b, JointType.HandRight, JointType.ElbowRight) >= 0.0d);
-
-                    // got one? check to see if we need to trigger engagement.  
-                    if (first != null)
+                    var engaging = false;
+                    foreach (var bdy in from curBdy in bodies where curBdy.IsTracked select curBdy)
                     {
-                        this.EnsureEngaged(first.TrackingId);
+                        if (AreTracked(bdy, JointType.HandRight, JointType.ShoulderRight)
+                                && VerticalDistance(bdy, JointType.HandRight, JointType.ShoulderRight) >= 0.0d)
+                        {
+                            EnsureEngaged(bdy.TrackingId, HandType.RIGHT);
+                            engaging = true;
+                            break;
+                        }
+                        else if (AreTracked(bdy, JointType.HandLeft, JointType.ShoulderLeft)
+                                && VerticalDistance(bdy, JointType.HandLeft, JointType.ShoulderLeft) >= 0.0d)
+                        {
+                            EnsureEngaged(bdy.TrackingId, HandType.LEFT);
+                            engaging = true;
+                        }
+                        if (engaging)
+                        {
+                            break;
+                        }
                     }
-                    else
+                    // got one? check to see if we need to trigger engagement.  
+                    if (!engaging)
                     {
                         // not got one? check to see if we need to clear engagement.  
                         this.EnsureNotEngaged();
@@ -77,7 +86,7 @@ namespace De.DataExperts.conhITApp
                 }
             }
         }
-        void EnsureEngaged(ulong trackingId)
+        void EnsureEngaged(ulong trackingId, HandType hand)
         {
             if (this.trackingId != trackingId)
             {
@@ -86,7 +95,7 @@ namespace De.DataExperts.conhITApp
                 this.changed = true;
 
                 KinectCoreWindow.SetKinectOnePersonManualEngagement(
-                  new BodyHandPair(trackingId, HandType.RIGHT));
+                  new BodyHandPair(trackingId, hand));
 
                 if (this.Engaged != null)
                 {

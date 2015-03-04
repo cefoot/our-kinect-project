@@ -109,7 +109,6 @@ namespace De.DataExperts.conhITApp
                                 skeletDataObject.HeadDistance = head.Position.Z;
 
                                 _skeletData[skeleton.TrackingId] = skeletDataObject;
-
                             }
                         }
                     }
@@ -142,6 +141,14 @@ namespace De.DataExperts.conhITApp
                     _imgs[heartKey].Visibility = System.Windows.Visibility.Visible;
                     var skeletDataObject = _skeletData[heartKey];
                     if (float.IsInfinity(skeletDataObject.heartWidth))
+                    {
+                        continue;
+                    }
+                    if (float.IsInfinity(skeletDataObject.HeartPosition.X))
+                    {
+                        continue;
+                    }
+                    if (float.IsInfinity(skeletDataObject.HeartPosition.Y))
                     {
                         continue;
                     }
