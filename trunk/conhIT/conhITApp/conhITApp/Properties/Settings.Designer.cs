@@ -25,13 +25,49 @@ namespace De.DataExperts.conhITApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Willkommen bei der conhIT!")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Hallo Welt")]
         public string Text {
             get {
                 return ((string)(this["Text"]));
             }
             set {
                 this["Text"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("35")]
+        public double MenuFontSize {
+            get {
+                return ((double)(this["MenuFontSize"]));
+            }
+            set {
+                this["MenuFontSize"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public double MenuRadius {
+            get {
+                return ((double)(this["MenuRadius"]));
+            }
+            set {
+                this["MenuRadius"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("70")]
+        public double HeaderFontSize {
+            get {
+                return ((double)(this["HeaderFontSize"]));
+            }
+            set {
+                this["HeaderFontSize"] = value;
             }
         }
     }

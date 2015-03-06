@@ -1,9 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="conhITApp.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="De.DataExperts.conhITApp.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="Text" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Willkommen bei der conhIT!</Value>
+      <Value Profile="(Default)">Hallo Welt</Value>
+    </Setting>
+    <Setting Name="MenuFontSize" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">35</Value>
+    </Setting>
+    <Setting Name="MenuRadius" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="HeaderFontSize" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">70</Value>
     </Setting>
   </Settings>
 </SettingsFile>
