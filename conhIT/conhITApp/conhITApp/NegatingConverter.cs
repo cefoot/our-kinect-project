@@ -18,7 +18,7 @@ using System.Windows.Data;
 
 namespace De.DataExperts.conhITApp
 {
-
+    [ValueConversion(typeof(double), typeof(double))]
     public class NegatingConverter : IValueConverter
     {
 
