@@ -42,6 +42,8 @@ namespace De.DataExperts.conhITApp
             kinect.ColorFrameSource.OpenReader().FrameArrived += Sensor_ColorFrameReady;
         }
 
+        private bool _debugging = false;
+
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -50,20 +52,29 @@ namespace De.DataExperts.conhITApp
                     MessageBox.Show("Folgende Hotkeys sind hinterlegt:\n\tF\tVollbild\n\tH\tHilfe\n\tESC\tSchließen", "Hilfe");
                     break;
                 case Key.X:
+                    _debugging = !_debugging;
+                    lblDbg.Visibility = _debugging ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                    break;
+                case Key.V:
+                    if (!_debugging) break;
                     //MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
                     StartVideo(new Uri(@"p:\telematik\expertConnect_v3.mp4"));
                     break;
                 case Key.Y:
+                    if (!_debugging) break;
                     //MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
                     ShowImage(new BitmapImage(new Uri(@"p:\Temp\cpapenfuss\conHIT\xout.GIF")));
                     break;
                 case Key.F:
                     WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
                     break;
+                case Key.M:
+                    if (!_debugging) break;
+                    ShowUserMenu(new System.Windows.Point(this.ActualWidth / 2d, this.ActualHeight / 2d), 200d);
+                    break;
                 case Key.Escape:
                     Application.Current.Shutdown();
                     break;
-
             }
         }
 
