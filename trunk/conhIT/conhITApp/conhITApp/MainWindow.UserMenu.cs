@@ -60,8 +60,18 @@ namespace De.DataExperts.conhITApp
 
         private static KinectMenuItem LoadMenuItem(string[] data)
         {
-            var newItm = new KinectMenuItem { LabelText = data[0].Replace("\\n", Environment.NewLine) };
+            var newItm = new KinectMenuItem();// { LabelText = data[0].Replace("\\n", Environment.NewLine) };
+            var lblCont = data[0].Replace("\\n", Environment.NewLine);
             FileInfo file;
+            if ((file = new FileInfo(lblCont)).Exists)
+            {
+                newItm.LabelImage = new BitmapImage(new Uri(lblCont));
+            }
+            else
+            {
+                newItm.LabelText = lblCont;
+            }
+
             if ((file = new FileInfo(data[1])).Exists)
             {
                 try
@@ -250,26 +260,32 @@ namespace De.DataExperts.conhITApp
                     {
                         return;
                     }
-                    var singleAngle = 360d / items.Count;
-                    var curAngle = 30d;
-                    items.ToList().ForEach(itm =>
-                    {
-                        itm.Visibility = System.Windows.Visibility.Visible;
-                        var pnt = curAngle.ComputeCartesianCoordinate(dist);
-                        curAngle += singleAngle;
-                        pnt.Offset(pos.X, pos.Y);
-                        pnt.Offset(itm.ActualWidth / -2d, itm.ActualHeight / -2d);
-
-                        if (!double.IsNaN(pnt.X) && !double.IsNaN(pnt.Y))
-                        {
-                            itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
-                        }
-                    });
+                    pos = ShowUserMenu(pos, dist);
 
                 }
 
             }
 
+        }
+
+        private Point ShowUserMenu(Point pos, double dist)
+        {
+            var singleAngle = 360d / items.Count;
+            var curAngle = 30d;
+            items.ToList().ForEach(itm =>
+            {
+                itm.Visibility = System.Windows.Visibility.Visible;
+                var pnt = curAngle.ComputeCartesianCoordinate(dist);
+                curAngle += singleAngle;
+                pnt.Offset(pos.X, pos.Y);
+                pnt.Offset(itm.ActualWidth / -2d, itm.ActualHeight / -2d);
+
+                if (!double.IsNaN(pnt.X) && !double.IsNaN(pnt.Y))
+                {
+                    itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
+                }
+            });
+            return pos;
         }
 
         Dictionary<ulong, TimeSpan> visileBdys = new Dictionary<ulong, TimeSpan>();

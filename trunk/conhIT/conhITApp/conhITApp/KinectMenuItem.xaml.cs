@@ -48,6 +48,24 @@ namespace De.DataExperts.conhITApp
             set
             {
                 txt.Content = value;
+                img.Visibility = System.Windows.Visibility.Hidden;
+            }
+        }
+
+        public ImageSource LabelImage
+        {
+            get
+            {
+                return img.Source;
+            }
+            set
+            {
+                img.Source = value;
+                var diameter = Math.Sqrt(img.Source.Width * img.Source.Width + img.Source.Height * img.Source.Height);
+                var horizontal = (diameter - img.Source.Width) / 2d;
+                var vertical = (diameter - img.Source.Height) / 2d;
+                img.Margin = new Thickness(horizontal, vertical, horizontal, vertical);//make circle fit image size
+                img.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
@@ -61,13 +79,13 @@ namespace De.DataExperts.conhITApp
             get { return false; }
         }
 
-        private bool ChangingSize { get; set; }
+        private bool _ChangingSize { get; set; }
 
         private void Ctrl_SizeChanged(object sender, SizeChangedEventArgs e)
         {//controls should always be square
-            if (ChangingSize)
+            if (_ChangingSize)
             {//guard
-                ChangingSize = false;
+                _ChangingSize = false;
                 return;
             }
             if (e.NewSize.IsEmpty)
@@ -76,12 +94,12 @@ namespace De.DataExperts.conhITApp
             }
             if (e.NewSize.Height > e.NewSize.Width)
             {
-                ChangingSize = true;
+                _ChangingSize = true;
                 Width = e.NewSize.Height;
             }
             else if (e.NewSize.Width > e.NewSize.Height)
             {
-                ChangingSize = true;
+                _ChangingSize = true;
                 Height = e.NewSize.Width;
             }
         }

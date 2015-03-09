@@ -22,7 +22,8 @@
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <Label  Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Content="Close" Name="txt" Foreground="White" FontSize="{Binding Source={x:Static p:Settings.Default},
+        <Label Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Name="txt" Foreground="White" FontSize="{Binding Source={x:Static p:Settings.Default},
                                Path=MenuFontSize}" Margin="0,0,0,11"  />
+        <Image Name="img" Stretch="None" Visibility="Hidden" />
     </Grid>
 </UserControl>
