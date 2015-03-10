@@ -36,5 +36,11 @@ namespace De.DataExperts.conhITApp
                 txt.Content = value;
             }
         }
+
+        private void Ctrl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            grd.Margin = new Thickness(0, -e.NewSize.Height, 0, e.NewSize.Height);
+        }
+        private static Action EmptyDelegate = delegate() { };
     }
 }

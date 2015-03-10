@@ -6,7 +6,7 @@
         Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing" KeyUp="Window_KeyUp" WindowStyle="None"
         xmlns:k="clr-namespace:Microsoft.Kinect.Wpf.Controls;assembly=Microsoft.Kinect.Wpf.Controls">
     <k:KinectRegion x:Name="kinectRegion" Loaded="kinectRegion_Loaded" >
-        <Grid Name="gridContainer" >
+        <Grid Name="gridContainer" ShowGridLines="False">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>

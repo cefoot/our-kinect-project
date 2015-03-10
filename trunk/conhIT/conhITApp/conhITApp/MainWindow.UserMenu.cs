@@ -31,7 +31,7 @@ namespace De.DataExperts.conhITApp
 
         void InitMenuItems()
         {
-            using (var fReader = File.OpenRead("MenuItems.txt"))
+            using (var fReader = (File.Exists("MenuItems.txt") ? File.OpenRead("MenuItems.txt") : File.OpenRead("MenuItems.txt.sample")))
             using (var reader = new StreamReader(fReader))
             {
                 string line;
@@ -42,7 +42,14 @@ namespace De.DataExperts.conhITApp
                         continue;
                     }
                     var data = line.Split(";".ToCharArray(), 2);
-                    items.Add(LoadMenuItem(data));
+                    try
+                    {
+                        items.Add(LoadMenuItem(data));
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(String.Format("Error Loading MenuItems line:{0}", line), e);
+                    }
                 }
             }
             items.ToList().ForEach(itm =>
@@ -63,11 +70,19 @@ namespace De.DataExperts.conhITApp
             var newItm = new KinectMenuItem();// { LabelText = data[0].Replace("\\n", Environment.NewLine) };
             var lblCont = data[0].Replace("\\n", Environment.NewLine);
             FileInfo file;
-            if ((file = new FileInfo(lblCont)).Exists)
+
+            try
             {
-                newItm.LabelImage = new BitmapImage(new Uri(lblCont));
+                if ((file = new FileInfo(lblCont)).Exists)
+                {
+                    newItm.LabelImage = new BitmapImage(new Uri(file.FullName));
+                }
+                else
+                {
+                    newItm.LabelText = lblCont;
+                }
             }
-            else
+            catch
             {
                 newItm.LabelText = lblCont;
             }
@@ -241,7 +256,7 @@ namespace De.DataExperts.conhITApp
                 if (frame != null)
                 {
                     var skeletons = new Body[frame.BodyCount];
-
+                    //TODO Menu bleibt stehen => vielleicht nicht so schön
                     frame.GetAndRefreshBodyData(skeletons);
                     var user = (from sk in skeletons
                                 where sk.TrackingId == this.curTrackedID
@@ -253,6 +268,10 @@ namespace De.DataExperts.conhITApp
                         ShowThinkbubble(skeletons, frame.RelativeTime);
                         return;
                     }
+                    else
+                    {
+                        HideThinkbubble(skeletons);
+                    }
 
                     var pos = user.Joints[JointType.SpineShoulder].Position.GetControlPoint(kinect, new Size(gridContainer.ActualWidth, gridContainer.ActualHeight));
                     var dist = (user.Joints[JointType.ShoulderLeft].Position.GetControlPoint(kinect, new Size(gridContainer.ActualWidth, gridContainer.ActualHeight)) - user.Joints[JointType.ShoulderRight].Position.GetControlPoint(kinect, new Size(gridContainer.ActualWidth, gridContainer.ActualHeight))).Length;
@@ -260,7 +279,7 @@ namespace De.DataExperts.conhITApp
                     {
                         return;
                     }
-                    pos = ShowUserMenu(pos, dist);
+                    ShowUserMenu(pos, dist);
 
                 }
 
@@ -268,7 +287,7 @@ namespace De.DataExperts.conhITApp
 
         }
 
-        private Point ShowUserMenu(Point pos, double dist)
+        private void ShowUserMenu(Point pos, double dist)
         {
             var singleAngle = 360d / items.Count;
             var curAngle = 30d;
@@ -285,31 +304,71 @@ namespace De.DataExperts.conhITApp
                     itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
                 }
             });
-            return pos;
         }
 
-        Dictionary<ulong, TimeSpan> visileBdys = new Dictionary<ulong, TimeSpan>();
+        private class VisibleBody
+        {
+            public TimeSpan StartTime { get; set; }
+            public ThinkBubble Bubble { get; set; }
+        }
+
+        Dictionary<ulong, VisibleBody> visileBdys = new Dictionary<ulong, VisibleBody>();
+
+        private void HideThinkbubble(Body[] skeletons)
+        {
+            visileBdys.Values.ToList().ForEach(bdy => gridContainer.Children.Remove(bdy.Bubble));
+            visileBdys.Clear();
+        }
 
         private void ShowThinkbubble(Body[] skeletons, TimeSpan time)
         {
-            var user = from sk in skeletons
+            var user = (from sk in skeletons
                        where sk.IsTracked
-                       select sk;
+                       select sk).ToList();
             foreach (var skelet in user)
             {
                 if (visileBdys.ContainsKey(skelet.TrackingId))
                 {
-                    if ((time - visileBdys[skelet.TrackingId]).TotalMilliseconds > 1000)
+                    if ((time - visileBdys[skelet.TrackingId].StartTime).TotalMilliseconds > 1000)
                     {
-                        Console.WriteLine("Lange Da");
+                        var pos = skelet.Joints[JointType.Head].Position.GetControlPoint(kinect, new Size(image1.ActualWidth, image1.ActualHeight));
+                        pos = image1.PointToScreen(pos);
+                        pos = gridContainer.PointFromScreen(pos);
+                        visileBdys[skelet.TrackingId].Bubble = ShowAndCreateThinkbubble(pos, visileBdys[skelet.TrackingId].Bubble);
                     }
                 }
                 else
                 {
-                    visileBdys[skelet.TrackingId] = time;
+                    var bdy = new VisibleBody();
+                    bdy.StartTime = time;
+                    visileBdys[skelet.TrackingId] = bdy;
                 }
             }
+            var goneUsers = (from vis in visileBdys
+                      where !user.Exists(usr=>usr.TrackingId == vis.Key)
+                      select vis).ToList();
+            foreach (var goneUser in goneUsers)
+            {
+                visileBdys.Remove(goneUser.Key);
+                gridContainer.Children.Remove(goneUser.Value.Bubble);
+            }
 
+        }
+
+        private ThinkBubble ShowAndCreateThinkbubble(Point pos, ThinkBubble thinkBubble)
+        {
+            if (thinkBubble == null)
+            {
+                thinkBubble = new ThinkBubble();
+                gridContainer.Children.Add(thinkBubble);
+                Grid.SetColumnSpan(thinkBubble, 3);
+                Grid.SetRowSpan(thinkBubble, 2);
+                thinkBubble.VerticalAlignment = VerticalAlignment.Top;
+                thinkBubble.HorizontalAlignment = HorizontalAlignment.Left;
+            }
+
+            thinkBubble.Margin = new Thickness(pos.X, pos.Y, 0, 0);
+            return thinkBubble;
         }
 
     }

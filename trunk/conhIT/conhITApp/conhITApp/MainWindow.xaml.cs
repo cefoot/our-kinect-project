@@ -44,6 +44,8 @@ namespace De.DataExperts.conhITApp
 
         private bool _debugging = false;
 
+        private ThinkBubble bubble;
+
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -67,6 +69,11 @@ namespace De.DataExperts.conhITApp
                     break;
                 case Key.F:
                     WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+                    break;
+                case Key.T:
+                    if (!_debugging) break;
+                    var pos = Mouse.GetPosition(gridContainer);
+                    bubble = ShowAndCreateThinkbubble(pos, bubble);
                     break;
                 case Key.M:
                     if (!_debugging) break;

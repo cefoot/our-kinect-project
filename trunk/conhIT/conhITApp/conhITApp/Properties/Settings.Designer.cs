@@ -70,5 +70,29 @@ namespace De.DataExperts.conhITApp.Properties {
                 this["HeaderFontSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Neugierig? Hebe die Hand.")]
+        public string BubbleText {
+            get {
+                return ((string)(this["BubbleText"]));
+            }
+            set {
+                this["BubbleText"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public double BubbleFontSize {
+            get {
+                return ((double)(this["BubbleFontSize"]));
+            }
+            set {
+                this["BubbleFontSize"] = value;
+            }
+        }
     }
 }

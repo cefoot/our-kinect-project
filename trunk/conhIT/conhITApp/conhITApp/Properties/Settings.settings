@@ -14,5 +14,11 @@
     <Setting Name="HeaderFontSize" Type="System.Double" Scope="User">
       <Value Profile="(Default)">70</Value>
     </Setting>
+    <Setting Name="BubbleText" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Neugierig? Hebe die Hand.</Value>
+    </Setting>
+    <Setting Name="BubbleFontSize" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
