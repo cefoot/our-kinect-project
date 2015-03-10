@@ -3,26 +3,55 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:props="clr-namespace:De.DataExperts.conhITApp.Properties"
              mc:Ignorable="d" 
-             d:DesignHeight="191" d:DesignWidth="229">
-    <Grid>
+             Opacity="1"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             SizeChanged="Ctrl_SizeChanged"
+             d:DesignHeight="137" d:DesignWidth="399">
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     Duration="00:00:08"
+                                                     From="0"
+                                                     To="1" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="FrameworkElement.Unloaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     Duration="00:00:08"
+                                                     From="1"
+                                                     To="0" />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </UserControl.Triggers>
+    <Grid Name="grd">
         <Grid.RowDefinitions>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="2.25*"/>
-            <RowDefinition Height="1.5*"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40px" MaxHeight="40" MinHeight="40"/>
+            <RowDefinition Height="30px" MaxHeight="30" MinHeight="30"/>
+            <RowDefinition Height="15px" MaxHeight="15" MinHeight="15"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="1.5*" />
-            <ColumnDefinition Width="2.25*"/>
-            <ColumnDefinition Width="10*" />
+            <ColumnDefinition Width="15px" MaxWidth="15" MinWidth="15" />
+            <ColumnDefinition Width="30px" MaxWidth="30" MinWidth="30" />
+            <ColumnDefinition Width="40px" MaxWidth="40" MinWidth="40" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Fill="#FF686868" Stroke="#FF000000" RadiusX="60" RadiusY="60"/>
-        <Label Name="txt" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="25" Content="Hello World"/>
-        <Ellipse Fill="#FF686868" Grid.Row="3" Grid.Column="0" Stroke="#FF000000" />
-        <Ellipse Fill="#FF686868" Grid.Row="2" Grid.Column="1" Stroke="#FF000000" />
-        <Ellipse Fill="#FF686868" Grid.Row="1" Grid.Column="2" Stroke="#FF000000" />
+        <Rectangle Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Fill="#FFC8C8C8" Stroke="#FF000000" RadiusX="60" RadiusY="60"/>
+        <Label Margin="10,0,10,0" Name="txt" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+               Content="{Binding Source={x:Static props:Settings.Default}, Path=BubbleText}"
+               FontSize="{Binding Source={x:Static props:Settings.Default}, Path=BubbleFontSize}"/>
+        <Ellipse Fill="#FF646464" Grid.Row="3" Grid.Column="0" Stroke="#FF000000" />
+        <Ellipse Fill="#FF8C8C8C" Grid.Row="2" Grid.Column="1" Stroke="#FF000000" />
+        <Ellipse Fill="#FFB4B4B4" Grid.Row="1" Grid.Column="2" Stroke="#FF000000" />
     </Grid>
 </UserControl>
