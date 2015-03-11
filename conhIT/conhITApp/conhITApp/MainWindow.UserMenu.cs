@@ -21,7 +21,7 @@ namespace De.DataExperts.conhITApp
 {
     public partial class MainWindow
     {
-        HashSet<KinectMenuItem> items = new HashSet<KinectMenuItem>();
+        List<KinectMenuItem> menuCtrls = new List<KinectMenuItem>();
 
         private List<FrameworkElement> imgCtrls = new List<FrameworkElement>();
 
@@ -44,7 +44,7 @@ namespace De.DataExperts.conhITApp
                     var data = line.Split(";".ToCharArray(), 2);
                     try
                     {
-                        items.Add(LoadMenuItem(data));
+                        menuCtrls.Add(LoadMenuItem(data));
                     }
                     catch (Exception e)
                     {
@@ -52,7 +52,7 @@ namespace De.DataExperts.conhITApp
                     }
                 }
             }
-            items.ToList().ForEach(itm =>
+            menuCtrls.ToList().ForEach(itm =>
             {
                 itm.Visibility = System.Windows.Visibility.Hidden;
                 //itm.Background = new SolidColorBrush(Colors.Green) { Opacity = .25d };
@@ -264,13 +264,19 @@ namespace De.DataExperts.conhITApp
                                 select sk).FirstOrDefault();
                     if (user == null)
                     {
-                        items.ToList().ForEach(itm => itm.Visibility = System.Windows.Visibility.Hidden);
+                        menuCtrls.ToList().ForEach(itm => itm.Visibility = System.Windows.Visibility.Hidden);
                         ShowThinkbubble(skeletons, frame.RelativeTime);
                         return;
                     }
                     else
                     {
                         HideThinkbubble(skeletons);
+                    }
+
+                    if (curUserInactive)
+                    {
+                        menuCtrls.ToList().ForEach(itm => itm.Visibility = System.Windows.Visibility.Hidden);
+                        return;
                     }
 
                     var pos = user.Joints[JointType.SpineShoulder].Position.GetControlPoint(kinect, new Size(gridContainer.ActualWidth, gridContainer.ActualHeight));
@@ -289,9 +295,9 @@ namespace De.DataExperts.conhITApp
 
         private void ShowUserMenu(Point pos, double dist)
         {
-            var singleAngle = 360d / items.Count;
+            var singleAngle = 360d / menuCtrls.Count;
             var curAngle = 30d;
-            items.ToList().ForEach(itm =>
+            menuCtrls.ToList().ForEach(itm =>
             {
                 itm.Visibility = System.Windows.Visibility.Visible;
                 var pnt = curAngle.ComputeCartesianCoordinate(dist);
@@ -299,7 +305,7 @@ namespace De.DataExperts.conhITApp
                 pnt.Offset(pos.X, pos.Y);
                 pnt.Offset(itm.ActualWidth / -2d, itm.ActualHeight / -2d);
 
-                if (!double.IsNaN(pnt.X) && !double.IsNaN(pnt.Y))
+                if (!double.IsNaN(pnt.X) && !double.IsNaN(pnt.Y) && !double.IsInfinity(pnt.X) && !double.IsInfinity(pnt.Y))
                 {
                     itm.Margin = new Thickness(pnt.X, pnt.Y, 0d, 0d);
                 }

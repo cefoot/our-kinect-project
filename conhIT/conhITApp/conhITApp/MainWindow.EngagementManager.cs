@@ -79,6 +79,7 @@ namespace De.DataExperts.conhITApp
                         }
                         if (bdy.TrackingId == curTrackedID)
                         {//wenn der Nutzer noch im Bild ist, dann ist der auch der eine!
+                            curUserInactive = true;//aber interessiert sich offenbar gerade nicht
                             break;
                         }
                     }
@@ -94,6 +95,7 @@ namespace De.DataExperts.conhITApp
         void EnsureEngaged(ulong trackingId, HandType hand)
         {
             userLastEngaged = DateTime.Now;
+            curUserInactive = false;
             if (this.curTrackedID != trackingId)
             {
                 this.curTrackedID = trackingId;
@@ -128,6 +130,7 @@ namespace De.DataExperts.conhITApp
 
         bool changed = false;
         ulong? curTrackedID;
+        bool curUserInactive;
         
         BodyFrameReader reader;
         Body[] bodies;
