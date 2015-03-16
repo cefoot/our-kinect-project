@@ -87,6 +87,13 @@ namespace De.DataExperts.conhITApp
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            Console.WriteLine(kinectRegion.CursorSpriteSheetDefinition.ImageUri);
+            kinectRegion.CursorSpriteSheetDefinition = new CursorSpriteSheetDefinition(
+                new Uri(@"pack://application:,,,/Resources/cursorspritesheet.png", UriKind.RelativeOrAbsolute),
+                kinectRegion.CursorSpriteSheetDefinition.Columns,
+                kinectRegion.CursorSpriteSheetDefinition.Rows,
+                kinectRegion.CursorSpriteSheetDefinition.SpriteWidth,
+                kinectRegion.CursorSpriteSheetDefinition.SpriteHeight);
             var bitmap = Properties.Resources.face;
             bitmap.MakeTransparent(System.Drawing.Color.Blue);
             _face = CreateBitmapSourceFromBitmap(bitmap);
@@ -132,21 +139,6 @@ namespace De.DataExperts.conhITApp
         {
             MessageBox.Show("btn1_MouseLeave");
         }
-
-        private void ThicknessAnimationUsingKeyFrames_Changed(object sender, EventArgs e)
-        {
-            Console.WriteLine("Changed");
-            if (marqueeLeft == null) return;
-            Console.WriteLine(marqueeLeft.Margin);
-        }
-
-        private void ThicknessAnimationUsingKeyFrames_Completed(object sender, EventArgs e)
-        {
-            Console.WriteLine("Completed");
-            if (marqueeLeft == null) return;
-            Console.WriteLine(marqueeLeft.Margin);
-        }
-
 
     }
 }
