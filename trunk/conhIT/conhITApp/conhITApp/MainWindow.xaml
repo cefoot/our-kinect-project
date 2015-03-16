@@ -16,51 +16,55 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock FontSize="{Binding Source={x:Static props:Settings.Default},
-                               Path=HeaderFontSize}"/>
-            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="#FF00695B" BorderThickness="0 0 2 4">
-                <StackPanel Orientation="Horizontal" x:Name="stack" >
-                    <StackPanel.Resources>
-                        <loc:NegatingConverter x:Key="NegatingConv" />
-                        <Storyboard x:Key="slide">
-                            <DoubleAnimation From="0" To="{Binding Width, ElementName=canvas, Converter={StaticResource NegatingConv}}" Duration="00:00:30"
-                          Storyboard.TargetProperty="X"
-                          Storyboard.TargetName="transferCurreny"
-                          RepeatBehavior="Forever"/>
-                        </Storyboard>
-                    </StackPanel.Resources>
-                    <StackPanel.RenderTransform>
-                        <TranslateTransform x:Name="transferCurreny" X="0"/>
-                    </StackPanel.RenderTransform>
-                    <StackPanel.Triggers>
-                        <EventTrigger RoutedEvent="StackPanel.Loaded">
-                            <BeginStoryboard Storyboard="{StaticResource slide}" />
-                        </EventTrigger>
-                        <EventTrigger RoutedEvent="StackPanel.SizeChanged">
-                            <BeginStoryboard Storyboard="{StaticResource slide}" />
-                        </EventTrigger>
-                </StackPanel.Triggers>
-                    <Canvas x:Name="canvas" Width="{Binding ActualWidth, ElementName=stack}">
-                        <TextBlock Text="{Binding Source={x:Static props:Settings.Default}, Path=Text}" FontSize="{Binding Source={x:Static props:Settings.Default},
-                               Path=HeaderFontSize}"  x:Name="txtKron" Canvas.Left="0" DataContext="{Binding RelativeSource={RelativeSource Self}}"/>
-                        <TextBlock Text="{Binding Text, ElementName=txtKron}" FontSize="{Binding Source={x:Static props:Settings.Default},
-                               Path=HeaderFontSize}" Canvas.Left="{Binding Width, ElementName=canvas}"/>
-                    </Canvas>
-                </StackPanel>
-            </Border>
-            <Rectangle IsHitTestVisible="False" Fill="White" Grid.Column="2" Grid.Row="0" />
-            <Border Grid.Row="0" Grid.Column="2" BorderBrush="#FF00695B" BorderThickness="0 0 0 4">
-                <Border.Background>
-                    <ImageBrush ImageSource="Resources/data_experts_4c_ohneTextzeile200x104.jpg" Stretch="Uniform"/>
-                </Border.Background>
-                <Label Name="lblDbg" Content="debugging" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="ExtraBold" Visibility="Hidden" />
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="#FF00695B" BorderThickness="0 0 0 4">
+                <Border.Resources>
+                    <loc:NegatingConverter x:Key="NegatingConv" />
+                    <Storyboard x:Key="slide">
+                        <DoubleAnimation
+                             Storyboard.TargetProperty="(Canvas.Left)"
+                             Storyboard.TargetName="stack"
+                             RepeatBehavior="Forever"
+                             Duration="00:00:10"
+                             From="0"
+                             To="{Binding ActualWidth, ElementName=gridContainer, Converter={StaticResource NegatingConv}}" />
+                    </Storyboard>
+                </Border.Resources>
+                <Border.Triggers>
+                    <EventTrigger RoutedEvent="Border.Loaded">
+                        <BeginStoryboard Storyboard="{StaticResource slide}" />
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="Border.SizeChanged">
+                        <BeginStoryboard Storyboard="{StaticResource slide}" />
+                    </EventTrigger>
+                </Border.Triggers>
+                <Canvas Name="canvas" Width="{Binding ActualWidth, ElementName=stack}" Height="{Binding ActualHeight,ElementName=txtKron,Mode=OneTime}">
+                    <StackPanel Canvas.Left="0" Orientation="Horizontal" x:Name="stack">
+                        <Grid Name="marqueeLeft" Width="{Binding ActualWidth, ElementName=gridContainer,Mode=OneWay}" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Source={x:Static props:Settings.Default}, Path=Text}" FontSize="{Binding Source={x:Static props:Settings.Default},
+                               Path=HeaderFontSize}"  x:Name="txtKron" DataContext="{Binding RelativeSource={RelativeSource Self}}" FontFamily="/conhITApp;component/Resources/fonts/#MetaOT"/>
+                            <Image Grid.Column="1" Source="/Resources/data_experts_4c_ohneTextzeile200x104.jpg" Margin="20,0,20,0" />
+                        </Grid>
+                        <Grid Width="{Binding ActualWidth, ElementName=gridContainer,Mode=OneWay}" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Text, ElementName=txtKron}" FontSize="{Binding Source={x:Static props:Settings.Default},
+                               Path=HeaderFontSize}"  FontFamily="/conhITApp;component/Resources/fonts/#MetaOT"/>
+                            <Image Grid.Column="1" Source="/Resources/data_experts_4c_ohneTextzeile200x104.jpg" Margin="20,0,20,0" />
+                        </Grid>
+                    </StackPanel>
+                </Canvas>
             </Border>
             <Grid Grid.Row="1" Grid.Column="1" Name="container">
                 <Image Margin="0,0,0,0" Name="image1" Stretch="Fill" />
             </Grid>
             <Image Grid.Column="0" Grid.Row="1" Stretch="Uniform" Source="Resources/border.gif" />
             <Image Grid.Column="2" Grid.Row="1" Stretch="Uniform" Source="Resources/border.gif" />
-
         </Grid>
     </k:KinectRegion>
 </Window>

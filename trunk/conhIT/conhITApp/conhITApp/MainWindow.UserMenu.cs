@@ -248,7 +248,6 @@ namespace De.DataExperts.conhITApp
             }
         }
 
-
         void Sensor_SkeletonFrameReady_UserMenu(object sender, BodyFrameArrivedEventArgs e)
         {
             using (var frame = e.FrameReference.AcquireFrame())
@@ -256,7 +255,6 @@ namespace De.DataExperts.conhITApp
                 if (frame != null)
                 {
                     var skeletons = new Body[frame.BodyCount];
-                    //TODO Menu bleibt stehen => vielleicht nicht so schön
                     frame.GetAndRefreshBodyData(skeletons);
                     var user = (from sk in skeletons
                                 where sk.TrackingId == this.curTrackedID

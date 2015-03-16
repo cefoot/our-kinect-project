@@ -35,7 +35,7 @@ namespace De.DataExperts.conhITApp
         {
             if (value is double)
             {
-                return +(double)value;
+                return -(double)value;
             }
             return value;
         }

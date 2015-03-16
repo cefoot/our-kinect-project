@@ -150,6 +150,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Resources\fonts\MetaOT-Bold.otf" />
+    <Resource Include="Resources\fonts\MetaOT-BoldItalic.otf" />
+    <Resource Include="Resources\fonts\MetaOT-Book.otf" />
+    <Resource Include="Resources\fonts\MetaOT-BookItalic.otf" />
     <Resource Include="Resources\gesture.agif" />
   </ItemGroup>
   <ItemGroup>
