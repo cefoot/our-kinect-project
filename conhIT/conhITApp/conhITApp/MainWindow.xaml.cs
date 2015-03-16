@@ -55,12 +55,12 @@ namespace De.DataExperts.conhITApp
                     break;
                 case Key.X:
                     _debugging = !_debugging;
-                    lblDbg.Visibility = _debugging ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+                    MessageBox.Show(String.Format("Debug-Schalter steht jetzt auf: '{0}'", _debugging));
                     break;
                 case Key.V:
                     if (!_debugging) break;
                     //MoveHeart(450f, 50f, 50f, 50f, CreateHeart());
-                    StartVideo(new Uri(@"p:\telematik\expertConnect_v3.mp4"));
+                    StartVideo(new Uri(@"p:\Messen\conhIT\2015\expertconnect_professor.mp4"));
                     break;
                 case Key.Y:
                     if (!_debugging) break;
@@ -131,6 +131,20 @@ namespace De.DataExperts.conhITApp
         private void btn1_MouseLeave(object sender, MouseEventArgs e)
         {
             MessageBox.Show("btn1_MouseLeave");
+        }
+
+        private void ThicknessAnimationUsingKeyFrames_Changed(object sender, EventArgs e)
+        {
+            Console.WriteLine("Changed");
+            if (marqueeLeft == null) return;
+            Console.WriteLine(marqueeLeft.Margin);
+        }
+
+        private void ThicknessAnimationUsingKeyFrames_Completed(object sender, EventArgs e)
+        {
+            Console.WriteLine("Completed");
+            if (marqueeLeft == null) return;
+            Console.WriteLine(marqueeLeft.Margin);
         }
 
 
