@@ -16,7 +16,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="#FF00695B" BorderThickness="0 0 0 4">
+            <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" BorderBrush="#FF00695B" BorderThickness="2 0 0 4">
                 <Border.Resources>
                     <loc:NegatingConverter x:Key="NegatingConv" />
                     <Storyboard x:Key="slide">
@@ -24,7 +24,7 @@
                              Storyboard.TargetProperty="(Canvas.Left)"
                              Storyboard.TargetName="stack"
                              RepeatBehavior="Forever"
-                             Duration="00:00:10"
+                             Duration="00:00:30"
                              From="0"
                              To="{Binding ActualWidth, ElementName=gridContainer, Converter={StaticResource NegatingConv}}" />
                     </Storyboard>
