@@ -92,11 +92,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColorConverter.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="KinectMenuItem.xaml.cs">
       <DependentUpon>KinectMenuItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.UserMenu.cs" />
+    <Compile Include="BrushConverter.cs" />
     <Compile Include="NegatingConverter.cs" />
     <Compile Include="ManipulatingController.cs" />
     <Compile Include="PressableController.cs" />

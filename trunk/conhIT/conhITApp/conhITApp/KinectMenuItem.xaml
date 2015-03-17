@@ -1,30 +1,36 @@
-﻿<UserControl x:Class="De.DataExperts.conhITApp.KinectMenuItem"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:p="clr-namespace:De.DataExperts.conhITApp.Properties"
+             xmlns:local="clr-namespace:De.DataExperts.conhITApp" x:Class="De.DataExperts.conhITApp.KinectMenuItem"
              mc:Ignorable="d" 
              SizeChanged="Ctrl_SizeChanged"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Name="backGrd">
+    <UserControl.Resources>
+        <local:BrushConverter x:Key="BrushConverter"/>
+    </UserControl.Resources>
+    <Grid x:Name="backGrd">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Ellipse Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="#FF073B4C"   >
+        <Ellipse x:Name="shape" Grid.Row="0" Grid.Column="0" StrokeThickness="4" Stroke="{Binding MenuStrokeColor, Source={x:Static p:Settings.Default}, Converter={StaticResource BrushConverter}}"   >
+            <Ellipse.Resources>
+                <local:ColorConverter x:Key="ColorConverter"/>
+            </Ellipse.Resources>
             <Ellipse.Fill>
                 <RadialGradientBrush>
-                    <GradientStop Color="#FF195D78" Offset="1"/>
-                    <GradientStop Color="#FF03425D" Offset="0.85"/>
+                    <GradientStop Color="{Binding MenuColor2, Source={x:Static p:Settings.Default}, Converter={StaticResource ColorConverter}}" Offset="1" />
+                    <GradientStop Color="{Binding MenuColor1, Source={x:Static p:Settings.Default}, Converter={StaticResource ColorConverter}}" Offset="0.85" />
                 </RadialGradientBrush>
             </Ellipse.Fill>
         </Ellipse>
-        <Label Grid.Row="0" Grid.Column="0" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Name="txt" Foreground="White" FontSize="{Binding Source={x:Static p:Settings.Default},
-                               Path=MenuFontSize}" Margin="0,0,0,11"
-               FontFamily="/conhITApp;component/Resources/fonts/#MetaOT"/>
-        <Image Name="img" Stretch="None" Visibility="Hidden" />
+        <Label Grid.Row="0" Grid.Column="0" TextBlock.TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" x:Name="txt" Foreground="White" FontSize="{Binding MenuFontSize, Source={x:Static p:Settings.Default}}" Margin="0,0,0,11"
+			FontFamily="/conhITApp;component/Resources/fonts/#MetaOT"/>
+        <Image x:Name="img" Stretch="None" Visibility="Hidden" />
     </Grid>
 </UserControl>
