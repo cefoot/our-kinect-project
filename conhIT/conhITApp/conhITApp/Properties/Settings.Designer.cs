@@ -94,5 +94,41 @@ namespace De.DataExperts.conhITApp.Properties {
                 this["BubbleFontSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 105, 91")]
+        public global::System.Drawing.Color MenuColor1 {
+            get {
+                return ((global::System.Drawing.Color)(this["MenuColor1"]));
+            }
+            set {
+                this["MenuColor1"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100, 205, 191")]
+        public global::System.Drawing.Color MenuColor2 {
+            get {
+                return ((global::System.Drawing.Color)(this["MenuColor2"]));
+            }
+            set {
+                this["MenuColor2"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50, 155, 141")]
+        public global::System.Drawing.Color MenuStrokeColor {
+            get {
+                return ((global::System.Drawing.Color)(this["MenuStrokeColor"]));
+            }
+            set {
+                this["MenuStrokeColor"] = value;
+            }
+        }
     }
 }

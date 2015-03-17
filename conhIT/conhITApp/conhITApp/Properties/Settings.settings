@@ -20,5 +20,14 @@
     <Setting Name="BubbleFontSize" Type="System.Double" Scope="User">
       <Value Profile="(Default)">20</Value>
     </Setting>
+    <Setting Name="MenuColor1" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">0, 105, 91</Value>
+    </Setting>
+    <Setting Name="MenuColor2" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">100, 205, 191</Value>
+    </Setting>
+    <Setting Name="MenuStrokeColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">50, 155, 141</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
