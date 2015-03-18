@@ -48,6 +48,7 @@ namespace De.DataExperts.conhITApp
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
+            var pos = Mouse.GetPosition(gridContainer);
             switch (e.Key)
             {
                 case Key.H:
@@ -72,8 +73,15 @@ namespace De.DataExperts.conhITApp
                     break;
                 case Key.T:
                     if (!_debugging) break;
-                    var pos = Mouse.GetPosition(gridContainer);
                     bubble = ShowAndCreateThinkbubble(pos, bubble);
+                    break;
+                case Key.D:
+                    if (!_debugging) break;
+                    helpBubble = ShowAndCreateThinkbubble(pos, helpBubble);
+                    break;
+                case Key.G:
+                    if (!_debugging) break;
+                    MoveGesture((float)pos.X, (float)pos.Y, 80f, 80f, CreateGesture());
                     break;
                 case Key.M:
                     if (!_debugging) break;
@@ -87,7 +95,6 @@ namespace De.DataExperts.conhITApp
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine(kinectRegion.CursorSpriteSheetDefinition.ImageUri);
             kinectRegion.CursorSpriteSheetDefinition = new CursorSpriteSheetDefinition(
                 new Uri(@"pack://application:,,,/Resources/cursorspritesheet.png", UriKind.RelativeOrAbsolute),
                 kinectRegion.CursorSpriteSheetDefinition.Columns,

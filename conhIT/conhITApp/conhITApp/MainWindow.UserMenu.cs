@@ -55,7 +55,6 @@ namespace De.DataExperts.conhITApp
             menuCtrls.ToList().ForEach(itm =>
             {
                 itm.Visibility = System.Windows.Visibility.Hidden;
-                //itm.Background = new SolidColorBrush(Colors.Green) { Opacity = .25d };
                 gridContainer.Children.Add(itm);
                 Grid.SetRowSpan(itm, 2);
                 Grid.SetColumnSpan(itm, 3);
@@ -65,9 +64,33 @@ namespace De.DataExperts.conhITApp
             });
         }
 
+        private Image CreateGesture()
+        {
+            var gestureImg = new Image();
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = new Uri(@"pack://application:,,,/Resources/Grap_Gesture.gif", UriKind.RelativeOrAbsolute);
+            image.EndInit();
+            ImageBehavior.SetAnimatedSource(gestureImg, image);
+            Grid.SetColumnSpan(gestureImg, 3);
+            Grid.SetRowSpan(gestureImg, 2);
+            gestureImg.VerticalAlignment = VerticalAlignment.Top;
+            gestureImg.HorizontalAlignment = HorizontalAlignment.Left;
+            gridContainer.Children.Add(gestureImg);
+            return gestureImg;
+        }
+
+        private void MoveGesture(float x, float y, float height, float width, Image gestureImg)
+        {
+            gestureImg.Width = width;
+            gestureImg.Height = height;
+            gestureImg.Margin = new Thickness(x, y, 0, 0);
+        }
+
         private static KinectMenuItem LoadMenuItem(string[] data)
         {
             var newItm = new KinectMenuItem();// { LabelText = data[0].Replace("\\n", Environment.NewLine) };
+            Panel.SetZIndex(newItm, 1);//über dem Rest
             var lblCont = data[0].Replace("\\n", Environment.NewLine);
             FileInfo file;
 
@@ -106,6 +129,12 @@ namespace De.DataExperts.conhITApp
         void MenuItm_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var itm = sender as KinectMenuItem;
+            userExperienced = true;//er hat ein Menupunkt geklickt
+            menuCtrls.ToList().ForEach(cItm =>
+            {
+                cItm.IsForceHide = true;
+                cItm.Visibility = System.Windows.Visibility.Hidden;
+            });
             if (itm.Tag is Uri)
             {
                 StartVideo(itm.Tag as Uri);
@@ -124,6 +153,11 @@ namespace De.DataExperts.conhITApp
                 element.Stretch = Stretch.Uniform;
                 KinectMenuItem newItm = new KinectMenuItem { LabelText = "Close" };
                 newItm.MouseDoubleClick += (send, args) => HideImage();
+                newItm.MouseDoubleClick += (send, args) => menuCtrls.ToList().ForEach(cItm =>
+                {
+                    cItm.IsForceHide = false;
+                    cItm.Visibility = System.Windows.Visibility.Visible;
+                });
                 Grid.SetColumnSpan(element, 3);
                 Grid.SetRowSpan(element, 2);
                 element.Margin = new Thickness(0);
@@ -175,6 +209,11 @@ namespace De.DataExperts.conhITApp
                 };
                 element.MediaEnded += (send, args) =>
                 {
+                    menuCtrls.ToList().ForEach(cItm =>
+                    {
+                        cItm.IsForceHide = false;
+                        cItm.Visibility = System.Windows.Visibility.Visible;
+                    });
                     StopVideo();
                 };
                 Grid.SetColumnSpan(element, 3);
@@ -183,6 +222,11 @@ namespace De.DataExperts.conhITApp
                 vidCtrls.Add(element);
                 //Close Btn
                 KinectMenuItem newItm = new KinectMenuItem { LabelText = "Close" };
+                newItm.MouseDoubleClick += (send, args) => menuCtrls.ToList().ForEach(cItm =>
+                {
+                    cItm.IsForceHide = false;
+                    cItm.Visibility = System.Windows.Visibility.Visible;
+                });
                 newItm.MouseDoubleClick += (send, args) => StopVideo();
                 Grid.SetColumnSpan(newItm, 3);
                 Grid.SetRowSpan(newItm, 2);
@@ -271,6 +315,15 @@ namespace De.DataExperts.conhITApp
                         HideThinkbubble(skeletons);
                     }
 
+                    if (!userExperienced && (DateTime.Now - userFirstEngaged).TotalSeconds > Properties.Settings.Default.Seconds2Wait_HelpGrab)
+                    {
+                        ShowHelpBubble(user);
+                    }
+                    else
+                    {
+                        HideHelpBubble();
+                    }
+
                     if (curUserInactive)
                     {
                         menuCtrls.ToList().ForEach(itm => itm.Visibility = System.Windows.Visibility.Hidden);
@@ -327,13 +380,13 @@ namespace De.DataExperts.conhITApp
         private void ShowThinkbubble(Body[] skeletons, TimeSpan time)
         {
             var user = (from sk in skeletons
-                       where sk.IsTracked
-                       select sk).ToList();
+                        where sk.IsTracked
+                        select sk).ToList();
             foreach (var skelet in user)
             {
                 if (visileBdys.ContainsKey(skelet.TrackingId))
                 {
-                    if ((time - visileBdys[skelet.TrackingId].StartTime).TotalMilliseconds > 1000)
+                    if ((time - visileBdys[skelet.TrackingId].StartTime).TotalSeconds > Properties.Settings.Default.Seconds2Wait_HelpActivate)
                     {
                         var pos = skelet.Joints[JointType.Head].Position.GetControlPoint(kinect, new Size(image1.ActualWidth, image1.ActualHeight));
                         pos = image1.PointToScreen(pos);
@@ -349,8 +402,8 @@ namespace De.DataExperts.conhITApp
                 }
             }
             var goneUsers = (from vis in visileBdys
-                      where !user.Exists(usr=>usr.TrackingId == vis.Key)
-                      select vis).ToList();
+                             where !user.Exists(usr => usr.TrackingId == vis.Key)
+                             select vis).ToList();
             foreach (var goneUser in goneUsers)
             {
                 visileBdys.Remove(goneUser.Key);
@@ -359,11 +412,29 @@ namespace De.DataExperts.conhITApp
 
         }
 
-        private ThinkBubble ShowAndCreateThinkbubble(Point pos, ThinkBubble thinkBubble)
+        private HelpThinkBubble helpBubble;
+
+        private void HideHelpBubble()
+        {
+            if (helpBubble == null) return;
+            helpBubble.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private void ShowHelpBubble(Body user)
+        {
+            var pos = user.Joints[JointType.Head].Position.GetControlPoint(kinect, new Size(image1.ActualWidth, image1.ActualHeight));
+            pos = image1.PointToScreen(pos);
+            pos = gridContainer.PointFromScreen(pos);
+            helpBubble = ShowAndCreateThinkbubble(pos, helpBubble);
+            helpBubble.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private T ShowAndCreateThinkbubble<T>(Point pos, T thinkBubble)
+           where T : FrameworkElement
         {
             if (thinkBubble == null)
             {
-                thinkBubble = new ThinkBubble();
+                thinkBubble = Activator.CreateInstance<T>();
                 gridContainer.Children.Add(thinkBubble);
                 Grid.SetColumnSpan(thinkBubble, 3);
                 Grid.SetRowSpan(thinkBubble, 2);

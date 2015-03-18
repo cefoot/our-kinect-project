@@ -103,6 +103,9 @@
     <Compile Include="ManipulatingController.cs" />
     <Compile Include="PressableController.cs" />
     <Compile Include="SkeletData.cs" />
+    <Compile Include="HelpThinkBubble.xaml.cs">
+      <DependentUpon>HelpThinkBubble.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ThinkBubble.xaml.cs">
       <DependentUpon>ThinkBubble.xaml</DependentUpon>
     </Compile>
@@ -122,6 +125,10 @@
     <Page Include="KinectMenuItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HelpThinkBubble.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ThinkBubble.xaml">
       <SubType>Designer</SubType>
@@ -189,6 +196,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\cursorspritesheet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Grab_Gesture.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hand.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
