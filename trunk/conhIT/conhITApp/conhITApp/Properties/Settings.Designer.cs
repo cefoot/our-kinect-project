@@ -130,5 +130,29 @@ namespace De.DataExperts.conhITApp.Properties {
                 this["MenuStrokeColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int Seconds2Wait_HelpGrab {
+            get {
+                return ((int)(this["Seconds2Wait_HelpGrab"]));
+            }
+            set {
+                this["Seconds2Wait_HelpGrab"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int Seconds2Wait_HelpActivate {
+            get {
+                return ((int)(this["Seconds2Wait_HelpActivate"]));
+            }
+            set {
+                this["Seconds2Wait_HelpActivate"] = value;
+            }
+        }
     }
 }

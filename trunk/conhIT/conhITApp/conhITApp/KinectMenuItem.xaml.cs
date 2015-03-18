@@ -39,6 +39,23 @@ namespace De.DataExperts.conhITApp
             RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left) { RoutedEvent = Label.MouseDoubleClickEvent });
         }
 
+        public bool IsForceHide { get; set; }
+
+        public new Visibility Visibility
+        {
+            get
+            {
+                return base.Visibility;
+            }
+            set
+            {
+                if (value == System.Windows.Visibility.Hidden || !IsForceHide)
+                {
+                    base.Visibility = value;
+                }
+            }
+        }
+
         public String LabelText
         {
             get
@@ -92,7 +109,7 @@ namespace De.DataExperts.conhITApp
             {
                 return;
             }
-            if (e.NewSize.Height > e.NewSize.Width)
+            if (e.NewSize.Height >= e.NewSize.Width)
             {
                 _ChangingSize = true;
                 Width = e.NewSize.Height;

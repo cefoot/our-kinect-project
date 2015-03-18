@@ -29,5 +29,11 @@
     <Setting Name="MenuStrokeColor" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">50, 155, 141</Value>
     </Setting>
+    <Setting Name="Seconds2Wait_HelpGrab" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="Seconds2Wait_HelpActivate" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

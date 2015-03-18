@@ -46,7 +46,20 @@ namespace De.DataExperts.conhITApp
             return (body.Joints[jointOne].Position.Y - body.Joints[jointTwo].Position.Y);
         }
 
+        /// <summary>
+        /// time when user last activated menu
+        /// </summary>
         DateTime userLastEngaged = DateTime.Now;
+
+        /// <summary>
+        /// time when user activated menu first
+        /// </summary>
+        DateTime userFirstEngaged = DateTime.Now;
+
+        /// <summary>
+        /// User ever clicked an menuitem
+        /// </summary>
+        Boolean userExperienced = false;
 
         void OnFrameArrived(Object sender, BodyFrameArrivedEventArgs args)
         {
@@ -92,12 +105,15 @@ namespace De.DataExperts.conhITApp
                 }
             }
         }
+
         void EnsureEngaged(ulong trackingId, HandType hand)
         {
             userLastEngaged = DateTime.Now;
             curUserInactive = false;
             if (this.curTrackedID != trackingId)
             {
+                userFirstEngaged = DateTime.Now;
+                userExperienced = false;
                 this.curTrackedID = trackingId;
 
                 this.changed = true;
