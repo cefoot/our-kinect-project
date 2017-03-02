@@ -38,7 +38,7 @@ function imgRecieved(msg){
     image.src = msg;
 }
 
-function gotSources(sourceInfos) {
+/*function gotSources(sourceInfos) {
 	var vId;
 	for (var i = 0; i != sourceInfos.length; ++i) {
 		var sourceInfo = sourceInfos[i];
@@ -54,7 +54,7 @@ function gotSources(sourceInfos) {
 		return;
 	}
 	// Grab elements, create settings, etc.
-	var video = document.getElementById("video"), videoObj = {
+	var video = document.getElementById("videoel"), videoObj = {
 		"video" : {
 			optional : [ {
 				sourceId : vId
@@ -85,7 +85,7 @@ function gotSources(sourceInfos) {
 	//	var data = videoCanvas.toDataURL('image/jpeg', 1.0);
 	//	send('/cam/img', data);
 	//}, 250);
-}
+}*/
 
 function initScreenListener() {
 	register('/cam/img', imgRecieved);
@@ -116,10 +116,33 @@ function initCam() {
 		//dann eben nicht-> keine kamera hier
 		return;
 	}
-	if (typeof MediaStreamTrack === 'undefined') {
+	var vid = document.getElementById('videoel');
+	navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+	window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL;
+	if (!navigator.getUserMedia) {
 		alert('This browser does not support MediaStreamTrack.\n\nTry Chrome Canary.');
 	} else {
-		MediaStreamTrack.getSources(gotSources);
+		var videoSelector = {video : true};
+					if (window.navigator.appVersion.match(/Chrome\/(.*?) /)) {
+						var chromeVersion = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+						if (chromeVersion < 20) {
+							videoSelector = "video";
+						}
+					};
+				
+					navigator.getUserMedia(videoSelector, function( stream ) {
+						if (vid.mozCaptureStream) {
+							vid.mozSrcObject = stream;
+						} else {
+							vid.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+						}
+						vid.play();
+					}, function() {
+						insertAltVideo(vid);
+						document.getElementById('gum').className = "hide";
+						document.getElementById('nogum').className = "nohide";
+						alert("There was some problem trying to fetch video from your webcam, using a fallback video instead.");
+					});
 	}
 }
 
